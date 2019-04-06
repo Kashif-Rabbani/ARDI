@@ -171,17 +171,17 @@ app.get('/admin/demoPrepare', admin_routes.demoPrepare);
 /*****************************************************************************************/
 
 app.get('/', checkAuthenticated, function(req,res) {
-    res.render('index', {user:req.session.passport.user});
+    res.render('bdi_index', {user:req.session.passport.user});
 });
 
 app.get('/login', function (req, res) {
     res.setHeader('Last-Modified', (new Date()).toUTCString());
-    res.render('login', {message: req.flash('error')});
+    res.render('bdi_login', {message: req.flash('error')});
 });
 
 app.get('/registration', function(req, res) {
     res.setHeader('Last-Modified', (new Date()).toUTCString());
-    res.render('register_user');
+    res.render('bdi_register_user');
 });
 
 /********** Global graph section ***************************************************************/

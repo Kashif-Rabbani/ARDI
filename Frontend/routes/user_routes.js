@@ -20,7 +20,7 @@ exports.postUser = function (req, res, next) {
             bcrypt.hash(user_object.password, salt, function(err, hash) {
                 user_object.password = hash;
                 request.post({
-                    url: config.METADATA_DATA_LAYER_URL + "users",
+                    url: config.BDI_DATA_LAYER_URL + "users",
                     body: JSON.stringify(req.body)
                 }, function (error, response, body) {
                     console.log(error + " - " + response + " - " + body);
