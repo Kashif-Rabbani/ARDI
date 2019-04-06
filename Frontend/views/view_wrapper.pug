@@ -1,0 +1,92 @@
+extends layout
+block headers
+    link(rel='stylesheet', href='/stylesheets/loading.css')
+    script(src='/js/client_view_wrapper.js')
+    link(rel='stylesheet', href='/stylesheets/highlight.js/default.min.css')
+    script(src='/js/highlight.js/highlight.min.js')
+
+block content
+
+    .container-fluid
+        .card.bg-secondary.mb-3
+            .card-header
+                .row
+                    .col-md-11
+                        h2(style="color:black")
+                            | New Wrapper
+                    .col-md-1
+                        button.btn.btn-link(data-toggle="collapse" data-target="#instructions")#instructionsButton
+                            i.fas.fa-chevron-circle-down.fa-3x(style="color:black")
+            #instructions.collapse(aria-labelledby="headingOne" data-parent="#accordion")
+                .card-body
+                    p.card-text(style='text-align: left')
+                        | New wrappers are introduced either because we want to consider data from a new data source, or because the schema of an existing source has evolved. Nevertheless, in both cases the procedure to incorporate them to the source level, whose elements are prefixed with S, is the same. Data stewards must provide the definition of the wrapper, as well as its signature. We work under the assumption that wrappers provide a flat structure in first normal form, thus the signature is an expression of the form w(a1 , ... , an ) where w is the wrapper name and a1, ..., an the set of attributes. With such information, MDM extracts the RDF-based representation of the wrapper’s schema (i.e., creates elements of type S:Attribute) which are incorporated to the existing source level.
+
+        .card.bg-secondary.mb-3
+            form#wrapperForm
+                            .form-group#idForm
+                                label.col-lg-4.col-form-label ID
+                                .col-lg-12
+                                    input#id.form-control(type='text', name='id', required='required', readonly="")
+
+                            .form-group#iriForm
+                                label.col-lg-4.col-form-label IRI
+                                .col-lg-12
+                                    input#iri.form-control(type='text', name='iri', required='required', readonly="")
+
+                            .form-group#nameForm
+                                label.col-lg-4.col-form-label Name
+                                .col-lg-12
+                                    input#name.form-control(type='text', name='name', required='required', readonly="")
+
+                            .form-group#dataSourceForm
+                                label.col-lg-4.col-form-label Data Source
+                                .col-lg-12
+                                    input#dataSource.form-control(type='text', name='dataSource', required='required', readonly="")
+
+                            .form-group
+                                label.col-lg-4.col-form-label Attributes
+                                .col-lg-12#controls
+                                            //form(role="form" autocomplete="off")
+                                                //.entry.input-group.col-xs-3
+                                                    //.input-group-prepend
+                                                        .input-group-text
+                                                            input(type="checkbox" name="idSet[]")
+                                                            | &nbsp;ID
+                                                    input.form-control(name="attributeSet[]" type="text" placeholder="")
+
+                            .form-group#cypherQueryForm(style="display:none")
+                                label.col-lg-8.col-form-label Cypher query
+                                .col-lg-12
+                                    form(role="form" autocomplete="off")
+                                        .entry.input-group.col-xs-3
+                                            input#cypherQuery.form-control(type='text', name='cypherQuery', required='required', readonly="")
+
+                            .form-group#fileseparatorForm(style="display:none")
+                                label.col-lg-8.col-form-label File separator
+                                .col-lg-12
+                                    form(role="form" autocomplete="off")
+                                        .entry.input-group.col-xs-3
+                                            input#fileseparator.form-control(type='text', name='fileseparator', required='required', readonly="")
+
+                            .form-group#sparksqlQueryForm(style="display:none")
+                                label.col-lg-8.col-form-label SparkSQL query (use data source name as table)
+                                .col-lg-12
+                                    form(role="form" autocomplete="off")
+                                        .entry.input-group.col-xs-3
+                                            input#sparksqlQuery.form-control(type='text', name='sparksqlQuery', required='required', readonly="")
+
+                            .form-group#mongodbQueryForm(style="display:none")
+                                label.col-lg-8.col-form-label MongoDB Query (MUPGL queries)
+                                .col-lg-12
+                                    input#mongodbQuery.form-control(type='text', name='mongodbQuery', required='required', readonly="")
+
+                            .form-group#restapiQueryForm(style="display:none")
+                                label.col-lg-8.col-form-label REST API Parameters (path or query string)
+                                .col-lg-12
+                                    input#restapiQuery.form-control(type='text', name='restapiQuery', required='required', readonly="")
+
+                            .form-group#sqlQueryForm(style="display:none")
+                                label.col-lg-8.col-form-label SQL Query
+                                .col-lg-12
+                                    input#sqlQuery.form-control(type='text', name='sqlQuery', required='required', readonly="")

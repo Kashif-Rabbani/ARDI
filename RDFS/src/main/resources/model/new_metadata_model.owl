@@ -1,0 +1,228 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://www.BDIOntology.com/source#"
+     xml:base="http://www.BDIOntology.com/source"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <owl:Ontology rdf:about="http://www.BDIOntology.com/source"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.BDIOntology.com/source#hasArray -->
+
+    <owl:ObjectProperty rdf:about="http://www.BDIOntology.com/source#hasArray">
+        <rdfs:subPropertyOf rdf:resource="http://www.BDIOntology.com/source#hasCollection"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.BDIOntology.com/source#hasAttribute -->
+
+    <owl:ObjectProperty rdf:about="http://www.BDIOntology.com/source#hasAttribute">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.BDIOntology.com/source#AbstractObject"/>
+        <rdfs:domain rdf:resource="http://www.BDIOntology.com/source#CollectionElement"/>
+        <rdfs:range rdf:resource="http://www.BDIOntology.com/source#Attribute"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.BDIOntology.com/source#hasCollection -->
+
+    <owl:ObjectProperty rdf:about="http://www.BDIOntology.com/source#hasCollection">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.BDIOntology.com/source#AbstractObject"/>
+        <rdfs:domain rdf:resource="http://www.BDIOntology.com/source#CollectionElement"/>
+        <rdfs:range rdf:resource="http://www.BDIOntology.com/source#Collection"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.BDIOntology.com/source#hasDataType -->
+
+    <owl:ObjectProperty rdf:about="http://www.BDIOntology.com/source#hasDataType">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.BDIOntology.com/source#Attribute"/>
+        <rdfs:domain rdf:resource="http://www.BDIOntology.com/source#CollectionElement"/>
+        <rdfs:range rdf:resource="http://www.BDIOntology.com/source#DataType"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.BDIOntology.com/source#hasElement -->
+
+    <owl:ObjectProperty rdf:about="http://www.BDIOntology.com/source#hasElement">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.BDIOntology.com/source#Collection"/>
+        <rdfs:range rdf:resource="http://www.BDIOntology.com/source#CollectionElement"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.BDIOntology.com/source#hasEmbeddedObject -->
+
+    <owl:ObjectProperty rdf:about="http://www.BDIOntology.com/source#hasEmbeddedObject">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.BDIOntology.com/source#CollectionElement"/>
+        <rdfs:domain rdf:resource="http://www.BDIOntology.com/source#Object"/>
+        <rdfs:domain rdf:resource="http://www.BDIOntology.com/source#RootObject"/>
+        <rdfs:range rdf:resource="http://www.BDIOntology.com/source#Object"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.BDIOntology.com/source#hasLiteral -->
+
+    <owl:ObjectProperty rdf:about="http://www.BDIOntology.com/source#hasLiteral">
+        <rdfs:subPropertyOf rdf:resource="http://www.BDIOntology.com/source#hasDataType"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.BDIOntology.com/source#hasNumber -->
+
+    <owl:ObjectProperty rdf:about="http://www.BDIOntology.com/source#hasNumber">
+        <rdfs:subPropertyOf rdf:resource="http://www.BDIOntology.com/source#hasDataType"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.BDIOntology.com/source#hasReferencedObject -->
+
+    <owl:ObjectProperty rdf:about="http://www.BDIOntology.com/source#hasReferencedObject">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.BDIOntology.com/source#Object"/>
+        <rdfs:range rdf:resource="http://www.BDIOntology.com/source#Object"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.BDIOntology.com/source#hasSet -->
+
+    <owl:ObjectProperty rdf:about="http://www.BDIOntology.com/source#hasSet">
+        <rdfs:subPropertyOf rdf:resource="http://www.BDIOntology.com/source#hasCollection"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.BDIOntology.com/source#hasString -->
+
+    <owl:ObjectProperty rdf:about="http://www.BDIOntology.com/source#hasString">
+        <rdfs:subPropertyOf rdf:resource="http://www.BDIOntology.com/source#hasDataType"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.BDIOntology.com/source#AbstractObject -->
+
+    <owl:Class rdf:about="http://www.BDIOntology.com/source#AbstractObject"/>
+    
+
+
+    <!-- http://www.BDIOntology.com/source#Array -->
+
+    <owl:Class rdf:about="http://www.BDIOntology.com/source#Array">
+        <rdfs:subClassOf rdf:resource="http://www.BDIOntology.com/source#Collection"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.BDIOntology.com/source#Attribute -->
+
+    <owl:Class rdf:about="http://www.BDIOntology.com/source#Attribute"/>
+    
+
+
+    <!-- http://www.BDIOntology.com/source#Collection -->
+
+    <owl:Class rdf:about="http://www.BDIOntology.com/source#Collection"/>
+    
+
+
+    <!-- http://www.BDIOntology.com/source#CollectionElement -->
+
+    <owl:Class rdf:about="http://www.BDIOntology.com/source#CollectionElement"/>
+    
+
+
+    <!-- http://www.BDIOntology.com/source#DataType -->
+
+    <owl:Class rdf:about="http://www.BDIOntology.com/source#DataType"/>
+    
+
+
+    <!-- http://www.BDIOntology.com/source#Literal -->
+
+    <owl:Class rdf:about="http://www.BDIOntology.com/source#Literal">
+        <rdfs:subClassOf rdf:resource="http://www.BDIOntology.com/source#DataType"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.BDIOntology.com/source#Number -->
+
+    <owl:Class rdf:about="http://www.BDIOntology.com/source#Number">
+        <rdfs:subClassOf rdf:resource="http://www.BDIOntology.com/source#DataType"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.BDIOntology.com/source#Object -->
+
+    <owl:Class rdf:about="http://www.BDIOntology.com/source#Object">
+        <rdfs:subClassOf rdf:resource="http://www.BDIOntology.com/source#AbstractObject"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.BDIOntology.com/source#RootObject -->
+
+    <owl:Class rdf:about="http://www.BDIOntology.com/source#RootObject">
+        <rdfs:subClassOf rdf:resource="http://www.BDIOntology.com/source#AbstractObject"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.BDIOntology.com/source#Set -->
+
+    <owl:Class rdf:about="http://www.BDIOntology.com/source#Set">
+        <rdfs:subClassOf rdf:resource="http://www.BDIOntology.com/source#Collection"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.BDIOntology.com/source#String -->
+
+    <owl:Class rdf:about="http://www.BDIOntology.com/source#String">
+        <rdfs:subClassOf rdf:resource="http://www.BDIOntology.com/source#DataType"/>
+    </owl:Class>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.2.8.20170104-2310) https://github.com/owlcs/owlapi -->
+

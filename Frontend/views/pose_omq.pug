@@ -1,0 +1,77 @@
+extends layout
+block headers
+    link(rel='stylesheet', href='/stylesheets/global_graph.css')
+    script(src="/js/d3.v4.min.js")
+    //script(src='/js/d3.min.js')
+    //script(src='/js/cola.d3.min.js')
+    script(src='/js/client_pose_omq.js')
+    script(src='/js/client_pose_omq_d3.js')
+    link(href='/js/select2-4.0.3/dist/css/select2.min.css', rel='stylesheet', type='text/css')
+    script(src='/js/select2-4.0.3/dist/js/select2.min.js')
+    link(rel='stylesheet', href='/stylesheets/select2-bootstrap.min.css')
+
+    link(rel='stylesheet', href='/js/highlight/styles/railscasts.css')
+    script(src='/js/highlight/highlight.pack.js')
+
+block content
+
+    .container-fluid
+        .banner
+            .row.align-middle
+                .col-md-5.align-middle
+                    h2 Pose Ontology-Mediated Query
+                .col-md-5
+                    .row
+                        .col-md-3
+                            h4 Global Graph
+                        .col-md-9
+                            select#globalGraph.form-control(type='text', name='globalGraph', required='required')
+                .col-md-2
+                    button#clearQueryButton.btn.btn-primary.btn-lg.btn-block(type='submit') Clear Query
+
+        .row
+            .col-md-7
+                svg(width="100%", height=600)#globalGraphSVG
+            .col-md-5
+                .form-group#projectedFeaturesForm
+                    label.col-lg-4.col-form-label Projected Features
+                    select#projectedFeatures.form-control(type='text', name='projectedFeatures[]', multiple="multiple")
+                .form-group#generateSPARQLForm
+                    .row
+                        .col-md-3
+                        .col-md-6
+                            button#generateSparqlButton.btn.btn-primary.btn-lg.btn-block(type='submit') Generate SPARQL
+                        .col-md-3
+
+                .form-group#sparqlAreaForm
+                    //pre#text
+                        code.sql#sparqlArea
+                    //input.textarea#sparqlArea(readonly="", size='60%')
+                .form-group#generateRelationalAlgebraForm
+                    .row
+                        .col-md-3
+                        .col-md-6
+                            button#generateRelationalAlgebraButton.btn.btn-primary.btn-lg.btn-block.invisible(type='submit') Rewrite query over wrappers
+                        .col-md-3
+                .form-group#relationalAlgebraAreaForm
+
+                .form-group#executeQueryForm
+                    .row
+                        .col-md-3
+                        .col-md-6
+                            button#executeQueryButton.btn.btn-primary.btn-lg.btn-block.invisible.btn-query(type='submit') Execute query
+                        .col-md-3
+
+    #dataModal.modal.fade(tabindex="-1" role="dialog")
+        .modal-dialog.modal-lg.modal-dialog-centered(role="document",style="max-width: 90%;")
+            .modal-content
+                .modal-header
+                    h5.modal-title Ontology-Mediated Query Execution
+                    button.close(type="button" data-dismiss="modal" aria-label="Close")
+                        span(aria-hidden="true") ×
+                .modal-body(style="position:relative;text-align:center;")
+                    span#spinner.fa.fa-spinner.fa-spin(style="font-size: 128px;")
+                    table#dataTable.table.table-striped.table-hover(style="display:none")
+                        thead.thead-dark
+                            tr
+                        tbody

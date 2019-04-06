@@ -1,0 +1,1 @@
+This is an output directory, schema rdf/owl files will be generated inside this directory.

@@ -1,0 +1,183 @@
+extends layout
+block headers
+    link(rel='stylesheet', href='/stylesheets/loading.css')
+    script(src='/js/client_new_wrapper.js')
+    link(rel='stylesheet', href='/stylesheets/highlight.js/default.min.css')
+    script(src='/js/highlight.js/highlight.min.js')
+
+block content
+
+    .container-fluid
+        .card.bg-secondary.mb-3
+            .card-header
+                .row
+                    .col-md-11
+                        h2(style="color:black")
+                            | New Wrapper
+                    .col-md-1
+                        button.btn.btn-link(data-toggle="collapse" data-target="#instructions")#instructionsButton
+                            i.fas.fa-chevron-circle-down.fa-3x(style="color:black")
+            #instructions.collapse(aria-labelledby="headingOne" data-parent="#accordion")
+                .card-body
+                    p.card-text(style='text-align: left')
+                        | New wrappers are introduced either because we want to consider data from a new data source, or because the schema of an existing source has evolved. Nevertheless, in both cases the procedure to incorporate them to the source level, whose elements are prefixed with S, is the same. Data stewards must provide the definition of the wrapper, as well as its signature. We work under the assumption that wrappers provide a flat structure in first normal form, thus the signature is an expression of the form w(a1 , ... , an ) where w is the wrapper name and a1, ..., an the set of attributes. With such information, MDM extracts the RDF-based representation of the wrapper’s schema (i.e., creates elements of type S:Attribute) which are incorporated to the existing source level.
+
+        .card.bg-secondary.mb-3
+            form#wrapperForm
+                            #hiddenDiv(style="display:none")
+                                #fields.control-group
+                                            label.control-label Attributes
+                                            .controls
+                                                form(name="attributesForm" role="form" autocomplete="off")
+                                                    .entry.input-group.col-xs-3
+                                                        //.input-group-prepend
+                                                            .input-group-text
+                                                                input#ids(type="checkbox" name="ids[]")
+                                                                | &nbsp;ID
+                                                        input.form-control(name="fields[]" type="text" placeholder="")
+                                                        span.input-group-btn
+                                                            button.btn.btn-success.attBtn.btn-add(type="button")
+                                                                span.fa.fa-plus
+
+                            .form-group#nameForm
+                                label.col-lg-4.col-form-label Name
+                                .col-lg-12
+                                    input#name.form-control(type='text', name='name', required='required' /*value="Wrapper_"*/)
+
+                            .form-group#dataSourceForm
+                                label.col-lg-4.col-form-label Data Source
+                                .col-lg-12
+                                    select#dataSource.form-control(type='text', name='dataSource', required='required')
+
+                            .form-group
+                                .control-group
+                                    label.col-lg-4.col-form-label Attributes
+                                    .col-lg-12
+                                        .controls
+                                            form(role="form" autocomplete="off")
+                                                .entry.input-group.col-xs-3
+                                                    input.form-control(name="attributeSet[]" type="text" placeholder="")
+                                                    span.input-group-btn
+                                                        button.btn.btn-success.btn-add(type="button")
+                                                            span.fa.fa-plus
+
+                            .form-group#cypherQueryForm(style="display:none")
+                                label.col-lg-8.col-form-label Cypher query
+                                .col-lg-12
+                                    form(role="form" autocomplete="off")
+                                        .entry.input-group.col-xs-3
+                                            input#cypherQuery.form-control(type='text', name='cypherQuery', required='required')
+                                            span.input-group-btn
+                                                button.btn.btn-success.btn-preview(type="button")
+                                                    span.fa.fa-search
+
+                            .form-group#jsonArrayExplodeForm(style="display:none")
+                                .col-lg-12
+                                    #explodeLevels.control-group
+                                        label.control-label Explode levels hierarchy (separates the elements of array into multiple rows)
+                                        .controls
+                                            form(role="form" autocomplete="off")
+                                                .entry.input-group.col-xs-3
+                                                    input.form-control(name="explodeLevels[]" type="text" placeholder="")
+                                                    span.input-group-btn
+                                                        button.btn.btn-success.btn-add(type="button")
+                                                            span.fa.fa-plus
+
+                            .form-group#jsonValueToAttribute(style="display:none")
+                                .row
+                                    .col-md-6
+                                        .form-group#attributesForm
+                                            label.col-lg-4.col-form-label Attributes
+                                            .col-lg-12#attributes
+                                                input#asdasd.form-control(type='text', name='cypherQuery', required='required')
+                                    .col-md-6
+                                        .form-group#featuresForm
+                                            label.col-lg-4.col-form-label Features
+                                            .col-lg-12#features
+
+                                //.col-lg-12
+                                    form(role="form" autocomplete="off")
+                                        .entry.input-group.col-xs-3
+                                            input#fileseparator.form-control(type='text', name='fileseparator', required='required', readonly="", value="-")
+                                            span.input-group-btn
+                                                button.btn.btn-success.btn-preview(type="button")
+                                                    span.fa.fa-search
+
+                            //.form-group#fileseparatorForm(style="display:none")
+                                label.col-lg-8.col-form-label (No Filtering)
+                                .col-lg-12
+                                    form(role="form" autocomplete="off")
+                                        .entry.input-group.col-xs-3
+                                            input#fileseparator.form-control(type='text', name='fileseparator', required='required', readonly="", value="-")
+                                            span.input-group-btn
+                                                button.btn.btn-success.btn-preview(type="button")
+                                                    span.fa.fa-search
+
+                            .form-group#sparksqlQueryForm(style="display:none")
+                                label.col-lg-8.col-form-label SparkSQL query (use data source name as table)
+                                .col-lg-12
+                                    form(role="form" autocomplete="off")
+                                        .entry.input-group.col-xs-3
+                                            input#sparksqlQuery.form-control(type='text', name='sparksqlQuery', required='required')
+                                            span.input-group-btn
+                                                button.btn.btn-success.btn-preview(type="button")
+                                                    span.fa.fa-search
+
+                            .form-group#mongodbQueryForm(style="display:none")
+                                label.col-lg-8.col-form-label MongoDB Query (MUPGL queries)
+                                .col-lg-12
+                                    form(role="form" autocomplete="off")
+                                        .entry.input-group.col-xs-3
+                                            input#mongodbQuery.form-control(type='text', name='mongodbQuery', required='required')
+                                            span.input-group-btn
+                                                button.btn.btn-success.btn-preview(type="button")
+                                                    span.fa.fa-search
+
+                            .form-group#restapiQueryForm(style="display:none")
+                                label.col-lg-8.col-form-label REST API Parameters (path or query string)
+                                .col-lg-12
+                                    form(role="form" autocomplete="off")
+                                        .entry.input-group.col-xs-3
+                                            input#restapiQuery.form-control(type='text', name='restapiQuery', required='required')
+                                            span.input-group-btn
+                                                button.btn.btn-success.btn-preview(type="button")
+                                                    span.fa.fa-search
+
+                            .form-group#sqlQueryForm(style="display:none")
+                                label.col-lg-8.col-form-label SQL Query
+                                .col-lg-12
+                                    form(role="form" autocomplete="off")
+                                        .entry.input-group.col-xs-3
+                                            input#sqlQuery.form-control(type='text', name='sqlQuery', required='required')
+                                            span.input-group-btn
+                                                button.btn.btn-success.btn-preview(type="button")
+                                                    span.fa.fa-search
+
+                            .form-group
+                                .row
+                                    .col-md-4
+                                        .col-lg-12.col-lg-offset-2
+                                            button#inferSchema.btn.btn-primary.btn-lg.btn-block(type="submit") Infer schema
+
+                                    .col-md-4
+                                        .col-lg-12.col-lg-offset-2
+                                            button#previewWrapper.btn.btn-primary.btn-lg.btn-block(type="submit") Preview
+
+                                    .col-md-4
+                                        .col-lg-12.col-lg-offset-2
+                                            button#submitWrapper.btn.btn-primary.btn-lg.btn-block(type="submit") Submit
+
+
+    #previewModal.modal.fade(tabindex="-1" role="dialog")
+        .modal-dialog.modal-lg.modal-dialog-centered(role="document",style="max-width: 75%;max-height: 75%")
+            .modal-content
+                .modal-header
+                    h5.modal-title Data preview (limited to 10 results)
+                    button.close(type="button" data-dismiss="modal" aria-label="Close")
+                        span(aria-hidden="true") ×
+                .modal-body(style="position:relative;text-align:center;")
+                    span#spinner.fa.fa-spinner.fa-spin(style="font-size: 128px;")
+                    table#dataTable.table.table-striped.table-hover(style="display:none")
+                        thead.thead-dark
+                            tr
+                        tbody

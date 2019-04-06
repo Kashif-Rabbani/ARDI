@@ -1,0 +1,67 @@
+extends layout
+block headers
+    link(rel='stylesheet', href='/stylesheets/loading.css')
+    link(rel='stylesheet', href='/stylesheets/global_graph.css')
+    link(rel='stylesheet', href='/stylesheets/global_graph_creator.css')
+    script(src='/js/metamodel.js')
+    script(src='/js/d3.min.js')
+    script(src='/js/cola.d3.min.js')
+    script(src='/js/noty-2.3.8/js/noty/packaged/jquery.noty.packaged.js')
+
+
+block content
+
+    .container-fluid
+
+        .card.bg-secondary.mb-3
+            .card-header
+                .row
+                    .col-md-11
+                        h2(style="color:black")
+                            | Edit Global Graph
+                    .col-md-1
+                        button.btn.btn-link(data-toggle="collapse" data-target="#instructions")#instructionsButton
+                            i.fas.fa-chevron-circle-down.fa-3x(style="color:black")
+            #instructions.collapse(aria-labelledby="headingOne" data-parent="#accordion")
+                .card-body
+                    p.card-text(style='text-align: left')
+                        | This is the Global Graph editor (based on
+                        a(target="_blank" href="https://github.com/metacademy/directed-graph-creator")  directed-graph-creator&nbsp;
+                        | published under the MIT/X license). To manipulate the graph, select the appropriate class and apply the following operations:
+                        ul.list-inline
+                            li.list-inline-item (a) drag/scroll to translate/zoom the graph;
+                            li.list-inline-item (b) shift-click on graph to create a node;
+                            li.list-inline-item (c) shift-click on a node and then drag to another node to connect them with a directed edge;
+                            li.list-inline-item (d) shift-click on a node/edge to change its title;
+                            li.list-inline-item (e) click on node or edge and press backspace/delete to delete
+
+        h4
+            span.label Metadata Model:
+            | &nbsp;&nbsp;
+            span.label.btn(id='Concept').metamodelButton.normal
+                a(href="#") G:Concept
+            | &nbsp;&nbsp;
+            //span.label.btn(id='MemberConcept').metamodelButton.normal
+            //    a(href="#") G:MemberConcept
+            //| &nbsp;&nbsp;
+            span.label.btn(id='Feature_ID').metamodelButton.normal
+                a(href="#") G:Feature (ID subclass)
+            | &nbsp;&nbsp;
+            span.label.btn(id='Feature').metamodelButton.normal
+                a(href="#") G:Feature
+            //| &nbsp;&nbsp;
+            //span.label.btn(id='AggregationFunction').metamodelButton.normal
+            //    a(href="#") G:AggregationFunction
+    //Used to save the graph
+    //p#download-input(hidden="") Download
+    //Used to load the graph
+    //p#upload-input(hidden="") Upload
+    div#toolbox
+        input.d-none#upload-input(type="button" class="btn btn-primary btn-md" value="Upload")
+        input.d-none#download-input(type="button" class="btn btn-primary btn-md" value="Download")
+        input.d-none#delete-graph(type="button" class="btn btn-primary btn-md" value="Delete")
+
+    #graph
+
+
+    script(src='/js/client_view_global_graph_creator_d3.js')
