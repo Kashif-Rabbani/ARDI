@@ -16,6 +16,6 @@ config.FILES_PATH = "/home/kashif/Documents/GIT/MDM/MetadataFrontend";
 
 config.BDI_FRONTEND_URL = "http://localhost:" + config.PORT + "/";
 config.BDI_DATA_LAYER_URL = "http://localhost:8080/bdi/";
-config.BDI_FILES_PATH = "/home/kashif/Documents/GIT/BDI/Frontend/";
+config.BDI_FILES_PATH = "/home/kashif/Documents/GIT/BDI/Frontend/Uploads/";
 
 module.exports = config;

@@ -7,8 +7,7 @@ var request = require('request'),
     bcrypt = require('bcryptjs');
 
 exports.postUser = function (req, res, next) {
-    if (!(req.body.hasOwnProperty('username')) || req.body.username==null
-        || !(req.body.hasOwnProperty('password')) || req.body.password==null){
+    if (!(req.body.hasOwnProperty('username')) || req.body.username==null || !(req.body.hasOwnProperty('password')) || req.body.password==null){
         res.status(400).json({msg: "(Bad Request) data format: {username, password}"});
         if (next) next(res);
     } else {

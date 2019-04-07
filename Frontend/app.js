@@ -12,9 +12,11 @@ var app = express();
 var io = require('socket.io').listen(app.listen(port));
 var flash = require('express-flash');
 var multer = require('multer');
-var upload = multer({ dest: config.FILES_PATH });
+var uploadd = multer({ dest: config.FILES_PATH });
 var passport = require('passport');
 var fs = require('fs');
+var upload = require("express-fileupload");
+//var formData = require('form-data');
 
 /*****************************************************************************************/
 /*****************************************************************************************/
@@ -39,7 +41,7 @@ var admin_routes = require(__dirname+'/routes/admin_routes');
 
 
 
-
+var file_upload = require(__dirname+"/routes/upload_file")
 
 var test_route = require(__dirname +"/routes/test_route");
 
@@ -62,6 +64,10 @@ app.use(bodyParser.urlencoded({ extended: true }));  // parse application/x-www-
 //app.use(multer());                                   // parse multipart/form-data
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.raw({uploadDir:config.FILES_PATH}));
+// app.use(upload());
+// app.use(formidable());
+// app.use(readChunk());
+// app.use(fileType());
 
 app.use(flash());
 app.use(passport.initialize());
@@ -82,8 +88,7 @@ require('./auth');
 
 app.get('/test/', test_route.getGraph);
 
-
-
+app.post('/fileupload', file_upload.uploadFile);
 
 
 
@@ -211,6 +216,7 @@ app.get('/new_data_source', checkAuthenticated, function(req,res) {
 app.get('/manage_data_sources', checkAuthenticated, function(req,res) {
     res.render('manage_data_sources', {user:req.session.passport.user});
 });
+
 
 app.get('/view_data_source', checkAuthenticated, function(req,res) {
     res.render('view_data_source', {user:req.session.passport.user});

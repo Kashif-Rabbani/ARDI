@@ -9,58 +9,60 @@ function getParameterByName(name) {
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 
-$(function() {
+$(function () {
 
-    $('#submitDataSource').on("click", function(e){
+    $('#dataSourceForm').on("submit", function (e) {
         e.preventDefault();
 
-        var dataSource = new Object();
-        dataSource.name = $("#name").val();
+        var dataSource = new FormData();
+
         switch ($('.nav-tabs .active').attr('id')) {
-            case "avro-tab":
-                dataSource.type = "avro";
-                dataSource.avro_path = $("#avro_path").val();
-                break;
-
-            case "mongodb-tab":
-                dataSource.type = "mongodb";
-                dataSource.mongodb_connectionString = $("#mongodb_connectionString").val();
-                dataSource.mongodb_database = $("#mongodb_database").val();
-                break;
-
-            case "neo4j-tab":
-                dataSource.type = "neo4j";
-                break;
-
-            case "parquet-tab":
-                dataSource.type = "parquet";
-                dataSource.parquet_path = $("#parquet_path").val();
-                break;
 
             case "json-tab":
-                dataSource.type = "json";
-                dataSource.json_path = $("#json_path").val();
+                dataSource.append("givenName", $("#givenName").val());
+                dataSource.append("givenType", "json");
+                // Get the files from input, create new FormData.
+                var files = $('#file_path').get(0).files;
+
+                // Append the files to the formData.
+                for (var i = 0; i < files.length; i++) {
+                    var file = files[i];
+                    dataSource.append('FILE', file, file.name);
+                }
+
                 break;
 
-            case "restapi-tab":
-                dataSource.type = "restapi";
-                dataSource.restapi_url = $("#restapi_url").val();
-                dataSource.restapi_format = $("#restapi_format").val();
+            case "xml-tab":
+                dataSource.append("givenName", $("#givenName").val());
+                dataSource.append("givenType", "xml");
+                // Get the files from input, create new FormData.
+                var files = $('#xml_path').get(0).files;
+
+                // Append the files to the formData.
+                for (var i = 0; i < files.length; i++) {
+                    var file = files[i];
+                    dataSource.append('FILE', file, file.name);
+                }
+
                 break;
 
             case "sqldatabase-tab":
-                dataSource.type = "sql";
-                dataSource.sql_jdbc = $("#sql_jdbc").val();
+                dataSource.append("givenName", $("#givenName").val());
+                dataSource.append("givenType", "SQL");
+                dataSource.append("sql_jdbc", $("#sql_path").val());
                 break;
         }
         $.ajax({
-            url: '/dataSource',
+            url: '/fileupload',
             method: "POST",
-            data: dataSource
-        }).done(function() {
-            window.location.href = '/manage_data_sources';
-        }).fail(function(err) {
-            alert("error "+JSON.stringify(err));
+            data: dataSource,
+            processData: false,
+            contentType: false
+        }).done(function (data) {
+            //window.location.href = '/fileupload';
+            console.log(data);
+        }).fail(function (err) {
+            alert("error " + JSON.stringify(err));
         });
     });
 

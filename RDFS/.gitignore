@@ -43,4 +43,9 @@ target/*
 Output/*
 
 # exception to the rule
-!Output/info.md
+!Output/README.md
+
+Input/*
+
+# exception to the rule
+!Input/README.md
