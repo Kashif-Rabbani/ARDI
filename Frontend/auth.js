@@ -11,7 +11,7 @@ var passport = require('passport'),
 
 passport.use(new LocalStrategy(
     function(username, password, done) {
-        request.get(config.METADATA_DATA_LAYER_URL+"users/findOne/"+username, function (error, response, body) {
+        request.get(config.BDI_DATA_LAYER_URL+"users/findOne/"+username, function (error, response, body) {
             if (error || response.statusCode == 404) { return done(null, false, {message: 'Invalid username or password'}); }
             var user = JSON.parse(body);
             if (!user) { return done(null, false, {message: 'Invalid username or password'}); }

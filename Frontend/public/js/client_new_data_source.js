@@ -13,9 +13,7 @@ $(function () {
 
     $('#dataSourceForm').on("submit", function (e) {
         e.preventDefault();
-
         var dataSource = new FormData();
-
         switch ($('.nav-tabs .active').attr('id')) {
 
             case "json-tab":

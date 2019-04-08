@@ -1,12 +1,12 @@
 package com.genesis.resources;
 
+import com.genesis.eso.util.ConfigManager;
 import com.genesis.eso.util.Utils;
 import com.google.common.collect.Lists;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.util.JSON;
-import com.genesis.eso.util.ConfigManager;
 import org.bson.Document;
 
 import javax.ws.rs.*;
@@ -17,10 +17,10 @@ import java.util.List;
 /**
  * @author Sergi Nadal - 17/05/2016
  *
- * Users resource (exposed at "metadataDataLayer/users" path)
+ * Users resource (exposed at "bdi/users" path)
  */
 @Path("bdi")
-public class UserResource {
+public class UserResourceFile {
 
     private MongoCollection<Document> getUsersCollection(MongoClient client) {
         return client.getDatabase(ConfigManager.getProperty("system_bdi_db_name")).getCollection("users");
