@@ -90,6 +90,7 @@ app.get('/test/', test_route.getGraph);
 
 app.post('/fileupload', file_upload.uploadFile);
 
+app.use(favicon(path.join(__dirname,'public','images','favicon.ico')));
 
 
 
