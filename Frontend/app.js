@@ -41,7 +41,8 @@ var admin_routes = require(__dirname+'/routes/admin_routes');
 
 
 
-var file_upload = require(__dirname+"/routes/upload_file")
+var file_upload = require(__dirname+"/routes/upload_file");
+var trigger_extraction = require(__dirname+"/routes/bdi_trigger_extraction");
 
 var test_route = require(__dirname +"/routes/test_route");
 
@@ -86,17 +87,11 @@ require('./auth');
 /*****************************************************************************************/
 
 
-app.get('/test/', test_route.getGraph);
+app.get('/test', test_route.getGraph);
 
 app.post('/fileupload', file_upload.uploadFile);
-
+app.post('/triggerExtraction', trigger_extraction.triggerExtraction);
 app.use(favicon(path.join(__dirname,'public','images','favicon.ico')));
-
-
-
-
-
-
 
 
 /********** User resource ****************************************************************/

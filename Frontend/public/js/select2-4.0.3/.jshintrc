@@ -15,7 +15,8 @@
     "require": false,
     "test": false,
     "window": false,
-    "$": true
+    "$": true,
+    "alert": true
   },
   "indent": 2,
   "noarg": true,

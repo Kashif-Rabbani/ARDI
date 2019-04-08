@@ -1,7 +1,6 @@
 /**
- * Author Kashif-Rabbani on 08-04-2018
+ * Author Kashif-Rabbani
  */
-
 function getParameterByName(name) {
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
     var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
@@ -17,6 +16,10 @@ $(function () {
         switch ($('.nav-tabs .active').attr('id')) {
 
             case "json-tab":
+                if ($("#file_path").get(0).files.length === 0) {
+                    console.log("jsonfile");
+                    return false;
+                }
                 dataSource.append("givenName", $("#givenName").val());
                 dataSource.append("givenType", "json");
                 // Get the files from input, create new FormData.
@@ -27,10 +30,13 @@ $(function () {
                     var file = files[i];
                     dataSource.append('JSON_FILE', file, file.name);
                 }
-
                 break;
 
             case "xml-tab":
+                if ($("#xml_path").get(0).files.length === 0) {
+                    console.log("xmltab");
+                    return false;
+                }
                 dataSource.append("givenName", $("#givenName").val());
                 dataSource.append("givenType", "xml");
                 // Get the files from input, create new FormData.
@@ -45,41 +51,101 @@ $(function () {
                 break;
 
             case "sqldatabase-tab":
+                if ($("#sql_path").val() === '') {
+                    console.log("sqldb");
+                    return false;
+                }
                 dataSource.append("givenName", $("#givenName").val());
                 dataSource.append("givenType", "SQL");
                 dataSource.append("sql_jdbc", $("#sql_path").val());
                 break;
         }
-        $.ajax({
-            url: '/fileupload',
-            method: "POST",
-            data: dataSource,
-            processData: false,
-            contentType: false,
-            xhr: function () {
-                var xhr = new XMLHttpRequest();
-                if (dataSource.get("givenType") !== 'SQL') {
-                    // Add progress event listener to the upload.
-                    xhr.upload.addEventListener('progress', function (event) {
-                        var progressBar = $('.progress-bar');
+        handler(dataSource);
+    });
+    handleProgressBar();
+});
 
-                        if (event.lengthComputable) {
-                            var percent = (event.loaded / event.total) * 100;
-                            progressBar.width(percent + '%');
+function handler(dataSource) {
+    $.ajax({
+        url: '/fileupload',
+        method: "POST",
+        data: dataSource,
+        processData: false,
+        contentType: false,
+        xhr: function () {
+            var xhr = new XMLHttpRequest();
+            if (dataSource.get("givenType") !== 'SQL') {
+                // Add progress event listener to the upload.
+                xhr.upload.addEventListener('progress', function (event) {
+                    var progressBar = $('.progress-bar');
 
-                            if (percent === 100) {
-                                progressBar.removeClass('active');
-                            }
+                    if (event.lengthComputable) {
+                        var percent = (event.loaded / event.total) * 100;
+                        progressBar.width(percent + '%');
+
+                        if (percent === 100) {
+                            progressBar.removeClass('active');
                         }
-                    });
-                }
-                return xhr;
+                    }
+                });
             }
+            return xhr;
+        }
+    }).done(function (data) {
+        parseSource(data);
+    }).fail(function (err) {
+        alert("Error " + JSON.stringify(err));
+    });
+}
+
+function parseSource(data) {
+    $('#confirmationModal').modal('toggle');
+
+    $('#ModalProceedButton').on("click", function (e) {
+        $('#confirmationModal').modal('toggle');
+        $.ajax({
+            type: 'POST',
+            data: JSON.stringify(data),
+            contentType: 'application/json',
+            url: '/triggerExtraction'
         }).done(function (data) {
-            //window.location.href = '/fileupload';
-            console.log(data);
+            console.log('success');
+            console.log(JSON.stringify(data));
         }).fail(function (err) {
-            alert("error " + JSON.stringify(err));
+            alert("Error " + JSON.stringify(err));
         });
     });
-});
+
+
+    /*$.get("/test", function(string) {
+        alert(string);
+    });*/
+
+    console.log(data);
+}
+
+function handleProgressBar() {
+    $('#json-tab').on('click', function () {
+        $('.progress-bar').width('0%');
+    });
+
+    $('#xml-tab').on('click', function () {
+        $('.progress-bar').width('0%');
+    });
+
+    $('#sqldatabase-tab').on('click', function () {
+        $('.progress-bar').width('0%');
+    });
+
+    $('#json_pathForm').on('click', function () {
+        $('.progress-bar').width('0%');
+    });
+
+    $('#xml_pathForm').on('click', function () {
+        $('.progress-bar').width('0%');
+    });
+
+    $('#sql_jdbcForm').on('click', function () {
+        $('.progress-bar').width('0%');
+    });
+}

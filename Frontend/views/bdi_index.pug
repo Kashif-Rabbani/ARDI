@@ -2,7 +2,6 @@ extends bdi_layout
 block headers
     link(rel='stylesheet', href='/stylesheets/loading.css')
     script(src='/js/client_new_data_source.js')
-        script(src='/js/supporting.js')
     link(href='/js/select2-4.0.3/dist/css/select2.min.css', rel='stylesheet', type='text/css')
     script(src='/js/select2-4.0.3/dist/js/select2.min.js')
     link(rel='stylesheet', href='/stylesheets/select2-bootstrap.min.css')
@@ -88,3 +87,21 @@ block content
                     .card-body
                         p.card-text(style='text-align: left')
                             | Graphical representation of the data sources...
+
+            // Button trigger modal
+            //button.btn.btn-primary(type='button', data-toggle='modal', data-target='#confirmationModal')
+                | Launch demo modal
+
+            // Modal
+            #confirmationModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true')
+                .modal-dialog(role='document')
+                    .modal-content
+                        .modal-header
+                            h5#exampleModalLabel.modal-title Please Confirm
+                            button.close(type='button', data-dismiss='modal', aria-label='Close')
+                                span(aria-hidden='true') ×
+                        .modal-body
+                            | Uploaded file will be parsed to extract its schema. It might take some time. Are you sure?
+                        .modal-footer
+                            button.btn.btn-secondary(type='button', data-dismiss='modal') Cancel
+                            button#ModalProceedButton.btn.btn-primary(type='button') Proceed
