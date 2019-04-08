@@ -18,3 +18,10 @@ local.properties
 
 node_modules/
 .idea/
+
+
+
+Uploads/*
+
+# exception to the rule
+!Uploads/README.md

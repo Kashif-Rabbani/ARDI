@@ -25,7 +25,7 @@ $(function () {
                 // Append the files to the formData.
                 for (var i = 0; i < files.length; i++) {
                     var file = files[i];
-                    dataSource.append('FILE', file, file.name);
+                    dataSource.append('JSON_FILE', file, file.name);
                 }
 
                 break;
@@ -34,12 +34,12 @@ $(function () {
                 dataSource.append("givenName", $("#givenName").val());
                 dataSource.append("givenType", "xml");
                 // Get the files from input, create new FormData.
-                var files = $('#xml_path').get(0).files;
+                var filesXML = $('#xml_path').get(0).files;
 
                 // Append the files to the formData.
-                for (var i = 0; i < files.length; i++) {
-                    var file = files[i];
-                    dataSource.append('FILE', file, file.name);
+                for (var x = 0; x < filesXML.length; x++) {
+                    var fileXML = filesXML[x];
+                    dataSource.append('XML_FILE', fileXML, fileXML.name);
                 }
 
                 break;

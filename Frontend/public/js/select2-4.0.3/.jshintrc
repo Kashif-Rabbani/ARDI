@@ -14,7 +14,8 @@
     "QUnit": false,
     "require": false,
     "test": false,
-    "window": false
+    "window": false,
+    "$": true
   },
   "indent": 2,
   "noarg": true,

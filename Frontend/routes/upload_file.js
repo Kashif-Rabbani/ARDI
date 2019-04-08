@@ -5,12 +5,26 @@ var formidable = require('formidable'),
 
 exports.uploadFile = function (req, res) {
 
-    var uploadedFile = [];
-    var form = new formidable.IncomingForm();
+    var uploadedFile = [],
+        form = new formidable.IncomingForm(),
+        givenFileName = '',
+        fileType = '',
+        sql_JDBC = '';
     form.uploadDir = config.BDI_FILES_PATH;
 
-    form.parse(req, function(err, fields, files) {
-        console.log(fields);
+    form.parse(req, function (err, fields, files) {
+        givenFileName = fields.givenName;
+        fileType = fields.givenType;
+        if (fields.sql_jdbc) {
+            //console.log(fields.sql_jdbc);
+            sql_JDBC = fields.sql_jdbc;
+            uploadedFile.push({
+                status: true,
+                filename: givenFileName,
+                type: fileType,
+                filePath: sql_JDBC
+            });
+        }
     });
 
 
@@ -31,7 +45,7 @@ exports.uploadFile = function (req, res) {
                 status: true,
                 filename: filename,
                 type: file.type,
-                publicPath: upload_path + '/' + filename
+                filePath: upload_path + '/' + filename
             });
         } else {
             uploadedFile.push({
@@ -56,6 +70,4 @@ exports.uploadFile = function (req, res) {
     form.parse(req, function (err, fields, files) {
         res.status(200).json(uploadedFile);
     });
-
-
 };
