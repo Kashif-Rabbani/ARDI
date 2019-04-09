@@ -16,6 +16,7 @@ import java.util.List;
 
 /**
  * @author Sergi Nadal - 17/05/2016
+ * @author Kashif Rabbani - 09-04-2019
  *
  * Users resource (exposed at "bdi/users" path)
  */

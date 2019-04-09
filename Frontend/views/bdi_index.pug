@@ -8,100 +8,100 @@ block headers
 
 block content
 
-    .container-fluid
-        .col-4.card.bg-white.float-left.border-0
-            .card.bg-light.mb-3
-                .card-header
-                    .row
-                        .col-md-10
-                            h3(style="color:black")
-                                | Data Sources
-                        .col-md-2
-                            button.btn.btn-link(data-toggle="collapse" data-target="#instructions")#instructionsButton
-                                i.fas.fa-chevron-circle-down.fa-2x(style="color:black")
-                #instructions.collapse(aria-labelledby="headingOne" data-parent="#accordion")
-                    .card-body
-                        p.card-text(style='text-align: left')
-                            | Data sources represent external endpoints where to fetch data from. We support connection to classic databases (e.g., SQL databases), NOSQL stores (e.g., document stores) and REST APIs.
+    //.container-fluid
+    .col-4.card.bg-white.float-left.border-0
+        .card.bg-light.mb-3
+            .card-header
+                .row
+                    .col-md-10
+                        h3(style="color:black")
+                            | Data Sources
+                    .col-md-2
+                        button.btn.btn-link(data-toggle="collapse" data-target="#instructions")#instructionsButton
+                            i.fas.fa-chevron-circle-down.fa-2x(style="color:black")
+            #instructions.collapse(aria-labelledby="headingOne" data-parent="#accordion")
+                .card-body
+                    p.card-text(style='text-align: left')
+                        | Data sources represent external endpoints where to fetch data from. We support connection to classic databases (e.g., SQL databases), NOSQL stores (e.g., document stores) and REST APIs.
 
-            .card.bg-light.mb-3
-                form#dataSourceForm(method ="post" enctype="multipart/form-data")
-                    .form-group#nameForm
-                        label.col-lg-4.col-form-label Name
-                        .col-lg-12
-                            input#givenName.form-control(type='text', name='givenName', required='required')
+        .card.bg-light.mb-3
+            form#dataSourceForm(method ="post" enctype="multipart/form-data")
+                .form-group#nameForm
+                    label.col-lg-4.col-form-label Name
+                    .col-lg-12
+                        input#givenName.form-control(type='text', name='givenName', required='required')
 
-                    .form-group#typeForm
-                        label.col-lg-4.col-form-label Type
-                        .col-lg-12
-                            ul#typeTabs.nav.nav-tabs(role="tablist").border-white
-                                li.nav-item
-                                    a.text-primary#json-tab.nav-link.active(data-toggle="tab" href="#json" role="tab" aria-controls="messages" aria-selected="false") JSON file
-                                li.nav-item
-                                    a.text-primary#xml-tab.nav-link(data-toggle="tab" href="#xml" role="tab" aria-controls="messages" aria-selected="false") XML file
-                                li.nav-item
-                                    a.text-primary#sqldatabase-tab.nav-link(data-toggle="tab" href="#sqldatabase" role="tab" aria-controls="settings" aria-selected="false") MySQL Database
+                .form-group#typeForm
+                    label.col-lg-4.col-form-label Type
+                    .col-lg-12
+                        ul#typeTabs.nav.nav-tabs(role="tablist").border-white
+                            li.nav-item
+                                a.text-primary#json-tab.nav-link.active(data-toggle="tab" href="#json" role="tab" aria-controls="messages" aria-selected="false") JSON file
+                            li.nav-item
+                                a.text-primary#xml-tab.nav-link(data-toggle="tab" href="#xml" role="tab" aria-controls="messages" aria-selected="false") XML file
+                            li.nav-item
+                                a.text-primary#sqldatabase-tab.nav-link(data-toggle="tab" href="#sqldatabase" role="tab" aria-controls="settings" aria-selected="false") MySQL Database
 
-                    .tab-content
+                .tab-content
 
-                        #json.tab-pane.active
-                            .form-group#json_pathForm
-                                label.col-lg-4.col-form-label File path
-                                .col-lg-12
-                                    input#file_path.form-control(type='file', name='json_file_path')
+                    #json.tab-pane.active
+                        .form-group#json_pathForm
+                            label.col-lg-4.col-form-label File path
+                            .col-lg-12
+                                input#file_path.form-control(type='file', name='json_file_path')
 
-                        #xml.tab-pane
-                            .form-group#xml_pathForm
-                                label.col-lg-4.col-form-label File path
-                                .col-lg-12
-                                    input#xml_path.form-control(type='file', name='xml_file_path')
+                    #xml.tab-pane
+                        .form-group#xml_pathForm
+                            label.col-lg-4.col-form-label File path
+                            .col-lg-12
+                                input#xml_path.form-control(type='file', name='xml_file_path')
 
-                        #sqldatabase.tab-pane(role="tabpanel" aria-labelledby="sqldatabase-tab")
-                            .form-group#sql_jdbcForm
-                                label.col-lg-4.col-form-label JDBC
-                                .col-lg-12
-                                    input#sql_path.form-control(type='text', name='sql_file_path')
+                    #sqldatabase.tab-pane(role="tabpanel" aria-labelledby="sqldatabase-tab")
+                        .form-group#sql_jdbcForm
+                            label.col-lg-4.col-form-label JDBC
+                            .col-lg-12
+                                input#sql_path.form-control(type='text', name='sql_file_path')
 
-                    .form-group
-                        .col-lg-12.col-lg-offset-2
-                            button#submitDataSource.btn.btn-primary.btn-md.btn-block(type="submit") Submit
-                    .row
-                        .col-md-12
-                            .progress
-                                .progress-bar.progress-bar-striped.active(role='progressbar', aria-valuenow='0', aria-valuemin='0', aria-valuemax='100', style='width: 0%')
-                                    span.sr-only
+                .form-group
+                    .col-lg-12.col-lg-offset-2
+                        button#submitDataSource.btn.btn-primary.btn-md.btn-block(type="submit") Submit
+                .row
+                    .col-md-12
+                        .progress
+                            .progress-bar.progress-bar-striped.active(role='progressbar', aria-valuenow='0', aria-valuemin='0', aria-valuemax='100', style='width: 0%')
+                                span.sr-only
 
 
 
-        .col-8.card.bg-white.float-left.border-0
-            .card.bg-light.mb-3
-                .card-header
-                    .row
-                        .col-md-11
-                            h3(style="color:black")
-                                | Schemas
-                        .col-md-1
-                            button.btn.btn-link(data-toggle="collapse" data-target="#schemaInstructions")#schemaInstructionsButton
-                                i.fas.fa-chevron-circle-down.fa-2x(style="color:black")
-                #schemaInstructions.collapse(aria-labelledby="headingOne" data-parent="#accordion")
-                    .card-body
-                        p.card-text(style='text-align: left')
-                            | Graphical representation of the data sources...
+    .col-8.card.bg-white.float-left.border-0
+        .card.bg-light.mb-3
+            .card-header
+                .row
+                    .col-md-11
+                        h3(style="color:black")
+                            | Schemas
+                    .col-md-1
+                        button.btn.btn-link(data-toggle="collapse" data-target="#schemaInstructions")#schemaInstructionsButton
+                            i.fas.fa-chevron-circle-down.fa-2x(style="color:black")
+            #schemaInstructions.collapse(aria-labelledby="headingOne" data-parent="#accordion")
+                .card-body
+                    p.card-text(style='text-align: left')
+                        | Graphical representation of the data sources...
 
-            // Button trigger modal
-            //button.btn.btn-primary(type='button', data-toggle='modal', data-target='#confirmationModal')
-                | Launch demo modal
+        // Button trigger modal
+        //button.btn.btn-primary(type='button', data-toggle='modal', data-target='#confirmationModal')
+            | Launch demo modal
 
-            // Modal
-            #confirmationModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true')
-                .modal-dialog(role='document')
-                    .modal-content
-                        .modal-header
-                            h5#exampleModalLabel.modal-title Please Confirm
-                            button.close(type='button', data-dismiss='modal', aria-label='Close')
-                                span(aria-hidden='true') ×
-                        .modal-body
-                            | Uploaded file will be parsed to extract its schema. It might take some time. Are you sure?
-                        .modal-footer
-                            button.btn.btn-secondary(type='button', data-dismiss='modal') Cancel
-                            button#ModalProceedButton.btn.btn-primary(type='button') Proceed
+        // Modal
+        #confirmationModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true')
+            .modal-dialog(role='document')
+                .modal-content
+                    .modal-header
+                        h5#exampleModalLabel.modal-title Please Confirm
+                        button.close(type='button', data-dismiss='modal', aria-label='Close')
+                            span(aria-hidden='true') ×
+                    .modal-body
+                        | Uploaded file will be parsed to extract its schema. It might take some time. Are you sure?
+                    .modal-footer
+                        button.btn.btn-secondary(type='button', data-dismiss='modal') Cancel
+                        button#ModalProceedButton.btn.btn-primary(type='button') Proceed

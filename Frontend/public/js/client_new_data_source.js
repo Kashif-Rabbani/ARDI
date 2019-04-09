@@ -51,6 +51,7 @@ $(function () {
                 break;
 
             case "sqldatabase-tab":
+
                 if ($("#sql_path").val() === '') {
                     console.log("sqldb");
                     return false;
@@ -99,42 +100,52 @@ function handler(dataSource) {
 }
 
 function parseSource(data) {
-    $('#confirmationModal').modal('toggle');
+    console.log(JSON.stringify(data));
+    toggleModal();
 
-    $('#ModalProceedButton').on("click", function (e) {
-        $('#confirmationModal').modal('toggle');
+    var clickHandler = function (e) {
+        e.preventDefault();
+        toggleModal();
         $.ajax({
             type: 'POST',
             data: JSON.stringify(data),
             contentType: 'application/json',
-            url: '/triggerExtraction'
-        }).done(function (data) {
-            console.log('success');
-            console.log(JSON.stringify(data));
-        }).fail(function (err) {
-            alert("Error " + JSON.stringify(err));
+            url: '/triggerExtraction',
+            cache: false,
+            success: function (response) {
+                console.log('success');
+                console.log(JSON.stringify(response));
+            },
+            error: function (response) {
+                data.clear();
+                console.log('failure');
+                console.log(JSON.stringify(response));
+            }
         });
-    });
+        e.stopImmediatePropagation();
+        return false;
+    }
+    $('#ModalProceedButton').one('click', clickHandler);
+}
 
-
-    /*$.get("/test", function(string) {
-        alert(string);
-    });*/
-
-    console.log(data);
+function toggleModal() {
+    $('#confirmationModal').modal('toggle');
 }
 
 function handleProgressBar() {
     $('#json-tab').on('click', function () {
         $('.progress-bar').width('0%');
+        $(this).closest('form').find("input[type=file],input[type=text]").val("");
     });
 
     $('#xml-tab').on('click', function () {
         $('.progress-bar').width('0%');
+        $(this).closest('form').find("input[type=file],input[type=text]").val("");
     });
 
     $('#sqldatabase-tab').on('click', function () {
         $('.progress-bar').width('0%');
+        $(this).closest('form').find("input[type=file],input[type=text]").val("");
     });
 
     $('#json_pathForm').on('click', function () {

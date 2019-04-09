@@ -16,7 +16,8 @@
     "test": false,
     "window": false,
     "$": true,
-    "alert": true
+    "alert": true,
+    "JSON": true
   },
   "indent": 2,
   "noarg": true,
