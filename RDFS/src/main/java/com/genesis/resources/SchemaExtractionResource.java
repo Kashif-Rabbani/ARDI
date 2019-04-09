@@ -1,7 +1,11 @@
 package com.genesis.resources;
 
 
+import com.genesis.rdf.model.bdi_ontology.JsonSchemaExtractor;
 import com.google.gson.Gson;
+import net.minidev.json.JSONObject;
+import net.minidev.json.JSONValue;
+import sun.misc.IOUtils;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -27,8 +31,15 @@ public class SchemaExtractionResource {
     @Produces(MediaType.TEXT_PLAIN)
     public Response POST_JsonFileInfo(String body) {
         System.out.println("[POST /json] body = " + body);
-
-        return Response.ok(new Gson().toJson("JSON")).build();
+        JSONObject objBody = (JSONObject) JSONValue.parse(body);
+        JsonSchemaExtractor obj = new JsonSchemaExtractor();
+        JSONObject res = obj.initiateExtraction(
+                objBody.getAsString("filePath"),
+                objBody.getAsString("givenName").replaceAll(" ", ""));
+        String fileName = obj.getOutputFile();
+        System.out.println(res.toJSONString());
+        System.out.println("FileName: " + fileName);
+        return Response.ok(new Gson().toJson(fileName)).build();
     }
 
     @POST

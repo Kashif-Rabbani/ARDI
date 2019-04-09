@@ -117,7 +117,6 @@ function parseSource(data) {
                 console.log(JSON.stringify(response));
             },
             error: function (response) {
-                data.clear();
                 console.log('failure');
                 console.log(JSON.stringify(response));
             }

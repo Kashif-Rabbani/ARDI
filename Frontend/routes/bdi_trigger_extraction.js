@@ -43,7 +43,7 @@ function sendPostRequest(url, objDataSource, res) {
             console.log(body);
             res.status(200).json("ok");
         } else {
-            response.status(500).send("Error Triggering Parsing.");
+            res.status(500).send("Error Triggering Parsing.");
         }
     });
 

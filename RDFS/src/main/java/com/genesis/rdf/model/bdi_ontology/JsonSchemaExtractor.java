@@ -32,8 +32,16 @@ import java.util.Optional;
 
 public class JsonSchemaExtractor {
     private static final String LANG = "TURTLE"; //"RDF/XML");//"N-TRIPLE");
+    private static String outputFile = "";
+
+    public static String getOutputFile() {
+        return outputFile;
+    }
 
     private static OntModel model;
+
+    public JsonSchemaExtractor() {
+    }
 
     public JsonSchemaExtractor(String filePath) {
         try {
@@ -44,6 +52,18 @@ public class JsonSchemaExtractor {
             e.printStackTrace();
         }
 
+    }
+
+    public JSONObject initiateExtraction(String filePath, String rootName) {
+        JSONObject res = null;
+        try {
+            File file = new File(filePath);
+            String body = new String(Files.readAllBytes(Paths.get(file.toURI())));
+            res = JsonSchemaExtractor.extract_schema(rootName, body);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return res;
     }
 
     static {
@@ -69,7 +89,7 @@ public class JsonSchemaExtractor {
 
         jsonToSchemaNew(schemaModel, json, root);
 
-        String outputFile = TempFiles.getIncrementalTempFile(filename);
+        outputFile = TempFiles.getIncrementalTempFile(filename);
         schemaModel.write(new FileOutputStream(outputFile), LANG);
 
         String content = new String(java.nio.file.Files.readAllBytes(new File(outputFile).toPath()));
@@ -375,7 +395,6 @@ public class JsonSchemaExtractor {
         NewRDFUtil.addTriple(schemaModel, subject, NewSourceLevel2.RDFSRange.asObjectProperty(model), object);
 
     }
-
 
 
     private static QuerySolution searchExistingTriple(OntModel schemaModel, String subject, Node predicate, String object) {
