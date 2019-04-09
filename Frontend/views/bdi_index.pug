@@ -88,6 +88,43 @@ block content
                     p.card-text(style='text-align: left')
                         | Graphical representation of the data sources...
 
+        .card.bg-light.mb-3
+            .card-header.bg-white
+                .row
+                    .col-md-12
+                        h5(style="color:black")
+                            | Integrated Data Sources
+                        form
+                            table.table.table-hover#integratedDataSources
+                                thead
+                                    tr
+                                        th #
+                                        th Name
+                                        th Type
+                                        th File Address
+                                        th View
+                                tbody
+
+
+        .card.bg-light.mb-3
+            .card-header.bg-white
+                .row
+                    .col-md-12
+                        h5(style="color:black")
+                            | Parsed Data Sources
+                        form
+                            table.table.table-hover#dataSources
+                                thead
+                                    tr
+                                        th #
+                                        th Name
+                                        th Type
+                                        th File Address
+                                        th View
+                                tbody
+
+
+
         // Button trigger modal
         //button.btn.btn-primary(type='button', data-toggle='modal', data-target='#confirmationModal')
             | Launch demo modal

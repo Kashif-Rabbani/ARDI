@@ -18,7 +18,7 @@ exports.getDataSource = function (req, res, next) {
 };
 
 exports.getAllDataSources = function (req, res, next) {
-    request.get(config.METADATA_DATA_LAYER_URL + "dataSource/", function (error, response, body) {
+    request.get(config.BDI_DATA_LAYER_URL + "dataSource/", function (error, response, body) {
         if (!error && response.statusCode == 200) {
             res.status(200).json(JSON.parse(body));
         } else {

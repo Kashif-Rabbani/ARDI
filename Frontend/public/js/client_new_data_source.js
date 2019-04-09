@@ -115,6 +115,7 @@ function parseSource(data) {
             success: function (response) {
                 console.log('success');
                 console.log(JSON.stringify(response));
+                window.location.href = '/';
             },
             error: function (response) {
                 console.log('failure');
@@ -126,6 +127,36 @@ function parseSource(data) {
     }
     $('#ModalProceedButton').one('click', clickHandler);
 }
+
+function getParsedFileDetails() {
+    $.get("/dataSource", function (data) {
+        console.log("getParsedFileDetails: " + data);
+        var i = 1;
+        $.each((data), function (key, value) {
+            var dataSource = JSON.parse(value);
+            $('#dataSources').find('tbody')
+                .append($('<tr>')
+                    .append($('<td>')
+                        .text(i)
+                    ).append($('<td>')
+                        .text(dataSource.name)
+                    ).append($('<td>')
+                        .text(dataSource.type)
+                    ).append($('<td>')
+                        .text(dataSource.address)
+                    ).append($('<td>').append($('<a href="/view_data_source?dataSourceID=' + (dataSource.dataSourceID) + '">').append($('<span class="fa fa-search"></span>')))
+                    ).append($('<td>').append($('<a href="/view_source_graph?iri=' + (dataSource.iri) + '">').append($('<span class="fa fa-search"></span>')))
+                    )
+                );
+
+            ++i;
+        });
+    });
+}
+
+$(function () {
+    getParsedFileDetails();
+});
 
 function toggleModal() {
     $('#confirmationModal').modal('toggle');

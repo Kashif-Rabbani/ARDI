@@ -16,19 +16,16 @@ exports.triggerExtraction = function (req, res, next) {
         if (req.body.type === 'SQL') {
             url = url + "sql/";
             sendPostRequest(url, objDataSource, res);
-            console.log("SQL CASE");
         }
 
         if (req.body.type === 'xml') {
             url = url + "xml/";
             sendPostRequest(url, objDataSource, res);
-            console.log("XML CASE");
         }
 
         if (req.body.type === 'json') {
             url = url + "json/";
             sendPostRequest(url, objDataSource, res);
-            console.log("JSON CASE");
         }
     }
 };
