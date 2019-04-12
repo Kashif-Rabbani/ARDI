@@ -33,10 +33,8 @@ import java.util.Optional;
 public class JsonSchemaExtractor {
     private static final String LANG = "TURTLE"; //"RDF/XML");//"N-TRIPLE");
     private static String outputFile = "";
+    private static String IRI = "";
 
-    public static String getOutputFile() {
-        return outputFile;
-    }
 
     private static OntModel model;
 
@@ -84,6 +82,7 @@ public class JsonSchemaExtractor {
         OntModel schemaModel = getOrCreateSchemaModel(filename);
 
         String root = NewSourceLevel2.ROOT.val() + "/" + filename;
+        IRI = root;
 
         NewRDFUtil.addTriple(schemaModel, root, NewSourceLevel2.TYPE, NewSourceLevel2.RDFSClass.asOntClass(model));
 
@@ -426,5 +425,14 @@ public class JsonSchemaExtractor {
         }
 
         return null;
+    }
+
+
+    public static String getOutputFile() {
+        return outputFile;
+    }
+
+    public static String getIRI() {
+        return IRI;
     }
 }

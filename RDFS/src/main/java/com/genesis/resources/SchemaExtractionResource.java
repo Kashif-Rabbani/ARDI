@@ -5,17 +5,27 @@ import com.genesis.eso.util.MongoCollections;
 import com.genesis.eso.util.Utils;
 import com.genesis.rdf.model.bdi_ontology.JsonSchemaExtractor;
 import com.google.common.collect.Lists;
+import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.mongodb.MongoClient;
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.ReadWrite;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.util.FileManager;
 import org.bson.Document;
 import sun.misc.IOUtils;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 
 @Path("bdi")
@@ -38,23 +48,28 @@ public class SchemaExtractionResource {
     public Response POST_JsonFileInfo(String body) {
         System.out.println("[POST /json] body = " + body);
         JSONObject objBody = (JSONObject) JSONValue.parse(body);
-        JsonSchemaExtractor obj = new JsonSchemaExtractor();
-        JSONObject res = obj.initiateExtraction(
+        JsonSchemaExtractor jsonSchemaExtractor = new JsonSchemaExtractor();
+        JSONObject res = jsonSchemaExtractor.initiateExtraction(
                 objBody.getAsString("filePath"),
                 objBody.getAsString("givenName").replaceAll(" ", ""));
-        String fileName = obj.getOutputFile();
 
-        JSONObject resData = new JSONObject();
-
-        resData.put("name", objBody.getAsString("givenName"));
-        resData.put("address", fileName);
-        resData.put("type", objBody.getAsString("type"));
-
-        resData.put("dataSourceID", "");
-        resData.put("iri", "");
+        JSONObject resData = prepareResponse(JsonSchemaExtractor.getOutputFile(), JsonSchemaExtractor.getIRI(), objBody);
         addMongoCollection(resData);
-        System.out.println(res.toJSONString());
-        System.out.println("FileName: " + fileName);
+
+        Dataset dataset = Utils.getTDBDataset();
+        dataset.begin(ReadWrite.WRITE);
+        Model model = dataset.getNamedModel(JsonSchemaExtractor.getIRI());
+        OntModel ontModel = ModelFactory.createOntologyModel();
+        /* Store RDF into a temporal file */
+        System.out.println(JsonSchemaExtractor.getOutputFile());
+        //model.add(FileManager.get().readModel(ontModel, "/home/kashif/Documents/GIT/BDI/RDFS/Output/CarRegistration2.ttl"));
+        model.read(JsonSchemaExtractor.getOutputFile());
+        model.commit();
+        model.close();
+        dataset.commit();
+        dataset.end();
+        dataset.close();
+
         return Response.ok(new Gson().toJson(resData)).build();
     }
 
@@ -79,14 +94,9 @@ public class SchemaExtractionResource {
         return Response.ok(new Gson().toJson("SQL")).build();
     }
 
-    private void addMongoCollection(JSONObject objBody){
-        MongoClient client = Utils.getMongoDBClient();
-        MongoCollections.getDataSourcesCollection(client).insertOne(Document.parse(objBody.toJSONString()));
-        client.close();
-    }
 
     @GET
-    @Path("dataSource/")
+    @Path("bdiDataSource/")
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.TEXT_PLAIN)
     public Response GET_dataSource() {
@@ -96,5 +106,26 @@ public class SchemaExtractionResource {
         MongoCollections.getDataSourcesCollection(client).find().iterator().forEachRemaining(document -> dataSources.add(document.toJson()));
         client.close();
         return Response.ok(new Gson().toJson(dataSources)).build();
+    }
+
+    private JSONObject prepareResponse(String fileName, String IRI, JSONObject objBody) {
+        JSONObject resData = new JSONObject();
+        resData.put("name", objBody.getAsString("givenName"));
+        resData.put("type", objBody.getAsString("type").toUpperCase());
+        resData.put("sourceFileAddress", objBody.getAsString("filePath"));
+        resData.put("parsedFileAddress", fileName);
+        resData.put("dataSourceID", UUID.randomUUID().toString().replace("-", ""));
+        resData.put("iri", IRI);
+        return resData;
+    }
+
+    private void addMongoCollection(JSONObject objBody) {
+        MongoClient client = Utils.getMongoDBClient();
+        MongoCollections.getDataSourcesCollection(client).insertOne(Document.parse(objBody.toJSONString()));
+        client.close();
+    }
+
+    public static void main(String[] args) throws Exception {
+
     }
 }

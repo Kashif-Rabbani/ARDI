@@ -21,13 +21,13 @@ public class TempFiles {
 
     private static final File DIR = new File("Output");
 
-    private static final String SUFFIX = ".owl";
+    private static final String SUFFIX = ".ttl";
 
     public static String storeInTempFile(String content) {
         String tempFileName = UUID.randomUUID().toString();
         String filePath = "";
         try {
-            File tempFile = File.createTempFile(tempFileName, ".owl");
+            File tempFile = File.createTempFile(tempFileName, SUFFIX);
             filePath = tempFile.getAbsolutePath();
             Files.write(content.getBytes(), tempFile);
         } catch (IOException e) {
@@ -40,7 +40,7 @@ public class TempFiles {
         String tempFileName = UUID.randomUUID().toString();
         String filePath = "";
         try {
-            File tempFile = File.createTempFile(tempFileName, ".owl");
+            File tempFile = File.createTempFile(tempFileName, SUFFIX);
             filePath = tempFile.getAbsolutePath();
         } catch (IOException e) {
             e.printStackTrace();

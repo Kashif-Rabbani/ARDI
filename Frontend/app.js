@@ -28,6 +28,7 @@ var user_routes = require(__dirname+'/routes/user_routes');
 var graph_routes = require(__dirname+'/routes/graph_routes');
 var global_graph_routes = require(__dirname+'/routes/global_graph_routes');
 var data_source_routes = require(__dirname+'/routes/data_source_routes');
+var bdi_data_source_routes = require(__dirname+'/routes/bdi_data_source_routes');
 var wrapper_routes = require(__dirname+'/routes/wrapper_routes');
 var lav_mapping_routes = require(__dirname+'/routes/lav_mapping_routes');
 var omq_routes = require(__dirname+'/routes/omq_routes');
@@ -134,6 +135,10 @@ app.post('/globalGraph/:globalGraphID/graphicalGraph', global_graph_routes.postG
 app.get('/dataSource/', data_source_routes.getAllDataSources);
 app.get('/dataSource/:dataSourceID', data_source_routes.getDataSource);
 app.post('/dataSource', data_source_routes.postDataSource);
+
+app.get('/bdiDataSource/', bdi_data_source_routes.getAllDataSources);
+app.get('/bdiDataSource/:dataSourceID', bdi_data_source_routes.getDataSource);
+app.post('/bdiDataSource', bdi_data_source_routes.postDataSource);
 
 /********** Wrapper resource ********************************************************/
 

@@ -14,7 +14,8 @@ $(function() {
         var width = $(window).width()*0.75;
         var height = $(window).height()*0.75;
         var nodeRadius = 12;
-
+        console.log("Printing Graph:");
+        console.log(graph);
         outer = d3.select("#sourceGraphWrapper").append("svg")
             .attr("width", width)
             .attr("height", height)
