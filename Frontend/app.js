@@ -1,4 +1,4 @@
-var config = require(__dirname+'/config');
+var config = require(__dirname + '/config');
 var port = config.PORT;
 var express = require('express');
 var path = require('path');
@@ -12,7 +12,7 @@ var app = express();
 var io = require('socket.io').listen(app.listen(port));
 var flash = require('express-flash');
 var multer = require('multer');
-var uploadd = multer({ dest: config.FILES_PATH });
+var uploadd = multer({dest: config.FILES_PATH});
 var passport = require('passport');
 var fs = require('fs');
 var upload = require("express-fileupload");
@@ -24,28 +24,27 @@ var upload = require("express-fileupload");
 /*****************************************************************************************/
 /*****************************************************************************************/
 
-var user_routes = require(__dirname+'/routes/user_routes');
-var graph_routes = require(__dirname+'/routes/graph_routes');
-var global_graph_routes = require(__dirname+'/routes/global_graph_routes');
-var data_source_routes = require(__dirname+'/routes/data_source_routes');
-var bdi_data_source_routes = require(__dirname+'/routes/bdi_data_source_routes');
-var wrapper_routes = require(__dirname+'/routes/wrapper_routes');
-var lav_mapping_routes = require(__dirname+'/routes/lav_mapping_routes');
-var omq_routes = require(__dirname+'/routes/omq_routes');
+var user_routes = require(__dirname + '/routes/user_routes');
+var graph_routes = require(__dirname + '/routes/graph_routes');
+var global_graph_routes = require(__dirname + '/routes/global_graph_routes');
+var data_source_routes = require(__dirname + '/routes/data_source_routes');
+var bdi_data_source_routes = require(__dirname + '/routes/bdi_data_source_routes');
+var wrapper_routes = require(__dirname + '/routes/wrapper_routes');
+var lav_mapping_routes = require(__dirname + '/routes/lav_mapping_routes');
+var omq_routes = require(__dirname + '/routes/omq_routes');
 
-var global_level_routes = require(__dirname+'/routes/global_level_routes');
-var bdi_ontology_routes = require(__dirname+'/routes/bdi_ontology_routes');
+var global_level_routes = require(__dirname + '/routes/global_level_routes');
+var bdi_ontology_routes = require(__dirname + '/routes/bdi_ontology_routes');
 
-var source_level_routes = require(__dirname+'/routes/source_level_routes');
-var release_routes = require(__dirname+'/routes/release_routes');
-var admin_routes = require(__dirname+'/routes/admin_routes');
+var source_level_routes = require(__dirname + '/routes/source_level_routes');
+var release_routes = require(__dirname + '/routes/release_routes');
+var admin_routes = require(__dirname + '/routes/admin_routes');
 
 
+var file_upload = require(__dirname + "/routes/upload_file");
+var trigger_extraction = require(__dirname + "/routes/bdi_trigger_extraction");
 
-var file_upload = require(__dirname+"/routes/upload_file");
-var trigger_extraction = require(__dirname+"/routes/bdi_trigger_extraction");
-
-var test_route = require(__dirname +"/routes/test_route");
+var test_route = require(__dirname + "/routes/test_route");
 
 
 /*****************************************************************************************/
@@ -58,14 +57,14 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 app.use(logger('dev'));
 app.use(methodOverride());
-app.use(session({ secret: 'uwotm8', proxy: true, resave: true, saveUninitialized: true }));
+app.use(session({secret: 'uwotm8', proxy: true, resave: true, saveUninitialized: true}));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 app.use(bodyParser.json());                          // parse application/json
-app.use(bodyParser.urlencoded({ extended: true }));  // parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({extended: true}));  // parse application/x-www-form-urlencoded
 //app.use(multer());                                   // parse multipart/form-data
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(bodyParser.raw({uploadDir:config.FILES_PATH}));
+app.use(bodyParser.raw({uploadDir: config.FILES_PATH}));
 // app.use(upload());
 // app.use(formidable());
 // app.use(readChunk());
@@ -89,10 +88,9 @@ require('./auth');
 
 
 app.get('/test', test_route.getGraph);
-
 app.post('/fileupload', file_upload.uploadFile);
 app.post('/triggerExtraction', trigger_extraction.triggerExtraction);
-app.use(favicon(path.join(__dirname,'public','images','favicon.ico')));
+app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.ico')));
 
 
 /********** User resource ****************************************************************/
@@ -105,7 +103,7 @@ app.post('/login', passport.authenticate('local', {
     failureFlash: true
 }));
 
-app.get('/logout', function(req, res){
+app.get('/logout', function (req, res) {
     req.logout();
     res.redirect('/');
 });
@@ -176,8 +174,15 @@ app.get('/admin/demoPrepare', admin_routes.demoPrepare);
 /*****************************************************************************************/
 /*****************************************************************************************/
 
-app.get('/', checkAuthenticated, function(req,res) {
-    res.render('bdi_index', {user:req.session.passport.user});
+
+app.get('/view/:resource_name', checkAuthenticated, function (req, res) {
+    console.log(req.params);
+    console.log(req.query);
+    res.render('bdi_visualization', {user: req.session.passport.user, resource_name : req.params.resource_name});
+});
+
+app.get('/', checkAuthenticated, function (req, res) {
+    res.render('bdi_index', {user: req.session.passport.user});
 });
 
 app.get('/login', function (req, res) {
@@ -185,91 +190,93 @@ app.get('/login', function (req, res) {
     res.render('bdi_login', {message: req.flash('error')});
 });
 
-app.get('/registration', function(req, res) {
+app.get('/registration', function (req, res) {
     res.setHeader('Last-Modified', (new Date()).toUTCString());
     res.render('bdi_register_user');
 });
 
 /********** Global graph section ***************************************************************/
 
-app.get('/new_global_graph', checkAuthenticated, function(req,res) {
-    res.render('new_global_graph', {user:req.session.passport.user});
+app.get('/new_global_graph', checkAuthenticated, function (req, res) {
+    res.render('new_global_graph', {user: req.session.passport.user});
 });
 
-app.get('/manage_global_graphs', checkAuthenticated, function(req,res) {
-    res.render('manage_global_graphs', {user:req.session.passport.user});
+app.get('/manage_global_graphs', checkAuthenticated, function (req, res) {
+    res.render('manage_global_graphs', {user: req.session.passport.user});
 });
 
-app.get('/view_global_graph', checkAuthenticated, function(req,res) {
-    res.render('view_global_graph', {user:req.session.passport.user});
+app.get('/view_global_graph', checkAuthenticated, function (req, res) {
+    res.render('view_global_graph', {user: req.session.passport.user});
 });
 
-app.get('/edit_global_graph', checkAuthenticated, function(req,res) {
-    res.render('edit_global_graph', {user:req.session.passport.user});
+app.get('/edit_global_graph', checkAuthenticated, function (req, res) {
+    res.render('edit_global_graph', {user: req.session.passport.user});
 });
 
 /********** Data Source section ***************************************************************/
 
-app.get('/new_data_source', checkAuthenticated, function(req,res) {
-    res.render('new_data_source', {user:req.session.passport.user});
+app.get('/new_data_source', checkAuthenticated, function (req, res) {
+    res.render('new_data_source', {user: req.session.passport.user});
 });
 
-app.get('/manage_data_sources', checkAuthenticated, function(req,res) {
-    res.render('manage_data_sources', {user:req.session.passport.user});
+app.get('/manage_data_sources', checkAuthenticated, function (req, res) {
+    res.render('manage_data_sources', {user: req.session.passport.user});
 });
 
 
-app.get('/view_data_source', checkAuthenticated, function(req,res) {
-    res.render('view_data_source', {user:req.session.passport.user});
+app.get('/view_data_source', checkAuthenticated, function (req, res) {
+    res.render('view_data_source', {user: req.session.passport.user});
 });
 
-app.get('/view_source_graph', checkAuthenticated, function(req,res) {
-    res.render('view_source_graph', {user:req.session.passport.user});
+app.get('/view_source_graph', checkAuthenticated, function (req, res) {
+    res.render('view_source_graph', {user: req.session.passport.user});
 });
 
 /********** Wrapper section ***************************************************************/
 
-app.get('/new_wrapper', checkAuthenticated, function(req,res) {
-    res.render('new_wrapper', {user:req.session.passport.user});
+app.get('/new_wrapper', checkAuthenticated, function (req, res) {
+    res.render('new_wrapper', {user: req.session.passport.user});
 });
 
-app.get('/manage_wrappers', checkAuthenticated, function(req,res) {
-    res.render('manage_wrappers', {user:req.session.passport.user});
+app.get('/manage_wrappers', checkAuthenticated, function (req, res) {
+    res.render('manage_wrappers', {user: req.session.passport.user});
 });
 
-app.get('/view_wrapper', checkAuthenticated, function(req,res) {
-    res.render('view_wrapper', {user:req.session.passport.user});
+app.get('/view_wrapper', checkAuthenticated, function (req, res) {
+    res.render('view_wrapper', {user: req.session.passport.user});
 });
 
 /********** LAV mapping section ************************************************************/
 
-app.get('/new_lav_mapping', checkAuthenticated, function(req,res) {
-    res.render('new_lav_mapping', {user:req.session.passport.user});
+app.get('/new_lav_mapping', checkAuthenticated, function (req, res) {
+    res.render('new_lav_mapping', {user: req.session.passport.user});
 });
 
-app.get('/manage_lav_mappings', checkAuthenticated, function(req,res) {
-    res.render('manage_lav_mappings', {user:req.session.passport.user});
+app.get('/manage_lav_mappings', checkAuthenticated, function (req, res) {
+    res.render('manage_lav_mappings', {user: req.session.passport.user});
 });
 
-app.get('/view_lav_mapping_sameAs', checkAuthenticated, function(req,res) {
-    res.render('view_lav_mapping_sameAs', {user:req.session.passport.user});
+app.get('/view_lav_mapping_sameAs', checkAuthenticated, function (req, res) {
+    res.render('view_lav_mapping_sameAs', {user: req.session.passport.user});
 });
 
-app.get('/view_lav_mapping_subgraph', checkAuthenticated, function(req,res) {
-    res.render('view_lav_mapping_subgraph', {user:req.session.passport.user});
+app.get('/view_lav_mapping_subgraph', checkAuthenticated, function (req, res) {
+    res.render('view_lav_mapping_subgraph', {user: req.session.passport.user});
 });
 
 /********** OMQ section ************************************************************/
 
-app.get('/pose_omq', checkAuthenticated, function(req,res) {
-    res.render('pose_omq', {user:req.session.passport.user});
+app.get('/pose_omq', checkAuthenticated, function (req, res) {
+    res.render('pose_omq', {user: req.session.passport.user});
 });
 
 
 /**********************************   END   ********************************************/
 
 function checkAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) { return next(); }
+    if (req.isAuthenticated()) {
+        return next();
+    }
     res.redirect('/login');
 }
 
