@@ -15,13 +15,10 @@ import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.bson.Document;
-import org.visualdataweb.vowl.owl2vowl.Owl2Vowl;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
 

@@ -176,17 +176,17 @@
             <version>2.8.1</version>
         </dependency>
 
- 		 <dependency>
+ 		 <!--<dependency>
             <groupId>com.github.VisualDataWeb</groupId>
             <artifactId>OWL2VOWL</artifactId>
-            <version>RELEASE</version>
-        </dependency>
+            <version>master-0.3.5-g73085ef-5</version>
+        </dependency>-->
 
-      <!--   <dependency>
+         <dependency>
             <groupId>org.visualdataweb.vowl.owl2vowl</groupId>
             <artifactId>OWL2VOWL</artifactId>
-            <version>0.3.5</version>
-        </dependency> -->
+            <version>0.3.6</version>
+        </dependency>
 
     </dependencies>
     <properties>
@@ -194,10 +194,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-     <repositories>
+    <!-- <repositories>
         <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
-    </repositories>
+    </repositories>-->
 </project>
