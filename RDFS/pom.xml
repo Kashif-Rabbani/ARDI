@@ -5,7 +5,7 @@
 
     <groupId>com.genesis.eso</groupId>
     <artifactId>BDI</artifactId>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
     <name>BDI</name>
 
@@ -96,17 +96,17 @@
             <artifactId>xsom</artifactId>
             <version>20140925</version>
             <type>jar</type>
-            
+
         </dependency>
         <dependency>
-  			<groupId>org.slf4j</groupId>
-  			<artifactId>slf4j-simple</artifactId>
-  			<version>1.7.25</version>
-		</dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.25</version>
+        </dependency>
         <dependency>
-        	<groupId>org.slf4j</groupId>
-        	<artifactId>slf4j-log4j12</artifactId>
-        	<version>1.8.0-beta2</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.8.0-beta2</version>
         </dependency>
 
         <!-- WordNet Enrichment Dependencies-->
@@ -176,11 +176,28 @@
             <version>2.8.1</version>
         </dependency>
 
+ 		 <dependency>
+            <groupId>com.github.VisualDataWeb</groupId>
+            <artifactId>OWL2VOWL</artifactId>
+            <version>RELEASE</version>
+        </dependency>
 
+      <!--   <dependency>
+            <groupId>org.visualdataweb.vowl.owl2vowl</groupId>
+            <artifactId>OWL2VOWL</artifactId>
+            <version>0.3.5</version>
+        </dependency> -->
 
     </dependencies>
     <properties>
         <jersey.version>2.26</jersey.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+     <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
 </project>

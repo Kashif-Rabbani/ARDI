@@ -1,5 +1,6 @@
 package com.genesis.main;
 
+import com.genesis.eso.util.Utils;
 import com.genesis.rdf.model.bdi_ontology.JsonSchemaExtractor;
 import com.genesis.rdf.model.bdi_ontology.XmlSchemaExtractor;
 import com.genesis.rdf.model.bdi_ontology.rdb.MySqlDB;
@@ -26,6 +27,9 @@ public class Main {
                         path.split(",")[3],
                         databaseType);
                 //new MySqlDB("employees","jdbc:mysql", "localhost", "root",  "");
+                break;
+            case "TRY":
+                Utils.oWl2vowl();
                 break;
             default:
                 System.out.println("Please provide the arguments in a correct way: " +

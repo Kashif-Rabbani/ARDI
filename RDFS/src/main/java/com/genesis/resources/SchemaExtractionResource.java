@@ -5,7 +5,6 @@ import com.genesis.eso.util.MongoCollections;
 import com.genesis.eso.util.Utils;
 import com.genesis.rdf.model.bdi_ontology.JsonSchemaExtractor;
 import com.google.common.collect.Lists;
-import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.mongodb.MongoClient;
 import net.minidev.json.JSONObject;
@@ -15,15 +14,14 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.util.FileManager;
 import org.bson.Document;
-import sun.misc.IOUtils;
+import org.visualdataweb.vowl.owl2vowl.Owl2Vowl;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.File;
-import java.io.IOException;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,22 +45,25 @@ public class SchemaExtractionResource {
     @Produces(MediaType.TEXT_PLAIN)
     public Response POST_JsonFileInfo(String body) {
         System.out.println("[POST /json] body = " + body);
+        //Parsing body as JSON
         JSONObject objBody = (JSONObject) JSONValue.parse(body);
+
+        //Creating JsonSchemaExtractor Object
         JsonSchemaExtractor jsonSchemaExtractor = new JsonSchemaExtractor();
+        //Initiating Extraction Process
         JSONObject res = jsonSchemaExtractor.initiateExtraction(
                 objBody.getAsString("filePath"),
                 objBody.getAsString("givenName").replaceAll(" ", ""));
 
+        // Preparing the response to be sent back
         JSONObject resData = prepareResponse(JsonSchemaExtractor.getOutputFile(), JsonSchemaExtractor.getIRI(), objBody);
+        // Adding the response to MongoDB
         addMongoCollection(resData);
 
         Dataset dataset = Utils.getTDBDataset();
         dataset.begin(ReadWrite.WRITE);
         Model model = dataset.getNamedModel(JsonSchemaExtractor.getIRI());
         OntModel ontModel = ModelFactory.createOntologyModel();
-        /* Store RDF into a temporal file */
-        System.out.println(JsonSchemaExtractor.getOutputFile());
-        //model.add(FileManager.get().readModel(ontModel, "/home/kashif/Documents/GIT/BDI/RDFS/Output/CarRegistration2.ttl"));
         model.read(JsonSchemaExtractor.getOutputFile());
         model.commit();
         model.close();
@@ -123,9 +124,5 @@ public class SchemaExtractionResource {
         MongoClient client = Utils.getMongoDBClient();
         MongoCollections.getDataSourcesCollection(client).insertOne(Document.parse(objBody.toJSONString()));
         client.close();
-    }
-
-    public static void main(String[] args) throws Exception {
-
     }
 }

@@ -1,7 +1,6 @@
 package com.genesis.eso.util;
 
 import com.genesis.rdf.model.bdi_ontology.metamodel.NewSourceLevel2;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 //added for date 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
