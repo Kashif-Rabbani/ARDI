@@ -1,4 +1,18 @@
 ### Libraries
+
+ - OWL2VOWL dependency
+    - Jar file is generated from https://github.com/Kashif-Rabbani/OWL2VOWL (This project is forked fromhttps://github.com/VisualDataWeb/OWL2VOWL). 
+    
+    - Updates are made in the forked project. For more details see the commits history. 
+    
+    - File: OWL2VOWL-0.3.6.jar 
+    
+    Jar file is available in the lib folder. Use the following `command` to add it as a maven dependency.
+    ```sh
+    mvn install:install-file -Dfile=/home/kashif/Documents/GIT/TestBDI/BDI/RDFS/lib/OWL2VOWL-0.3.6.jar -DgroupId=org.visualdataweb.vowl.owl2vowl -DartifactId=OWL2VOWL -Dversion=0.3.6 -Dpackaging=jar
+     ```
+    
+
 ### Configuration or Installation Issues
 In Ubuntu/Linux OS, you might encounter JDK versioning issue. You should install open-jdk-8. Sometimes it does not install javafx with it. You might need to install it separately. Or in the worst case, you might need to follow these steps:
 
