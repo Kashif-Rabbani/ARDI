@@ -30,3 +30,6 @@ public/vowl/data/*
 
 # exception to the rule
 !public/vowl/data/foaf.json
+!public/vowl/data/new_ontology.json
+!public/vowl/data/template.json
+!public/vowl/data/muto.json

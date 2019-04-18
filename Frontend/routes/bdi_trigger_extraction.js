@@ -1,7 +1,7 @@
 var config = require(__dirname + '/../config'),
     request = require('request');
 
-exports.triggerExtraction = function (req, res, next) {
+exports.triggerExtraction = function (req, res) {
     console.log(req.body);
     req.body = req.body[0];
 
@@ -15,7 +15,7 @@ exports.triggerExtraction = function (req, res, next) {
 
         if (req.body.type === 'SQL') {
             url = url + "sql/";
-            sendPostRequest(url, objDataSource, res);
+            //sendPostRequest(url, objDataSource, res);
         }
 
         if (req.body.type === 'xml') {
@@ -24,7 +24,7 @@ exports.triggerExtraction = function (req, res, next) {
         }
 
         if (req.body.type === 'json') {
-            url = url + "json/";
+            url = url + "jsonSchema/";
             sendPostRequest(url, objDataSource, res);
         }
     }
@@ -34,11 +34,13 @@ exports.triggerExtraction = function (req, res, next) {
 function sendPostRequest(url, objDataSource, res) {
     request.post({
         url: url,
-        body: JSON.stringify(objDataSource)
+        body: JSON.stringify(objDataSource),
+        cache: false
     }, function done(error, response, body) {
-        if (!error && response.statusCode == 200) {
+        if (!error && response.statusCode === 200) {
             console.log(body);
             res.status(200).json("ok");
+            res.end();
         } else {
             res.status(500).send("Error Triggering Parsing.");
         }

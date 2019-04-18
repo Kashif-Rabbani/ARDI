@@ -26,18 +26,8 @@ import java.util.UUID;
 @Path("bdi")
 public class SchemaExtractionResource {
 
-/*    @GET
-    @Path("json/")
-    @Consumes(MediaType.TEXT_PLAIN)
-    @Produces(MediaType.TEXT_PLAIN)
-    public Response GET_dataSource() {
-        System.out.println("[GET /GET_JSON/]");
-
-        return Response.ok(new Gson().toJson("Kashif")).build();
-    }*/
-
     @POST
-    @Path("json/")
+    @Path("jsonSchema/")
     @Consumes("text/plain")
     @Produces(MediaType.TEXT_PLAIN)
     public Response POST_JsonFileInfo(String body) {
@@ -62,9 +52,8 @@ public class SchemaExtractionResource {
         // Adding the response to MongoDB
         addMongoCollection(resData);
 
-
         // Adding the RDFS Schema in Jena TDB Triple Store
-        Dataset dataset = Utils.getTDBDataset();
+ /*       Dataset dataset = Utils.getTDBDataset();
         dataset.begin(ReadWrite.WRITE);
         Model model = dataset.getNamedModel(JsonSchemaExtractor.getIRI());
         OntModel ontModel = ModelFactory.createOntologyModel();
@@ -73,9 +62,9 @@ public class SchemaExtractionResource {
         model.close();
         dataset.commit();
         dataset.end();
-        dataset.close();
+        dataset.close();*/
 
-        return Response.ok(new Gson().toJson(resData)).build();
+        return Response.ok(new Gson().toJson("JSON")).build();
     }
 
     @POST

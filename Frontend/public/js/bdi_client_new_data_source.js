@@ -96,8 +96,7 @@ function handler(dataSource) {
         console.log("Return: " + JSON.stringify(data));
         if (data[0].status === true) {
             parseSource(data);
-        }
-        else {
+        } else {
             //TODO handle it, notify the user about the invalid format
             console.log("Invalid format");
         }
@@ -113,18 +112,19 @@ function parseSource(data) {
     toggleModal();
 
     var clickHandler = function (ee) {
+        console.log("Kashif here: clickHandler -> button Clicked");
         ee.preventDefault();
+        ee.stopImmediatePropagation();
         toggleModal();
         $.ajax({
             type: 'POST',
             data: JSON.stringify(data),
             contentType: 'application/json',
             url: '/triggerExtraction',
-            cache: false,
-            async: true,
             success: function (response) {
                 console.log('success');
                 console.log(JSON.stringify(response));
+                console.log("Kashif here: response is back");
                 window.location.href = '/';
             },
             error: function (response) {
@@ -132,7 +132,6 @@ function parseSource(data) {
                 console.log(JSON.stringify(response));
             }
         });
-        ee.stopImmediatePropagation();
         return false;
     };
     $('#ModalProceedButton').one('click', clickHandler);
@@ -146,6 +145,7 @@ function getParsedFileDetails() {
             var dataSource = JSON.parse(value);
             $('#dataSources').find('tbody')
                 .append($('<tr>')
+                    .append($('<td>').append('<input type="checkbox" name="checkbox" value = "'+ dataSource.dataSourceID +'" /> '))
                     .append($('<td>')
                         .text(i)
                     ).append($('<td>')
@@ -155,7 +155,7 @@ function getParsedFileDetails() {
                     ).append($('<td>')
                         .text(dataSource.parsedFileAddress)
                     )//.append($('<td>').append($('<a href="/view_data_source?dataSourceID=' + (dataSource.dataSourceID) + '">').append($('<span class="fa fa-search"></span>'))))
-                    .append($('<td>').append($('<a href="/view/' + (dataSource.vowlJsonFileName) + '&'+dataSource.name + '">').append($('<span class="fa fa-search"></span>')))
+                    .append($('<td>').append($('<a href="/view/' + (dataSource.vowlJsonFileName) + '&' + dataSource.name + '">').append($('<span class="fa fa-search"></span>')))
                     )
                 );
 

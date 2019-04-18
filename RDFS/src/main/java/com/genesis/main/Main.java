@@ -29,7 +29,8 @@ public class Main {
                 //new MySqlDB("employees","jdbc:mysql", "localhost", "root",  "");
                 break;
             case "TRY":
-                Utils.oWl2vowl("/home/kashif/Documents/GIT/BDI/RDFS/Output/Auto1.ttl");
+                //This is just to test some functionality independently
+                //Utils.oWl2vowl("/home/kashif/Documents/GIT/BDI/RDFS/Output/Auto1.ttl");
                 break;
             default:
                 System.out.println("Please provide the arguments in a correct way: " +
