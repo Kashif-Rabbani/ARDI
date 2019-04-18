@@ -175,10 +175,10 @@ app.get('/admin/demoPrepare', admin_routes.demoPrepare);
 /*****************************************************************************************/
 
 
-app.get('/view/:resource_name', checkAuthenticated, function (req, res) {
+app.get('/view/:resource_name&:dsn', checkAuthenticated, function (req, res) {
     console.log(req.params);
     console.log(req.query);
-    res.render('bdi_visualization', {user: req.session.passport.user, resource_name : req.params.resource_name});
+    res.render('bdi_visualization', {user: req.session.passport.user, resource_name : req.params.resource_name, data_source_name : req.params.dsn});
 });
 
 app.get('/', checkAuthenticated, function (req, res) {

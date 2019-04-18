@@ -8,9 +8,9 @@ block content
                 .row
                     .col-md-12
                         h5(style="color:black")
-                            | Visualizing  #{resource_name}
+                            | Visualizing Schema of data source:  #{data_source_name}
 
-    iframe#ViewiframeGraph(style='visibility:hidden;', onload="this.style.visibility = 'visible';" , src='http://localhost:8000/#'+resource_name, frameborder='0')
+    iframe#ViewiframeGraph(style='visibility:hidden;', onload="this.style.visibility = 'visible';" , src='/vowl/#'+resource_name, frameborder='0')
 
 
 

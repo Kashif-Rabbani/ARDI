@@ -108,11 +108,12 @@ function handler(dataSource) {
 }
 
 function parseSource(data) {
+    console.log("--------------------------- Parse Source Method ------------------------------");
     console.log(JSON.stringify(data));
     toggleModal();
 
-    var clickHandler = function (e) {
-        e.preventDefault();
+    var clickHandler = function (ee) {
+        ee.preventDefault();
         toggleModal();
         $.ajax({
             type: 'POST',
@@ -120,6 +121,7 @@ function parseSource(data) {
             contentType: 'application/json',
             url: '/triggerExtraction',
             cache: false,
+            async: true,
             success: function (response) {
                 console.log('success');
                 console.log(JSON.stringify(response));
@@ -130,9 +132,9 @@ function parseSource(data) {
                 console.log(JSON.stringify(response));
             }
         });
-        e.stopImmediatePropagation();
+        ee.stopImmediatePropagation();
         return false;
-    }
+    };
     $('#ModalProceedButton').one('click', clickHandler);
 }
 
@@ -153,7 +155,7 @@ function getParsedFileDetails() {
                     ).append($('<td>')
                         .text(dataSource.parsedFileAddress)
                     )//.append($('<td>').append($('<a href="/view_data_source?dataSourceID=' + (dataSource.dataSourceID) + '">').append($('<span class="fa fa-search"></span>'))))
-                    .append($('<td>').append($('<a href="/view_source_graph?iri=' + (dataSource.iri) + '">').append($('<span class="fa fa-search"></span>')))
+                    .append($('<td>').append($('<a href="/view/' + (dataSource.vowlJsonFileName) + '&'+dataSource.name + '">').append($('<span class="fa fa-search"></span>')))
                     )
                 );
 

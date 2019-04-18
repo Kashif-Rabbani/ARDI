@@ -48,15 +48,22 @@ public class SchemaExtractionResource {
         //Creating JsonSchemaExtractor Object
         JsonSchemaExtractor jsonSchemaExtractor = new JsonSchemaExtractor();
         //Initiating Extraction Process
+        // This process will extract JSON schema from the file and convert it into RDFS Knowledge Graph.
         JSONObject res = jsonSchemaExtractor.initiateExtraction(
                 objBody.getAsString("filePath"),
                 objBody.getAsString("givenName").replaceAll(" ", ""));
 
+        //Convert RDFS to VOWL (Visualization Framework) Compatible JSON
+        JSONObject vowlObj = Utils.oWl2vowl(JsonSchemaExtractor.getOutputFile());
+
         // Preparing the response to be sent back
-        JSONObject resData = prepareResponse(JsonSchemaExtractor.getOutputFile(), JsonSchemaExtractor.getIRI(), objBody);
+        JSONObject resData = prepareResponse(JsonSchemaExtractor.getOutputFile(), JsonSchemaExtractor.getIRI(), objBody, vowlObj);
+
         // Adding the response to MongoDB
         addMongoCollection(resData);
 
+
+        // Adding the RDFS Schema in Jena TDB Triple Store
         Dataset dataset = Utils.getTDBDataset();
         dataset.begin(ReadWrite.WRITE);
         Model model = dataset.getNamedModel(JsonSchemaExtractor.getIRI());
@@ -106,7 +113,7 @@ public class SchemaExtractionResource {
         return Response.ok(new Gson().toJson(dataSources)).build();
     }
 
-    private JSONObject prepareResponse(String fileName, String IRI, JSONObject objBody) {
+    private JSONObject prepareResponse(String fileName, String IRI, JSONObject objBody, JSONObject vowlObj) {
         JSONObject resData = new JSONObject();
         resData.put("name", objBody.getAsString("givenName"));
         resData.put("type", objBody.getAsString("type").toUpperCase());
@@ -114,6 +121,8 @@ public class SchemaExtractionResource {
         resData.put("parsedFileAddress", fileName);
         resData.put("dataSourceID", UUID.randomUUID().toString().replace("-", ""));
         resData.put("iri", IRI);
+        resData.put("vowlJsonFilePath", vowlObj.getAsString("vowlJsonFilePath"));
+        resData.put("vowlJsonFileName", vowlObj.getAsString("vowlJsonFileName"));
         return resData;
     }
 

@@ -25,3 +25,8 @@ Uploads/*
 
 # exception to the rule
 !Uploads/README.md
+
+public/vowl/data
+
+# exception to the rule
+!public/vowl/data/foaf.json

@@ -3,6 +3,7 @@ package com.genesis.eso.util;
 import com.almworks.sqlite4java.SQLiteConnection;
 import com.almworks.sqlite4java.SQLiteException;
 import com.mongodb.MongoClient;
+import net.minidev.json.JSONObject;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.tdb.TDBFactory;
 import org.visualdataweb.vowl.owl2vowl.Owl2Vowl;
@@ -11,7 +12,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-
 
 
 /**
@@ -24,6 +24,7 @@ public class Utils {
     }
 
     public static Dataset copyOfTheDataset = null;
+
     public static Dataset getTDBDataset() {
         if (copyOfTheDataset == null) {
             try {
@@ -54,17 +55,25 @@ public class Utils {
         return in;
     }
 
-    public static void oWl2vowl(){
-        InputStream in = null;
+    public static JSONObject oWl2vowl(String rdfsFilePath) {
+        JSONObject vowlData = new JSONObject();
+        String jsonFilePath = "";
         try {
-            in = new FileInputStream("Output/Auto1.ttl");
+            File temp = new File(rdfsFilePath);
+            String vowlFileName = temp.getName().replaceAll(".ttl", "-vowl.json");
+            //InputStream in = new FileInputStream(rdfsFilePath);
+            Owl2Vowl owl2Vowl = new Owl2Vowl(new FileInputStream(rdfsFilePath));
+            //System.out.println(owl2Vowl.getJsonAsString());
+            File jsonVowlFile = new File(ConfigManager.getProperty("vowl_output_path") + vowlFileName);
+            owl2Vowl.writeToFile(jsonVowlFile);
+            jsonFilePath = jsonVowlFile.getAbsolutePath();
+
+            vowlData.put("vowlJsonFileName", vowlFileName.replaceAll(".json", ""));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        Owl2Vowl owl2Vowl = new Owl2Vowl(in);
-        //System.out.println(owl2Vowl.getJsonAsString());
-        File newFile = new File("kashif.json");
-        System.out.println(newFile.getAbsolutePath());
-        owl2Vowl.writeToFile(newFile);
+        vowlData.put("vowlJsonFilePath", jsonFilePath);
+        //System.out.println(jsonFilePath);
+        return vowlData;
     }
 }
