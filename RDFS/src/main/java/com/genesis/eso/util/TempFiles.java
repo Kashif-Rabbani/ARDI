@@ -19,7 +19,8 @@ public class TempFiles {
 
     //private static final File DIR = new File(System.getProperty("java.io.tmpdir"));
 
-    private static final File DIR = new File("Output");
+    //    private static final File DIR = new File("Output");
+    private static final File DIR = new File(ConfigManager.getProperty("output_path"));
 
     private static final String SUFFIX = ".ttl";
 

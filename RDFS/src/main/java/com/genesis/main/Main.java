@@ -6,7 +6,7 @@ import com.genesis.rdf.model.bdi_ontology.XmlSchemaExtractor;
 import com.genesis.rdf.model.bdi_ontology.rdb.MySqlDB;
 
 public class Main {
-
+    public static String configPath = "config.kashif.properties";
     public static void main(String[] args) throws Exception {
         String extractionType = args[0];
         String path = args[1];

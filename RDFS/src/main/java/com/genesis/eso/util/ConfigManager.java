@@ -1,6 +1,7 @@
 package com.genesis.eso.util;
 
 import com.genesis.main.ApacheMain;
+import com.genesis.main.Main;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -13,7 +14,11 @@ public class ConfigManager {
     public static String getProperty(String property) {
         java.util.Properties prop = new java.util.Properties();
         try {
-            prop.load(new FileInputStream(ApacheMain.configPath));
+            if (ApacheMain.configPath != null) {
+                prop.load(new FileInputStream(ApacheMain.configPath));
+            } else{
+                prop.load(new FileInputStream(Main.configPath));
+            }
             return prop.getProperty(property);
         } catch (IOException ex) {
             return null;
