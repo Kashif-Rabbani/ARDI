@@ -145,7 +145,7 @@ function getParsedFileDetails() {
             var dataSource = JSON.parse(value);
             $('#dataSources').find('tbody')
                 .append($('<tr>')
-                    .append($('<td>').append('<input type="checkbox" name="checkbox" value = "'+ dataSource.dataSourceID +'" /> '))
+                    .append($('<td>').append('<input type="checkbox" class="dataSourceCheckbox" name="dataSource" value = "'+ dataSource.dataSourceID +'" /> '))
                     .append($('<td>')
                         .text(i)
                     ).append($('<td>')
