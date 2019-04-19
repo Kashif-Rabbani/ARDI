@@ -53,7 +53,9 @@ public class SchemaExtractionResource {
         addMongoCollection(resData);
 
         // Adding the RDFS Schema in Jena TDB Triple Store
- /*       Dataset dataset = Utils.getTDBDataset();
+
+        /*
+        Dataset dataset = Utils.getTDBDataset();
         dataset.begin(ReadWrite.WRITE);
         Model model = dataset.getNamedModel(JsonSchemaExtractor.getIRI());
         OntModel ontModel = ModelFactory.createOntologyModel();
@@ -62,8 +64,8 @@ public class SchemaExtractionResource {
         model.close();
         dataset.commit();
         dataset.end();
-        dataset.close();*/
-
+        dataset.close();
+        */
         return Response.ok(new Gson().toJson("JSON")).build();
     }
 

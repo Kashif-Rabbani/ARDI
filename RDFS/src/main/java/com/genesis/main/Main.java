@@ -4,6 +4,7 @@ import com.genesis.eso.util.Utils;
 import com.genesis.rdf.model.bdi_ontology.JsonSchemaExtractor;
 import com.genesis.rdf.model.bdi_ontology.XmlSchemaExtractor;
 import com.genesis.rdf.model.bdi_ontology.rdb.MySqlDB;
+import uk.ac.ox.krr.logmap2.*;
 
 public class Main {
     public static String configPath = "config.kashif.properties";
@@ -30,6 +31,15 @@ public class Main {
                 break;
             case "TRY":
                 //This is just to test some functionality independently
+                new LogMap2_Matcher("file:/home/kashif/Documents/GIT/BDI/RDFS/Output/AutoRegistration1.owl",
+                        "file:/home/kashif/Documents/GIT/BDI/RDFS/Output/CarRegistration1.owl",
+                        "/home/kashif/Documents/GIT/BDI/RDFS/Output/logmap/", true);
+                /*
+                    file:/home/kashif/Documents/GIT/BDI/RDFS/Output/CarRegistration1.owl
+                    file:/home/kashif/Documents/GIT/BDI/RDFS/Output/AutoRegistration1.owl
+                    /home/kashif/Documents/GIT/logmap-matcher/output/
+                    true
+                 */
                 //Utils.oWl2vowl("/home/kashif/Documents/GIT/BDI/RDFS/Output/Auto1.ttl");
                 break;
             default:
