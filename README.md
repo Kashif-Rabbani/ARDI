@@ -1,28 +1,40 @@
-# Frontend NodeJs Web Project
+# Big Data Integration
+
+[![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](#)
+
+## Frontend NodeJs Web Project
 
 ### Getting Started
 
  - Requirements: Node v8.0.0 is required. Version greater than this might encounter issues in file uploading module.
 
-# Backend Java Maven Project - RDFS
+## Backend Java Maven Project - RDFS
 
 ### Getting Started
 
+#### Services
+  -  It is required to run a few of the services used by the project to setup the execution of the project smoothly.
+        -   **OWL2VOWL Service:** 
+            How to run?  
+            ```sh
+            java -jar BDI/Services/owl2vowl-rest-service.jar
+            ```
+            This will start the service required by RDFS backend module to convert OWL to VOWL JSON representation required for the visualization.
+            Need to change? 
+            Source code is available here (link). Read the instrunctions in Readme file of this service.
+
 #### Libraries 
 
- - **OWL2VOWL external dependency library**
-    - Jar file is generated from https://github.com/Kashif-Rabbani/OWL2VOWL (This project is forked fromhttps://github.com/VisualDataWeb/OWL2VOWL). 
+ - **LogMap Matcher external dependency library**
+    - Jar file is generated from https://github.com/Kashif-Rabbani/logmap-matcher (This project is forked from https://github.com/ernestojimenezruiz/logmap-matcher). 
     
     - Updates are made in the forked project. For more details see the commits history. 
     
-    - Command to generate jar with dependencies: `mvn package -P standalone-release` 
+    - Command to generate jar with dependencies: `mvn clean install` and `mvn clean compile assembly:single` 
     - Jar file: OWL2VOWL-0.3.6.jar 
+    - Jar file is available in the lib folder of BDI Project. 
     
-    Jar file is available in the lib folder. Use the following `command` to add it as a maven dependency.
-    ```sh
-    mvn install:install-file -Dfile=/home/kashif/Documents/GIT/TestBDI/BDI/RDFS/lib/OWL2VOWL-0.3.6.jar -DgroupId=org.visualdataweb.vowl.owl2vowl -DartifactId=OWL2VOWL -Dversion=0.3.6 -Dpackaging=jar
-     ```
-    
+  
 
 #### Troubles
 In Ubuntu/Linux OS, you might encounter JDK versioning issue. You should install open-jdk-8. Sometimes it does not install javafx with it. You might need to install it separately. Or in the worst case, you might need to follow these steps:
