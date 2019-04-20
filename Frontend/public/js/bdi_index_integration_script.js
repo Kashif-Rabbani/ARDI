@@ -53,7 +53,7 @@ function integrationButtonClickHandler(integrateButton) {
                 //window.location.href = '/';
             },
             error: function (response) {
-                console.log('failure');
+                alert('failure' + response.toString());
                 console.log(JSON.stringify(response));
             }
         });

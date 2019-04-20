@@ -50,7 +50,7 @@ public class SchemaExtractionResource {
         JSONObject resData = prepareResponse(JsonSchemaExtractor.getOutputFile(), JsonSchemaExtractor.getIRI(), objBody, vowlObj);
 
         // Adding the response to MongoDB
-        addMongoCollection(resData);
+        addDataSourceInfoAsMongoCollection(resData);
 
         // Adding the RDFS Schema in Jena TDB Triple Store
 
@@ -117,7 +117,7 @@ public class SchemaExtractionResource {
         return resData;
     }
 
-    private void addMongoCollection(JSONObject objBody) {
+    private void addDataSourceInfoAsMongoCollection(JSONObject objBody) {
         MongoClient client = Utils.getMongoDBClient();
         MongoCollections.getDataSourcesCollection(client).insertOne(Document.parse(objBody.toJSONString()));
         client.close();

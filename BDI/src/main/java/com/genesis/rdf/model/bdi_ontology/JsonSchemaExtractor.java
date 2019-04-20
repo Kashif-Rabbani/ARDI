@@ -100,19 +100,17 @@ public class JsonSchemaExtractor {
     }
 
     public static OntModel getOrCreateSchemaModel(String filename) throws MalformedURLException {
-        //File latestSchemaModelFile = TempFiles.getLatestFile(filename).map(longFilePair -> longFilePair.getValue()).orElse(null);
+        File latestSchemaModelFile = TempFiles.getLatestFile(filename).map(longFilePair -> longFilePair.getValue()).orElse(null);
 
         OntModel schemaModel;
-//        if (latestSchemaModelFile != null) {
-//            schemaModel = ModelFactory.createOntologyModel();
-//            schemaModel.read(latestSchemaModelFile.toURI().toURL().toString(), LANG);
-//            return schemaModel;
-//        } else {
-//            schemaModel = ModelFactory.createOntologyModel();
-//            schemaModel.setNsPrefix(NewNamespaces2.rdfs.name(), NewNamespaces2.rdfs.val());
-//        }
-        schemaModel = ModelFactory.createOntologyModel();
-        schemaModel.setNsPrefix(NewNamespaces2.rdfs.name(), NewNamespaces2.rdfs.val());
+        if (latestSchemaModelFile != null) {
+            schemaModel = ModelFactory.createOntologyModel();
+            schemaModel.read(latestSchemaModelFile.toURI().toURL().toString(), LANG);
+            return schemaModel;
+        } else {
+            schemaModel = ModelFactory.createOntologyModel();
+            schemaModel.setNsPrefix(NewNamespaces2.rdfs.name(), NewNamespaces2.rdfs.val());
+        }
 
         return schemaModel;
     }

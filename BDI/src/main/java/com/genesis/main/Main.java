@@ -5,6 +5,10 @@ import com.genesis.rdf.model.bdi_ontology.JsonSchemaExtractor;
 import com.genesis.rdf.model.bdi_ontology.XmlSchemaExtractor;
 import com.genesis.rdf.model.bdi_ontology.rdb.MySqlDB;
 import uk.ac.ox.krr.logmap2.*;
+import uk.ac.ox.krr.logmap2.io.FlatAlignmentFormat;
+import uk.ac.ox.krr.logmap2.mappings.objects.MappingObjectStr;
+
+import java.util.Set;
 
 public class Main {
     public static String configPath = "config.kashif.properties";
@@ -31,16 +35,6 @@ public class Main {
                 break;
             case "TRY":
                 //This is just to test some functionality independently
-                new LogMap2_Matcher("file:/home/kashif/Documents/GIT/BDI/RDFS/Output/AutoRegistration1.owl",
-                        "file:/home/kashif/Documents/GIT/BDI/RDFS/Output/CarRegistration1.owl",
-                        "/home/kashif/Documents/GIT/BDI/RDFS/Output/logmap/", true);
-                /*
-                    file:/home/kashif/Documents/GIT/BDI/RDFS/Output/CarRegistration1.owl
-                    file:/home/kashif/Documents/GIT/BDI/RDFS/Output/AutoRegistration1.owl
-                    /home/kashif/Documents/GIT/logmap-matcher/output/
-                    true
-                 */
-                //Utils.oWl2vowl("/home/kashif/Documents/GIT/BDI/RDFS/Output/Auto1.ttl");
                 break;
             default:
                 System.out.println("Please provide the arguments in a correct way: " +
@@ -54,4 +48,5 @@ public class Main {
                         " UserName,Password,databaseName,databaseServer");
         }
     }
+
 }

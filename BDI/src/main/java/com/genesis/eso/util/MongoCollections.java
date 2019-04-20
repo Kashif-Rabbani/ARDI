@@ -10,8 +10,8 @@ public class MongoCollections {
         return client.getDatabase(ConfigManager.getProperty("system_bdi_db_name")).getCollection("globalGraphs");
     }
 
-    public static MongoCollection<Document> getWrappersCollection(MongoClient client) {
-        return client.getDatabase(ConfigManager.getProperty("system_bdi_db_name")).getCollection("wrappers");
+    public static MongoCollection<Document> getIntegratedDataSourcesCollection(MongoClient client) {
+        return client.getDatabase(ConfigManager.getProperty("system_bdi_db_name")).getCollection("integratedDataSources");
     }
 
     public static MongoCollection<Document> getDataSourcesCollection(MongoClient client) {
