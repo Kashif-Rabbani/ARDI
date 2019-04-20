@@ -17,7 +17,9 @@
     "window": false,
     "$": true,
     "alert": true,
-    "JSON": true
+    "JSON": true,
+    "XMLHttpRequest": true,
+    "FormData": true
   },
   "indent": 2,
   "noarg": true,

@@ -107,12 +107,9 @@ function handler(dataSource) {
 }
 
 function parseSource(data) {
-    console.log("--------------------------- Parse Source Method ------------------------------");
     console.log(JSON.stringify(data));
     toggleModal();
-
     var clickHandler = function (ee) {
-        console.log("Kashif here: clickHandler -> button Clicked");
         ee.preventDefault();
         ee.stopImmediatePropagation();
         toggleModal();
@@ -124,11 +121,11 @@ function parseSource(data) {
             success: function (response) {
                 console.log('success');
                 console.log(JSON.stringify(response));
-                console.log("Kashif here: response is back");
+                console.log("response is back");
                 window.location.href = '/';
             },
             error: function (response) {
-                console.log('failure');
+                alert('Upload failed ' + response.toString());
                 console.log(JSON.stringify(response));
             }
         });

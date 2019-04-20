@@ -1,5 +1,5 @@
 /**
- * Created by snadal on 18/05/16.
+ * Created by Kashif Rabbani
  */
 var fs = require('fs'),
     config = require(__dirname+'/../config'),
