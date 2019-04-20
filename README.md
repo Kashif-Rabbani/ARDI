@@ -12,6 +12,18 @@
 
 ### Getting Started
 
+#### Services
+  -  It is required to run a few of the services used by the project to setup the execution of the project smoothly.
+        -   **OWL2VOWL Service:** 
+            How to run?  
+            ```sh
+            java -jar BDI/Services/owl2vowl-rest-service.jar
+            ```
+            This will start the service required by RDFS backend module to convert OWL to VOWL JSON representation required for the visualization.
+            Need to change? 
+            Source code is available here (link). Read the instrunctions in Readme file of this service.
+
+
 #### Libraries 
 
  - **LogMap Matcher external dependency library**
