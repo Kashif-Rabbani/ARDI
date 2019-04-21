@@ -73,6 +73,7 @@ function handler(dataSource) {
         data: dataSource,
         processData: false,
         contentType: false,
+        async: true,
         xhr: function () {
             var xhr = new XMLHttpRequest();
             if (dataSource.get("givenType") !== 'SQL') {
@@ -118,6 +119,7 @@ function parseSource(data) {
             data: JSON.stringify(data),
             contentType: 'application/json',
             url: '/triggerExtraction',
+            async: true,
             success: function (response) {
                 console.log('success');
                 console.log(JSON.stringify(response));

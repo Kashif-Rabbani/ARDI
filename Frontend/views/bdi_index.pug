@@ -8,7 +8,9 @@ block headers
     link(rel='stylesheet', href='/stylesheets/select2-bootstrap.min.css')
 
 block content
-
+    #overlay
+        .cv-spinner
+            span.spinner
     //.container-fluid
     .col-4.card.bg-white.float-left.border-0
         .card.bg-light.mb-3
@@ -147,3 +149,6 @@ block content
                     .modal-footer
                         button.btn.btn-secondary(type='button', data-dismiss='modal') Cancel
                         button#ModalProceedButton.btn.btn-primary(type='button') Proceed
+
+
+

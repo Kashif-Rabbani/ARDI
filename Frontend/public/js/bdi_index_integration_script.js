@@ -3,6 +3,10 @@
  */
 $(document).ready(function () {
 
+    $(document).ajaxSend(function() {
+        $("#overlay").fadeIn(100);
+    });
+
     $("body").on('change', 'input[type=checkbox]', function () {
         var checkedCheckedBoxes = $('input[type=checkbox]:checked').length;
         var integrateButton = $("#integrateDataSourcesButton");
@@ -19,8 +23,7 @@ $(document).ready(function () {
             integrateButton.addClass("disabled");
             integrateButton.prop('disabled', true);
         }
-        if (integrateButton.hasClass('disabled')) {
-        } else {
+        if (!integrateButton.hasClass('disabled')) {
             integrationButtonClickHandler(integrateButton);
         }
     });
@@ -47,14 +50,17 @@ function integrationButtonClickHandler(integrateButton) {
             data: JSON.stringify(object),
             contentType: 'application/json',
             url: '/integrateDataSources',
+            async: true,
             success: function (response) {
                 console.log('success');
                 console.log(JSON.stringify(response));
                 //window.location.href = '/';
+                $("#overlay").fadeOut(200);
             },
             error: function (response) {
-                alert('failure' + response.toString());
+                alert('failure' + JSON.stringify(response));
                 console.log(JSON.stringify(response));
+                $("#overlay").fadeOut(200);
             }
         });
         return false;
