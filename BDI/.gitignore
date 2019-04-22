@@ -41,12 +41,14 @@ target
 target/*
 
 Output/*
+Output/logmap/*
 
 # exception to the rule
 !Output/README.md
-!Output/logmap
+!Output/logmap/
+!Output/logmap/README.md
 
-Output/logmap/*
+
 
 Input/*
 

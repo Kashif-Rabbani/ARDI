@@ -3,7 +3,7 @@
  */
 $(document).ready(function () {
 
-    $(document).ajaxSend(function() {
+    $(document).ajaxSend(function () {
         $("#overlay").fadeIn(100);
     });
 
@@ -50,12 +50,11 @@ function integrationButtonClickHandler(integrateButton) {
             data: JSON.stringify(object),
             contentType: 'application/json',
             url: '/integrateDataSources',
-            async: true,
+            async: false,
+            cache: false,
             success: function (response) {
-                console.log('success');
-                console.log(JSON.stringify(response));
-                //window.location.href = '/';
-                $("#overlay").fadeOut(200);
+                console.log('Success');
+                goToAlignmentsView(response);
             },
             error: function (response) {
                 alert('failure' + JSON.stringify(response));
@@ -68,3 +67,11 @@ function integrationButtonClickHandler(integrateButton) {
     integrateButton.one('click', clickHandler);
 }
 
+function goToAlignmentsView(data) {
+    //console.log("Inside Alignments" + data + '/integration/:ids_id&ds1_id&:ds2_id&:ds1_name&:ds2_name&:align_iri');
+    var d = JSON.parse(data);
+    var url = '/integration/' + d.integratedDataSourceID + '&' + d.dataSourceID1 + '&' + d.dataSourceID2 + '&' + d.dataSource1Name + '&' + d.dataSource2Name + '&' + d.alignmentsIRI;
+    console.log(url);
+    $("#overlay").fadeOut(300);
+    window.location.href = url;
+}

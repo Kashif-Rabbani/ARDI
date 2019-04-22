@@ -141,6 +141,7 @@ app.get('/bdiDataSource/', bdi_data_source_routes.getAllDataSources);
 app.get('/bdiDataSource/:dataSourceID', bdi_data_source_routes.getDataSource);
 app.post('/bdiDataSource', bdi_data_source_routes.postDataSource);
 
+app.get('/bdiAlignments/:iri', integrate_data_Sources.getAlignments);
 /********** Wrapper resource ********************************************************/
 
 app.get('/wrapper/', wrapper_routes.getAllWrappers);
@@ -178,12 +179,6 @@ app.get('/admin/demoPrepare', admin_routes.demoPrepare);
 /*****************************************************************************************/
 
 
-app.get('/view/:resource_name&:dsn', checkAuthenticated, function (req, res) {
-    console.log(req.params);
-    console.log(req.query);
-    res.render('bdi_visualization', {user: req.session.passport.user, resource_name : req.params.resource_name, data_source_name : req.params.dsn});
-});
-
 app.get('/', checkAuthenticated, function (req, res) {
     res.render('bdi_index', {user: req.session.passport.user});
 });
@@ -196,6 +191,18 @@ app.get('/login', function (req, res) {
 app.get('/registration', function (req, res) {
     res.setHeader('Last-Modified', (new Date()).toUTCString());
     res.render('bdi_register_user');
+});
+
+app.get('/view/:resource_name&:dsn', checkAuthenticated, function (req, res) {
+    /*console.log(req.params);
+    console.log(req.query);*/
+    res.render('bdi_visualization', {user: req.session.passport.user, resource_name : req.params.resource_name, data_source_name : req.params.dsn});
+});
+
+app.get('/integration/:ids_id&:ds1_id&:ds2_id&:ds1_name&:ds2_name&:align_iri', checkAuthenticated, function (req, res) {
+    console.log(req.params);
+    console.log(req.query);
+    res.render('bdi_integration', {user: req.session.passport.user, ids_id :req.params.ids_id});
 });
 
 /********** Global graph section ***************************************************************/

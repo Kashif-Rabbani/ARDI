@@ -121,9 +121,8 @@ function parseSource(data) {
             url: '/triggerExtraction',
             async: true,
             success: function (response) {
-                console.log('success');
+                console.log('Success');
                 console.log(JSON.stringify(response));
-                console.log("response is back");
                 window.location.href = '/';
             },
             error: function (response) {

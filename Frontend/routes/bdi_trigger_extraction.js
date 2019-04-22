@@ -38,12 +38,13 @@ function sendPostRequest(url, objDataSource, res) {
     request.post({
         url: url,
         body: JSON.stringify(objDataSource),
-        cache: false
+        cache: false,
+        async: true
     }, function done(error, response, body) {
         if (!error && response.statusCode === 200) {
             console.log(body);
-            res.status(200).json("ok");
-            res.end();
+            res.sendStatus(200);
+            //res.end();
         } else {
             res.status(500).send("Error Triggering Parsing.");
         }
