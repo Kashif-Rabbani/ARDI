@@ -32,8 +32,6 @@ $(document).ready(function () {
 function integrationButtonClickHandler(integrateButton) {
     var clickHandler = function (e) {
         e.preventDefault();
-        e.stopImmediatePropagation();
-
         integrateButton.prop('disabled', false);
 
         var dataSources = [];
@@ -45,15 +43,16 @@ function integrationButtonClickHandler(integrateButton) {
         object.id1 = dataSources[0];
         object.id2 = dataSources[1];
         console.log(object);
+
+
         $.ajax({
             type: 'POST',
             data: JSON.stringify(object),
             contentType: 'application/json',
             url: '/integrateDataSources',
-            async: false,
-            cache: false,
             success: function (response) {
                 console.log('Success');
+                //$("#overlay").fadeOut(200);
                 goToAlignmentsView(response);
             },
             error: function (response) {
@@ -62,6 +61,7 @@ function integrationButtonClickHandler(integrateButton) {
                 $("#overlay").fadeOut(200);
             }
         });
+        e.stopImmediatePropagation();
         return false;
     };
     integrateButton.one('click', clickHandler);
@@ -70,8 +70,13 @@ function integrationButtonClickHandler(integrateButton) {
 function goToAlignmentsView(data) {
     //console.log("Inside Alignments" + data + '/integration/:ids_id&ds1_id&:ds2_id&:ds1_name&:ds2_name&:align_iri');
     var d = JSON.parse(data);
-    var url = '/integration/' + d.integratedDataSourceID + '&' + d.dataSourceID1 + '&' + d.dataSourceID2 + '&' + d.dataSource1Name + '&' + d.dataSource2Name + '&' + d.alignmentsIRI;
+    var url = '/integration/' + d.integratedDataSourceID + '&' + d.dataSourceID1 + '&' + d.dataSourceID2 + '&' +
+        d.dataSource1Name + '&' + d.dataSource2Name + '&' + d.alignmentsIRI + '&' + d.integratedIRI;
+
     console.log(url);
+
     $("#overlay").fadeOut(300);
     window.location.href = url;
 }
+
+

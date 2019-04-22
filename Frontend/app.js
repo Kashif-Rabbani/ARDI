@@ -142,6 +142,7 @@ app.get('/bdiDataSource/:dataSourceID', bdi_data_source_routes.getDataSource);
 app.post('/bdiDataSource', bdi_data_source_routes.postDataSource);
 
 app.get('/bdiAlignments/:iri', integrate_data_Sources.getAlignments);
+app.post('/alignmentsAccept', integrate_data_Sources.acceptAlignment);
 /********** Wrapper resource ********************************************************/
 
 app.get('/wrapper/', wrapper_routes.getAllWrappers);
@@ -199,7 +200,7 @@ app.get('/view/:resource_name&:dsn', checkAuthenticated, function (req, res) {
     res.render('bdi_visualization', {user: req.session.passport.user, resource_name : req.params.resource_name, data_source_name : req.params.dsn});
 });
 
-app.get('/integration/:ids_id&:ds1_id&:ds2_id&:ds1_name&:ds2_name&:align_iri', checkAuthenticated, function (req, res) {
+app.get('/integration/:ids_id&:ds1_id&:ds2_id&:ds1_name&:ds2_name&:align_iri&:i_iri', checkAuthenticated, function (req, res) {
     console.log(req.params);
     console.log(req.query);
     res.render('bdi_integration', {user: req.session.passport.user, ids_id :req.params.ids_id});

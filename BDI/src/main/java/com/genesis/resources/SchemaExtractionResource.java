@@ -52,20 +52,9 @@ public class SchemaExtractionResource {
         // Adding the response to MongoDB
         addDataSourceInfoAsMongoCollection(resData);
 
-        // Adding the RDFS Schema in Jena TDB Triple Store
+        // Adding the RDFS Schema in Jena TDB Triple Store using IRI
+        addExtractedSchemaIntoTDBStore(JsonSchemaExtractor.getIRI());
 
-        /*
-        Dataset dataset = Utils.getTDBDataset();
-        dataset.begin(ReadWrite.WRITE);
-        Model model = dataset.getNamedModel(JsonSchemaExtractor.getIRI());
-        OntModel ontModel = ModelFactory.createOntologyModel();
-        model.read(JsonSchemaExtractor.getOutputFile());
-        model.commit();
-        model.close();
-        dataset.commit();
-        dataset.end();
-        dataset.close();
-        */
         return Response.ok(new Gson().toJson("JSON")).build();
     }
 
@@ -121,5 +110,18 @@ public class SchemaExtractionResource {
         MongoClient client = Utils.getMongoDBClient();
         MongoCollections.getDataSourcesCollection(client).insertOne(Document.parse(objBody.toJSONString()));
         client.close();
+    }
+
+    private void addExtractedSchemaIntoTDBStore(String iri){
+        Dataset dataset = Utils.getTDBDataset();
+        dataset.begin(ReadWrite.WRITE);
+        Model model = dataset.getNamedModel(iri);
+        //OntModel ontModel = ModelFactory.createOntologyModel();
+        model.read(JsonSchemaExtractor.getOutputFile());
+        model.commit();
+        model.close();
+        dataset.commit();
+        dataset.end();
+        dataset.close();
     }
 }

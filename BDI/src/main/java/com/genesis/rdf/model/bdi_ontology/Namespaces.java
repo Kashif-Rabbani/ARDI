@@ -9,7 +9,7 @@ public enum Namespaces {
     G("http://www.BDIOntology.com/global/"),
     M("http://www.BDIOntology.com/mappings/"),
     R("http://www.BDIOntology.com/eca_rule/"),
-
+    I("http://www.BDIOntology.com/integratedSchema/"),
     E("http://www.essi.upc.edu/~snadal/Event/"),
 
     owl("http://www.w3.org/2002/07/owl#"),
