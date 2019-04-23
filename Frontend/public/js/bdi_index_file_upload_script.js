@@ -135,36 +135,7 @@ function parseSource(data) {
     $('#ModalProceedButton').one('click', clickHandler);
 }
 
-function getParsedFileDetails() {
-    $.get("/bdiDataSource", function (data) {
-        console.log(data);
-        var i = 1;
-        $.each((data), function (key, value) {
-            var dataSource = JSON.parse(value);
-            $('#dataSources').find('tbody')
-                .append($('<tr>')
-                    .append($('<td>').append('<input type="checkbox" class="dataSourceCheckbox" name="dataSource" value = "'+ dataSource.dataSourceID +'" /> '))
-                    .append($('<td>')
-                        .text(i)
-                    ).append($('<td>')
-                        .text(dataSource.name)
-                    ).append($('<td>')
-                        .text(dataSource.type)
-                    ).append($('<td>')
-                        .text(dataSource.parsedFileAddress)
-                    )//.append($('<td>').append($('<a href="/view_data_source?dataSourceID=' + (dataSource.dataSourceID) + '">').append($('<span class="fa fa-search"></span>'))))
-                    .append($('<td>').append($('<a href="/view/' + (dataSource.vowlJsonFileName) + '&' + dataSource.name + '">').append($('<span class="fa fa-search"></span>')))
-                    )
-                );
 
-            ++i;
-        });
-    });
-}
-
-$(function () {
-    getParsedFileDetails();
-});
 
 function toggleModal() {
     $('#confirmationModal').modal('toggle');

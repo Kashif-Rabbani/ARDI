@@ -1,8 +1,8 @@
 extends bdi_layout
 block headers
     link(rel='stylesheet', href='/stylesheets/loading.css')
-    script(src='/js/bdi_client_new_data_source.js')
-    script(src='/js/bdi_index_integration_script.js')
+    script(src='/js/bdi_index_file_upload_script.js')
+    script(src='/js/bdi_index_script.js')
     link(href='/js/select2-4.0.3/dist/css/select2.min.css', rel='stylesheet', type='text/css')
     script(src='/js/select2-4.0.3/dist/js/select2.min.js')
     link(rel='stylesheet', href='/stylesheets/select2-bootstrap.min.css')
@@ -102,9 +102,9 @@ block content
                                 thead
                                     tr
                                         th #
-                                        th Name
-                                        th Type
-                                        th File Address
+                                        th Data Source 1
+                                        th Data Source 2
+                                        th Alignments IRI
                                         th View
                                 tbody
 

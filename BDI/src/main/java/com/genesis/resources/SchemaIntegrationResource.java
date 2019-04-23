@@ -1,14 +1,13 @@
 package com.genesis.resources;
 
-import com.genesis.eso.util.MongoCollections;
+import com.genesis.eso.util.ConfigManager;
+import com.genesis.eso.util.MongoUtil;
 import com.genesis.eso.util.RDFUtil;
 import com.genesis.eso.util.Utils;
 import com.genesis.rdf.LogMapMatcher;
 import com.genesis.rdf.model.bdi_ontology.JsonSchemaExtractor;
-import com.genesis.rdf.model.bdi_ontology.Namespaces;
-import com.genesis.rdf.parsers.OWLtoD3;
-import com.google.common.collect.Lists;
 import com.google.gson.Gson;
+import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCursor;
 import net.minidev.json.JSONArray;
@@ -16,18 +15,19 @@ import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.ReadWrite;
-import org.apache.jena.rdf.model.*;
-import org.apache.jena.rdf.model.impl.PropertyImpl;
-import org.apache.jena.rdf.model.impl.ResourceImpl;
+import org.apache.jena.rdf.model.Model;
+import org.bson.BsonDocument;
+import org.bson.BsonValue;
 import org.bson.Document;
-import scala.Tuple3;
+import com.mongodb.client.MongoCollection;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.util.List;
+
+import static com.mongodb.client.model.Filters.eq;
 
 @Path("bdi")
 public class SchemaIntegrationResource {
@@ -51,9 +51,12 @@ public class SchemaIntegrationResource {
             if (!dataSource1.isEmpty())
                 dataSource2Info = (JSONObject) JSONValue.parse(dataSource2);
 
-            // Caution: IRI after the namespace should not contain any slashes e.g. http://www.BDIOntology.com/schema/CarRegistration-Bus (allowed) and http://www.BDIOntology.com/schema/CarRegistration/Bus (Not allowed)
+             /*Caution: IRI after the namespace should not contain any slashes e.g.
+               http://www.BDIOntology.com/schema/CarRegistration-Bus (allowed) and
+                http://www.BDIOntology.com/schema/CarRegistration/Bus (Not allowed)*/
 
-            String alignmentsIRI = dataSource1Info.getAsString("iri") + "-" + dataSource2Info.getAsString("name").replaceAll(" ", "");
+            String alignmentsIRI = dataSource1Info.getAsString("iri") + "-" +
+                    dataSource2Info.getAsString("name").replaceAll(" ", "");
 
             System.out.println("********** Alignments IRI ********** " + alignmentsIRI);
 
@@ -91,7 +94,7 @@ public class SchemaIntegrationResource {
     @Path("getSchemaAlignments/{alignmentsIRI}")
     @Consumes("text/plain")
     public Response GET_IntegratedSchemaAlignment(@PathParam("alignmentsIRI") String iri) {
-        System.out.println("[GET /graph" + "/" + iri + "/graphical");
+        System.out.println("[GET /getSchemaAlignments" + "/" + iri);
         iri = "http://www.BDIOntology.com/schema/" + iri;
         try {
             JSONArray alignmentsArray = new JSONArray();
@@ -122,16 +125,32 @@ public class SchemaIntegrationResource {
         System.out.println("[POST /acceptAlignment] body = " + body);
         try {
             JSONObject objBody = (JSONObject) JSONValue.parse(body);
-            String integratedIRI = "http://www.BDIOntology.com/integratedSchema/"+ objBody.getAsString("integrated_iri");
+            String integratedIRI = "http://www.BDIOntology.com/integratedSchema/" + objBody.getAsString("integrated_iri");
             RDFUtil.addTriple(integratedIRI, objBody.getAsString("s"), "owl:sameAs", objBody.getAsString("p"));
+            return Response.ok(("Okay")).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
 
+    @POST
+    @Path("finishIntegration/")
+    @Consumes("text/plain")
+    public Response GET_finishIntegration(String body) {
+        JSONObject objBody = (JSONObject) JSONValue.parse(body);
+        System.out.println("[GET /finishIntegration" + "/" + objBody.getAsString("integratedIRI"));
+        String integratedIRI = objBody.getAsString("integratedIRI");
+        integratedIRI = "http://www.BDIOntology.com/integratedSchema/" + integratedIRI;
+        try {
             // Add the integratedModel into TDB
             Dataset integratedDataset = Utils.getTDBDataset();
             integratedDataset.begin(ReadWrite.WRITE);
             Model model = integratedDataset.getNamedModel(integratedIRI);
+            String integratedModelFileName = objBody.getAsString("dataSource1Name") + "-" + objBody.getAsString("dataSource2Name") + ".ttl";
             try {
-                model.write(new FileOutputStream("Output/integrated-new-model.ttl"), "TURTLE");
+                model.write(new FileOutputStream(ConfigManager.getProperty("output_path") + integratedModelFileName), "TURTLE");
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -140,7 +159,10 @@ public class SchemaIntegrationResource {
             integratedDataset.commit();
             integratedDataset.end();
             integratedDataset.close();
+            //Convert RDFS to VOWL (Visualization Framework) Compatible JSON
+            JSONObject vowlObj = Utils.oWl2vowl(ConfigManager.getProperty("output_path") + integratedModelFileName);
 
+            updateIntegratedDataSourceInfo(objBody.getAsString("integratedDataSourceID"), vowlObj);
 
 
             return Response.ok(("Okay")).build();
@@ -150,6 +172,7 @@ public class SchemaIntegrationResource {
         }
     }
 
+    //Supporting Methods
     private String mergeSourcesTDBDatasets(JSONObject dataSource1Info, JSONObject dataSource2Info) {
 
         String integratedIRI = "http://www.BDIOntology.com/integratedSchema/" + dataSource1Info.getAsString("name").replaceAll(" ", "")
@@ -192,26 +215,23 @@ public class SchemaIntegrationResource {
 
     private String getDataSourceInfo(String dataSourceId) {
         MongoClient client = Utils.getMongoDBClient();
-        MongoCursor<Document> cursor = MongoCollections.getDataSourcesCollection(client).
+        MongoCursor<Document> cursor = MongoUtil.getDataSourcesCollection(client).
                 find(new Document("dataSourceID", dataSourceId)).iterator();
-        boolean itIs = true;
-        String out = "";
-        if (!cursor.hasNext()) itIs = false;
-        else out = cursor.next().toJson();
-        client.close();
-
-        if (itIs) {
-            System.out.println(out);
-        } else {
-            System.out.println("Not Found");
-        }
-        return out;
+        return MongoUtil.getMongoObject(client, cursor);
     }
 
     private void addIntegratedDataSourceInfoAsMongoCollection(JSONObject objBody) {
         System.out.println("Successfully Added to MongoDB");
         MongoClient client = Utils.getMongoDBClient();
-        MongoCollections.getIntegratedDataSourcesCollection(client).insertOne(Document.parse(objBody.toJSONString()));
+        MongoUtil.getIntegratedDataSourcesCollection(client).insertOne(Document.parse(objBody.toJSONString()));
+        client.close();
+    }
+
+    private static void updateIntegratedDataSourceInfo(String iri, JSONObject vowlObj) {
+        MongoClient client = Utils.getMongoDBClient();
+        MongoCollection collection = MongoUtil.getIntegratedDataSourcesCollection(client);
+        collection.updateOne(eq("integratedDataSourceID", iri), new Document("$set", new Document("integratedVowlJsonFilePath", vowlObj.getAsString("vowlJsonFilePath"))));
+        collection.updateOne(eq("integratedDataSourceID", iri), new Document("$set", new Document("integratedVowlJsonFileName", vowlObj.getAsString("vowlJsonFileName"))));
         client.close();
     }
 }

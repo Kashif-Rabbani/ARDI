@@ -9,7 +9,17 @@ var fs = require('fs'),
 
 exports.getDataSource = function (req, res, next) {
     request.get(config.BDI_DATA_LAYER_URL + "bdiDataSource/"+req.params.dataSourceID, function (error, response, body) {
-        if (!error && response.statusCode == 200) {
+        if (!error && response.statusCode === 200) {
+            res.status(200).json(JSON.parse(body));
+        } else {
+            res.status(500).send("Error retrieving data source");
+        }
+    });
+};
+
+exports.getIntegratedDataSource = function (req, res, next) {
+    request.get(config.BDI_DATA_LAYER_URL + "bdiIntegratedDataSources/"+req.params.integratedDataSourceID, function (error, response, body) {
+        if (!error && response.statusCode === 200) {
             res.status(200).json(JSON.parse(body));
         } else {
             res.status(500).send("Error retrieving data source");
@@ -19,13 +29,25 @@ exports.getDataSource = function (req, res, next) {
 
 exports.getAllDataSources = function (req, res, next) {
     request.get(config.BDI_DATA_LAYER_URL + "bdiDataSource/", function (error, response, body) {
-        if (!error && response.statusCode == 200) {
+        if (!error && response.statusCode === 200) {
             res.status(200).json(JSON.parse(body));
         } else {
             res.status(500).send("Error retrieving list of data sources");
         }
     });
 };
+
+exports.getAllIntegratedDataSources = function (req, res, next) {
+    request.get(config.BDI_DATA_LAYER_URL + "bdiIntegratedDataSources/", function (error, response, body) {
+        if (!error && response.statusCode === 200) {
+            res.status(200).json(JSON.parse(body));
+        } else {
+            res.status(500).send("Error retrieving list of data sources");
+        }
+    });
+};
+
+
 
 exports.postDataSource = function (req, res, next) {
     console.log(req.body);
