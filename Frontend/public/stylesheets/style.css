@@ -205,3 +205,9 @@ a {
 .dataSourceClass{
   color:#18BC9C;
 }
+
+.table input[type="checkbox"]{
+  width: 20px; /*Desired width*/
+  height: 20px; /*Desired height*/
+  cursor: pointer;
+}

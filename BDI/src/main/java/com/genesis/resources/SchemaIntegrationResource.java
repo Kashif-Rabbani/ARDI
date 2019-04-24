@@ -230,8 +230,8 @@ public class SchemaIntegrationResource {
     private static void updateIntegratedDataSourceInfo(String iri, JSONObject vowlObj) {
         MongoClient client = Utils.getMongoDBClient();
         MongoCollection collection = MongoUtil.getIntegratedDataSourcesCollection(client);
-        collection.updateOne(eq("integratedDataSourceID", iri), new Document("$set", new Document("integratedVowlJsonFilePath", vowlObj.getAsString("vowlJsonFilePath"))));
-        collection.updateOne(eq("integratedDataSourceID", iri), new Document("$set", new Document("integratedVowlJsonFileName", vowlObj.getAsString("vowlJsonFileName"))));
+        collection.updateMany(eq("integratedDataSourceID", iri), new Document("$set", new Document("integratedVowlJsonFilePath", vowlObj.getAsString("vowlJsonFilePath"))));
+        collection.updateMany(eq("integratedDataSourceID", iri), new Document("$set", new Document("integratedVowlJsonFileName", vowlObj.getAsString("vowlJsonFileName"))));
         client.close();
     }
 }

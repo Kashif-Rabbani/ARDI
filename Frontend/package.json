@@ -18,6 +18,7 @@
     "express-session": "latest",
     "form-data": "^2.3.3",
     "formidable": "^1.2.1",
+    "location-href": "^1.0.0",
     "lodash": "^4.1.0",
     "method-override": "^2.1.2",
     "morgan": "latest",
@@ -29,6 +30,7 @@
     "request": "latest",
     "serve-favicon": "latest",
     "socket.io": "latest",
+    "store": "^2.0.12",
     "underscore": "latest",
     "uuid": "latest"
   }

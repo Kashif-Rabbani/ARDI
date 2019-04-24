@@ -2,37 +2,68 @@
  * Created by Kashif Rabbani
  */
 var config = require(__dirname + '/../config'),
-    request = require('request');
+    request = require('request'),
+    location = require('location-href'),
+    store = require('store');
 
-exports.triggerDataSourcesIntegration = function (req, res, next) {
+
+exports.triggerDataSourcesIntegration = function (req, res) {
     console.log("TriggerDataSourcesIntegration");
+    console.log('Request at time: ' + new Date() + ' BODY: ' + req.body);
 
-    if (!(req.body.hasOwnProperty('id1')) || req.body.id1 == null ||
-        !(req.body.hasOwnProperty('id2')) || req.body.id2 == null) {
-        res.status(400).json({msg: "(Bad Request) data format: {id1, id2}"});
+    /* var dt = new Date();
+     dt.setSeconds( dt.getSeconds() + 10 );
+     console.log("New Time: " + dt);*/
+    var temp = '';
+    if (store.get('lastRequestTime') != null) {
+        temp = new Date(store.get('lastRequestTime').time);
+        console.log("Last Request Saved Time: " + temp);
+
+        temp.setSeconds(temp.getSeconds() + 5);
+
+        console.log("Last Request + 5 Seconds: "+ temp);
+
     } else {
-        var objDataSource = req.body;
-        var url = config.BDI_DATA_LAYER_URL + 'schemaIntegration';
-        console.log(url);
-        console.log(objDataSource);
-
-        /*setTimeout(function(){
-            res.status(200).send("DONE");
-        }, 5000);*/
-
-        request.post({
-            url: url,
-            body: JSON.stringify(objDataSource)
-        }, function done(error, response, body) {
-            if (!error && response.statusCode === 200) {
-                console.log(body);
-                res.status(200).send(body);
-            } else {
-                res.status(500).send("Error in the backend");
-            }
-        });
-        //res.status(200).send("DONE");
+        store.set('lastRequestTime', {time: new Date()});
     }
+
+    console.log("Printing TEMP outside " + temp );
+
+    if (new Date() < temp) {
+        console.log("Aborting duplicate Request");
+        res.status(200).send("DUPLICATE");
+    } else {
+        if (!(req.body.hasOwnProperty('id1')) || req.body.id1 == null ||
+            !(req.body.hasOwnProperty('id2')) || req.body.id2 == null) {
+            res.status(400).json({msg: "(Bad Request) data format: {id1, id2}"});
+        } else {
+            var objDataSource = req.body;
+            var url = config.BDI_DATA_LAYER_URL + 'schemaIntegration';
+            console.log(url);
+            //console.log(objDataSource);
+
+            /*setTimeout(function () {
+                res.status(200).send("DONE");
+                console.log("TimeOut Function");
+            }, 10000);*/
+
+               request.post({
+                   url: url,
+                   body: JSON.stringify(objDataSource)
+               }, function done(error, response, body) {
+                   if (!error && response.statusCode === 200) {
+                       console.log(body);
+
+                       //res.redirect('/');
+                       res.status(200).send(body);
+                   } else {
+                       res.status(500).send("Error in the backend");
+                   }
+               });
+            //res.status(200).send("DONE");
+        }
+    }
+
 };
 
 exports.getAlignments = function (req, res, next) {
