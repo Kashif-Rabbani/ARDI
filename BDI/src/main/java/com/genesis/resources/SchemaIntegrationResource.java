@@ -15,7 +15,11 @@ import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.ReadWrite;
+import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.bson.BsonDocument;
 import org.bson.BsonValue;
 import org.bson.Document;
@@ -98,19 +102,13 @@ public class SchemaIntegrationResource {
         iri = "http://www.BDIOntology.com/schema/" + iri;
         try {
             JSONArray alignmentsArray = new JSONArray();
-            //List<Tuple3<Resource, Property, Resource>> triples = Lists.newArrayList();
-
             RDFUtil.runAQuery("SELECT * WHERE { GRAPH <" + iri + "> {?s ?p ?o} }", iri).forEachRemaining(triple -> {
                 JSONObject alignments = new JSONObject();
-
-                //System.out.println(new ResourceImpl(triple.get("s").toString()) + " -- " + new PropertyImpl(triple.get("p").toString()) + " -- " + new ResourceImpl(triple.get("o").toString()));
                 alignments.put("s", triple.get("s").toString());
                 alignments.put("p", triple.get("p").toString());
                 alignments.put("o", triple.get("o").toString());
                 alignmentsArray.add(alignments);
-                /* triples.add(new Tuple3<>(  new ResourceImpl(triple.get("s").toString()),new PropertyImpl(triple.get("p").toString()),new ResourceImpl(triple.get("o").toString())));*/
             });
-            //System.out.println(alignmentsArray.toJSONString());
             return Response.ok((alignmentsArray)).build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -124,9 +122,25 @@ public class SchemaIntegrationResource {
     public Response POST_AcceptAlignment(String body) {
         System.out.println("[POST /acceptAlignment] body = " + body);
         try {
+            // Alignments are stored in a triple store because it is more convenient to deal with them this way
+            // p: Contains Alignment of Class/Property A , s: Contains Alignment of Class/Property B, and o: Contains the confidence value between both mappings
             JSONObject objBody = (JSONObject) JSONValue.parse(body);
             String integratedIRI = "http://www.BDIOntology.com/integratedSchema/" + objBody.getAsString("integrated_iri");
-            RDFUtil.addTriple(integratedIRI, objBody.getAsString("s"), "owl:sameAs", objBody.getAsString("p"));
+            String query = "SELECT * WHERE { GRAPH <" + integratedIRI + "> {<" + objBody.getAsString("s") + "> rdf:type ?o ." +
+                    "<" + objBody.getAsString("p") + "> rdf:type ?oo .} }";
+            RDFUtil.runAQuery(RDFUtil.sparqlQueryPrefixes + query, integratedIRI).forEachRemaining(triple -> {
+                //System.out.println(triple.get("o") + " oo " + triple.get("oo"));
+                if (triple.get("o") != null && triple.get("oo") != null) {
+                    if (triple.get("o") == triple.get("oo")) {
+                        System.out.println("Alignments between " + triple.get("o").asResource().getLocalName() + " elements.");
+
+                        if (triple.get("o").asResource().getLocalName().equals("Class"))
+                            RDFUtil.addCustomPropertyTriple(integratedIRI, objBody.getAsString("s"), "EQUIVALENT_CLASS", objBody.getAsString("p"));
+                        if (triple.get("o").asResource().getLocalName().equals("Property"))
+                            RDFUtil.addCustomPropertyTriple(integratedIRI, objBody.getAsString("s"), "EQUIVALENT_PROPERTY", objBody.getAsString("p"));
+                    }
+                }
+            });
             return Response.ok(("Okay")).build();
         } catch (Exception e) {
             e.printStackTrace();
@@ -175,14 +189,18 @@ public class SchemaIntegrationResource {
     //Supporting Methods
     private String mergeSourcesTDBDatasets(JSONObject dataSource1Info, JSONObject dataSource2Info) {
 
-        String integratedIRI = "http://www.BDIOntology.com/integratedSchema/" + dataSource1Info.getAsString("name").replaceAll(" ", "")
+        String integratedIRI = "http://www.BDIOntology.com/integratedSchema/"
+                + dataSource1Info.getAsString("name").replaceAll(" ", "")
                 + dataSource2Info.getAsString("name").replaceAll(" ", "");
+
         System.out.println("********** Integrated IRI ********** " + integratedIRI);
+
         Dataset ds = Utils.getTDBDataset();
         ds.begin(ReadWrite.WRITE);
 
         Model ds1Model = ds.getNamedModel(dataSource1Info.getAsString("iri"));
         Model ds2Model = ds.getNamedModel(dataSource2Info.getAsString("iri"));
+
 
         //Create RDFS Inference Models
         /*InfModel ds1InfModel = ModelFactory.createRDFSModel(ds1Model);

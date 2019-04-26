@@ -1,5 +1,6 @@
 package com.genesis.main;
 
+import com.genesis.eso.util.RDFUtil;
 import com.genesis.eso.util.Utils;
 import com.genesis.rdf.model.bdi_ontology.JsonSchemaExtractor;
 import com.genesis.rdf.model.bdi_ontology.XmlSchemaExtractor;
@@ -35,6 +36,7 @@ public class Main {
                 break;
             case "TRY":
                 //This is just to test some functionality independently
+                //RDFUtil.testing();
                 break;
             default:
                 System.out.println("Please provide the arguments in a correct way: " +

@@ -27,8 +27,9 @@ console.log(params);
 
 
 function getIntegratedDataSourceInfo() {
+    $("#overlay").fadeIn(100);
     $.get('/bdiIntegratedDataSources/' + ids_id, function (data) {
-        $("#overlay").fadeOut(100);
+        //$("#overlay").fadeOut(100);
         console.log(data);
         integratedDataInfoObject = data;
         getAlignments(data.alignmentsIRI);
@@ -36,6 +37,7 @@ function getIntegratedDataSourceInfo() {
 }
 
 function getAlignments(alignmentIRI) {
+    $("#overlay").fadeIn(100);
     $.get('/bdiAlignments/' + alignmentIRI, function (data) {
         //console.log(data);
         $("#overlay").fadeOut(100);
@@ -93,9 +95,9 @@ $(function () {
 });
 
 $(document).ready(function () {
-    $(document).ajaxSend(function () {
+   /* $(document).ajaxSend(function () {
         $("#overlay").fadeIn(100);
-    });
+    });*/
 
     $(document).on('click', '#acceptAlignment', function () {
         var acceptButton = $("#acceptAlignment");

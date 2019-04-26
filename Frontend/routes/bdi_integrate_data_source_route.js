@@ -14,14 +14,15 @@ exports.triggerDataSourcesIntegration = function (req, res) {
     /* var dt = new Date();
      dt.setSeconds( dt.getSeconds() + 10 );
      console.log("New Time: " + dt);*/
-    var temp = '';
+    var temp;
     if (store.get('lastRequestTime') != null) {
         temp = new Date(store.get('lastRequestTime').time);
         console.log("Last Request Saved Time: " + temp);
 
         temp.setSeconds(temp.getSeconds() + 5);
-
         console.log("Last Request + 5 Seconds: "+ temp);
+
+        store.set('lastRequestTime', {time: new Date()});
 
     } else {
         store.set('lastRequestTime', {time: new Date()});
