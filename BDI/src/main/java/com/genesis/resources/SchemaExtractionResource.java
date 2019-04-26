@@ -17,6 +17,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.UUID;
+import org.apache.commons.lang3.RandomStringUtils;
 
 
 @Path("bdi")
@@ -81,7 +82,7 @@ public class SchemaExtractionResource {
         resData.put("type", objBody.getAsString("type").toUpperCase());
         resData.put("sourceFileAddress", objBody.getAsString("filePath"));
         resData.put("parsedFileAddress", fileName);
-        resData.put("dataSourceID", UUID.randomUUID().toString().replace("-", ""));
+        resData.put("dataSourceID", RandomStringUtils.randomAlphanumeric(8).replace("-", ""));
         resData.put("iri", IRI);
         resData.put("vowlJsonFilePath", vowlObj.getAsString("vowlJsonFilePath"));
         resData.put("vowlJsonFileName", vowlObj.getAsString("vowlJsonFileName"));

@@ -143,7 +143,7 @@ app.get('/bdiIntegratedDataSources/:integratedDataSourceID', bdi_data_source_rou
 app.get('/bdiDataSource/:dataSourceID', bdi_data_source_routes.getDataSource);
 app.post('/bdiDataSource', bdi_data_source_routes.postDataSource);
 
-app.get('/bdiAlignments/:iri', integrate_data_Sources.getAlignments);
+app.get('/bdiAlignments/:ds1_id&:ds2_id', integrate_data_Sources.getAlignments);
 app.post('/alignmentsAccept', integrate_data_Sources.acceptAlignment);
 app.post('/finishIntegration', integrate_data_Sources.finishIntegration);
 
@@ -204,10 +204,16 @@ app.get('/view/:resource_name&:dsn', checkAuthenticated, function (req, res) {
     res.render('bdi_visualization', {user: req.session.passport.user, resource_name : req.params.resource_name, data_source_name : req.params.dsn});
 });
 
-app.get('/integration/:ids_id&:ds1_name&:ds2_name', checkAuthenticated, function (req, res) {
+/*app.get('/integration/:ids_id&:ds1_name&:ds2_name', checkAuthenticated, function (req, res) {
     console.log(req.params);
     console.log(req.query);
     res.render('bdi_integration', {user: req.session.passport.user, ids_id :req.params.ids_id, ds1_name: req.params.ds1_name, ds2_name: req.params.ds2_name });
+});*/
+
+app.get('/integration/:ids1&:ids2', checkAuthenticated, function (req, res) {
+    console.log(req.params);
+    console.log(req.query);
+    res.render('bdi_integration', {user: req.session.passport.user, ids1 :req.params.ids1, ids2: req.params.ids2 });
 });
 
 /********** Global graph section ***************************************************************/

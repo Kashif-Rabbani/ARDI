@@ -19,7 +19,7 @@ import org.semarglproject.vocab.OWL;
  */
 public class RDFUtil {
 
-    public static String sparqlQueryPrefixes = "PREFIX : <http://data.europa.eu/CORDIS/ontology#>\n" +
+    public static String sparqlQueryPrefixes =
             "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
             "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
             "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";

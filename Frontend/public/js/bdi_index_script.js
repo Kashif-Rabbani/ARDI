@@ -9,18 +9,16 @@ function getIntegratedFileDetails() {
             var dataSource = JSON.parse(value);
             $('#integratedDataSources').find('tbody')
                 .append($('<tr>')
-                    //.append($('<td>').append('<input type="checkbox" class="dataSourceCheckbox" name="dataSource" value = "'+ dataSource.dataSourceID +'" /> '))
-                        .append($('<td>')
-                            .text(i)
-                        ).append($('<td>')
-                            .text(dataSource.dataSource1Name)
-                        ).append($('<td>')
-                            .text(dataSource.dataSource2Name)
-                        ).append($('<td>')
-                            .text('http://www.BDIOntology.com/alignments/' + dataSource.alignmentsIRI)
-                        )//.append($('<td>').append($('<a href="/view_data_source?dataSourceID=' + (dataSource.dataSourceID) + '">').append($('<span class="fa fa-search"></span>'))))
-                        .append($('<td>').append($('<a href="/view/' + (dataSource.integratedVowlJsonFileName) + '&Integrated' + '">').append($('<span class="fa fa-search"></span>')))
-                        )
+                    .append($('<td>').append('<input type="checkbox" class="dataSourceCheckbox" name="dataSource" value = "' + dataSource.dataSourceID + '" /> '))
+                    .append($('<td>')
+                        .text(i)
+                    ).append($('<td>')
+                        .text('http://www.BDIOntology.com/global/' + dataSource.iri)
+                    ).append($('<td>')
+                        .text( dataSource.parsedFileAddress)
+                    )//.append($('<td>').append($('<a href="/view_data_source?dataSourceID=' + (dataSource.dataSourceID) + '">').append($('<span class="fa fa-search"></span>'))))
+                    .append($('<td>').append($('<a href="/view/' + (dataSource.integratedVowlJsonFileName) + '&Integrated' + '">').append($('<span class="fa fa-search"></span>')))
+                    )
                 );
 
             ++i;
@@ -121,7 +119,9 @@ $(function () {
             object.id2 = dataSources[1];
             console.log(object);
 
-            $.ajax({
+            window.location.href = '/integration/' + dataSources[0] + '&' + dataSources[1];
+
+            /*$.ajax({
                 url: '/integrateDataSources',
                 method: "POST",
                 data: object
@@ -131,7 +131,7 @@ $(function () {
                 goToAlignmentsView(data);
             }).fail(function (err) {
                 alert("Error Integrating sources " + JSON.stringify(err));
-            });
+            });*/
         }
     });
 

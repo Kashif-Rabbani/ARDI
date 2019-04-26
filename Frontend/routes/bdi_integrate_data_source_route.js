@@ -68,8 +68,9 @@ exports.triggerDataSourcesIntegration = function (req, res) {
 };
 
 exports.getAlignments = function (req, res, next) {
-    console.log("THIS IS iri: " + req.params.iri);
-    request.get(config.BDI_DATA_LAYER_URL + "getSchemaAlignments/" + req.params.iri, function (error, response, body) {
+    console.log("Triggered getAlignments");
+    console.log("Params: " + req.params);
+    request.get(config.BDI_DATA_LAYER_URL + "getSchemaAlignments/" + req.params.ds1_id + "/" + req.params.ds2_id, function (error, response, body) {
         if (!error && response.statusCode === 200) {
             res.status(200).send(JSON.parse(body));
         } else {

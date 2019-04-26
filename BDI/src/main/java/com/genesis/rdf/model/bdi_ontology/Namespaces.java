@@ -6,7 +6,10 @@ package com.genesis.rdf.model.bdi_ontology;
 public enum Namespaces {
     T("http://www.BDIOntology.com/BDIOntology/"),
     S("http://www.BDIOntology.com/source/"),
+    Schema("http://www.BDIOntology.com/schema/"),
+    Alignments("http://www.BDIOntology.com/alignments/"),
     G("http://www.BDIOntology.com/global/"),
+    EGG("http://www.BDIOntology.com/extendedGlobal/"),
     M("http://www.BDIOntology.com/mappings/"),
     R("http://www.BDIOntology.com/eca_rule/"),
     I("http://www.BDIOntology.com/integratedSchema/"),

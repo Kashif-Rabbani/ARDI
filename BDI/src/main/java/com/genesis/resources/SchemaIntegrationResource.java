@@ -5,9 +5,8 @@ import com.genesis.eso.util.MongoUtil;
 import com.genesis.eso.util.RDFUtil;
 import com.genesis.eso.util.Utils;
 import com.genesis.rdf.LogMapMatcher;
-import com.genesis.rdf.model.bdi_ontology.JsonSchemaExtractor;
+import com.genesis.rdf.model.bdi_ontology.Namespaces;
 import com.google.gson.Gson;
-import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCursor;
 import net.minidev.json.JSONArray;
@@ -15,16 +14,11 @@ import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.ReadWrite;
-import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.ResourceFactory;
-import org.bson.BsonDocument;
-import org.bson.BsonValue;
 import org.bson.Document;
 import com.mongodb.client.MongoCollection;
 
+import javax.naming.Name;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -35,32 +29,39 @@ import static com.mongodb.client.model.Filters.eq;
 
 @Path("bdi")
 public class SchemaIntegrationResource {
-    @POST
-    @Path("schemaIntegration/")
+    @GET
+    @Path("getSchemaAlignments/{dataSource1_id}/{dataSource2_id}")
     @Consumes("text/plain")
-    @Produces(MediaType.TEXT_PLAIN)
-    public Response POST_SchemaIntegration(String body) {
-        System.out.println("[POST /schemaIntegration] body = " + body);
+    public Response GET_IntegratedSchemaAlignment(@PathParam("dataSource1_id") String ds1, @PathParam("dataSource2_id") String ds2) {
+        System.out.println("[GET /getSchemaAlignments" + "/" + ds1 + ds2);
         try {
-            JSONObject objBody = (JSONObject) JSONValue.parse(body);
             JSONObject dataSource1Info = new JSONObject();
             JSONObject dataSource2Info = new JSONObject();
+            String dataSource1 = null;
+            String dataSource2 = null;
+            // Receive the ids of two sources
+            if (ds1.contains("INTEGRATED_")) {
+                dataSource1 = getIntegratedDataSourceInfo(ds1);
+            } else {
+                dataSource1 = getDataSourceInfo(ds1);
+            }
 
-            String dataSource1 = getDataSourceInfo(objBody.getAsString("id1"));
-            String dataSource2 = getDataSourceInfo(objBody.getAsString("id2"));
+            dataSource2 = getDataSourceInfo(ds2);
 
             if (!dataSource1.isEmpty())
                 dataSource1Info = (JSONObject) JSONValue.parse(dataSource1);
 
-            if (!dataSource1.isEmpty())
+            if (!dataSource2.isEmpty())
                 dataSource2Info = (JSONObject) JSONValue.parse(dataSource2);
 
-             /*Caution: IRI after the namespace should not contain any slashes e.g.
-               http://www.BDIOntology.com/schema/CarRegistration-Bus (allowed) and
-                http://www.BDIOntology.com/schema/CarRegistration/Bus (Not allowed)*/
+            /*Caution: URN should not contain any slashes e.g. http://www.BDIOntology.com/schema/CarRegistration-Bus (allowed) http://www.BDIOntology.com/schema/CarRegistration/Bus (Not allowed)*/
 
-            String alignmentsIRI = dataSource1Info.getAsString("iri") + "-" +
-                    dataSource2Info.getAsString("name").replaceAll(" ", "");
+            /* Create an IRI for alignments which will be produced by LogMap for the two sources. Note that this IRI is required to store the alignments in the TripleStore. */
+
+            String alignmentsIRI = Namespaces.Alignments.val()
+                    + dataSource1Info.getAsString("dataSourceID")
+                    + "-" +
+                    dataSource2Info.getAsString("dataSourceID");
 
             System.out.println("********** Alignments IRI ********** " + alignmentsIRI);
 
@@ -71,44 +72,17 @@ public class SchemaIntegrationResource {
                     alignmentsIRI
             );
 
-            // Merge two sources
-            String integratedIRI = mergeSourcesTDBDatasets(dataSource1Info, dataSource2Info);
-
-            // Constructing JSON Response Object
-
-            JSONObject integratedDataSourceObj = new JSONObject();
-            integratedDataSourceObj.put("integratedDataSourceID", "INTEGRATED_" + dataSource1Info.getAsString("dataSourceID") + "_" + dataSource2Info.getAsString("dataSourceID"));
-            integratedDataSourceObj.put("alignmentsIRI", alignmentsIRI.split("http://www.BDIOntology.com/schema/")[1]);
-            integratedDataSourceObj.put("dataSourceID1", dataSource1Info.getAsString("dataSourceID"));
-            integratedDataSourceObj.put("dataSourceID2", dataSource2Info.getAsString("dataSourceID"));
-            integratedDataSourceObj.put("dataSource1Name", dataSource1Info.getAsString("name"));
-            integratedDataSourceObj.put("dataSource2Name", dataSource2Info.getAsString("name"));
-            integratedDataSourceObj.put("integratedIRI", integratedIRI.split("http://www.BDIOntology.com/integratedSchema/")[1]);
-
-            // Adding JSON Response in MongoDB Collection named as IntegratedDataSources
-            addIntegratedDataSourceInfoAsMongoCollection(integratedDataSourceObj);
-            return Response.ok(new Gson().toJson(integratedDataSourceObj)).build();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    @GET
-    @Path("getSchemaAlignments/{alignmentsIRI}")
-    @Consumes("text/plain")
-    public Response GET_IntegratedSchemaAlignment(@PathParam("alignmentsIRI") String iri) {
-        System.out.println("[GET /getSchemaAlignments" + "/" + iri);
-        iri = "http://www.BDIOntology.com/schema/" + iri;
-        try {
             JSONArray alignmentsArray = new JSONArray();
-            RDFUtil.runAQuery("SELECT * WHERE { GRAPH <" + iri + "> {?s ?p ?o} }", iri).forEachRemaining(triple -> {
+            RDFUtil.runAQuery("SELECT * WHERE { GRAPH <" + alignmentsIRI + "> {?s ?p ?o} }", alignmentsIRI).forEachRemaining(triple -> {
                 JSONObject alignments = new JSONObject();
                 alignments.put("s", triple.get("s").toString());
                 alignments.put("p", triple.get("p").toString());
                 alignments.put("o", triple.get("o").toString());
                 alignmentsArray.add(alignments);
             });
+
+            String iri = integrateTDBDatasets(dataSource1Info, dataSource2Info);
+
             return Response.ok((alignmentsArray)).build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -125,11 +99,14 @@ public class SchemaIntegrationResource {
             // Alignments are stored in a triple store because it is more convenient to deal with them this way
             // p: Contains Alignment of Class/Property A , s: Contains Alignment of Class/Property B, and o: Contains the confidence value between both mappings
             JSONObject objBody = (JSONObject) JSONValue.parse(body);
-            String integratedIRI = "http://www.BDIOntology.com/integratedSchema/" + objBody.getAsString("integrated_iri");
-            String query = "SELECT * WHERE { GRAPH <" + integratedIRI + "> {<" + objBody.getAsString("s") + "> rdf:type ?o ." +
+
+            String integratedIRI = Namespaces.G.val() + objBody.getAsString("integrated_iri");
+
+            String query = " SELECT * WHERE { GRAPH <" + integratedIRI + "> { <" + objBody.getAsString("s") + "> rdf:type ?o ." +
                     "<" + objBody.getAsString("p") + "> rdf:type ?oo .} }";
+
             RDFUtil.runAQuery(RDFUtil.sparqlQueryPrefixes + query, integratedIRI).forEachRemaining(triple -> {
-                //System.out.println(triple.get("o") + " oo " + triple.get("oo"));
+                System.out.println(triple.get("o") + " oo " + triple.get("oo"));
                 if (triple.get("o") != null && triple.get("oo") != null) {
                     if (triple.get("o") == triple.get("oo")) {
                         System.out.println("Alignments between " + triple.get("o").asResource().getLocalName() + " elements.");
@@ -141,6 +118,7 @@ public class SchemaIntegrationResource {
                     }
                 }
             });
+
             return Response.ok(("Okay")).build();
         } catch (Exception e) {
             e.printStackTrace();
@@ -154,15 +132,17 @@ public class SchemaIntegrationResource {
     @Consumes("text/plain")
     public Response GET_finishIntegration(String body) {
         JSONObject objBody = (JSONObject) JSONValue.parse(body);
-        System.out.println("[GET /finishIntegration" + "/" + objBody.getAsString("integratedIRI"));
-        String integratedIRI = objBody.getAsString("integratedIRI");
-        integratedIRI = "http://www.BDIOntology.com/integratedSchema/" + integratedIRI;
+        System.out.println("[GET /finishIntegration" + "/" + objBody.getAsString("iri"));
+        String integratedIRI = objBody.getAsString("iri");
+        integratedIRI = Namespaces.G.val() + integratedIRI;
         try {
             // Add the integratedModel into TDB
             Dataset integratedDataset = Utils.getTDBDataset();
             integratedDataset.begin(ReadWrite.WRITE);
             Model model = integratedDataset.getNamedModel(integratedIRI);
-            String integratedModelFileName = objBody.getAsString("dataSource1Name") + "-" + objBody.getAsString("dataSource2Name") + ".ttl";
+
+            String integratedModelFileName = objBody.getAsString("iri") + ".ttl";
+            //String integratedModelFileName = objBody.getAsString("dataSource1Name") + "-" + objBody.getAsString("dataSource2Name") + ".ttl";
             try {
                 model.write(new FileOutputStream(ConfigManager.getProperty("output_path") + integratedModelFileName), "TURTLE");
             } catch (FileNotFoundException e) {
@@ -176,8 +156,28 @@ public class SchemaIntegrationResource {
             //Convert RDFS to VOWL (Visualization Framework) Compatible JSON
             JSONObject vowlObj = Utils.oWl2vowl(ConfigManager.getProperty("output_path") + integratedModelFileName);
 
-            updateIntegratedDataSourceInfo(objBody.getAsString("integratedDataSourceID"), vowlObj);
+            //updateIntegratedDataSourceInfo(objBody.getAsString("integratedDataSourceID"), vowlObj);
 
+            JSONObject dataSource1Info = new JSONObject();
+            JSONObject dataSource2Info = new JSONObject();
+            // Receive the ids of two sources need to be integrated
+            String dataSource1 = getDataSourceInfo(objBody.getAsString("ds1_id"));
+            String dataSource2 = getDataSourceInfo(objBody.getAsString("ds2_id"));
+
+            if (!dataSource1.isEmpty())
+                dataSource1Info = (JSONObject) JSONValue.parse(dataSource1);
+
+            if (!dataSource2.isEmpty())
+                dataSource2Info = (JSONObject) JSONValue.parse(dataSource2);
+
+
+            if (objBody.getAsString("integrationType").equals("GLOBAL-vs-LOCAL")) {
+                updateInfo(dataSource1Info, dataSource2Info, ConfigManager.getProperty("output_path") + integratedModelFileName, vowlObj);
+            }
+
+            if (objBody.getAsString("integrationType").equals("LOCAL-vs-LOCAL")) {
+                addInfo(dataSource1Info, dataSource2Info, ConfigManager.getProperty("output_path") + integratedModelFileName, vowlObj);
+            }
 
             return Response.ok(("Okay")).build();
         } catch (Exception e) {
@@ -186,25 +186,52 @@ public class SchemaIntegrationResource {
         }
     }
 
+    private void addInfo(JSONObject dataSource1Info, JSONObject dataSource2Info, String integratedModelFileName, JSONObject vowlObj) {
+        // Constructing JSON Response Object
+
+        JSONObject integratedDataSourceObj = new JSONObject();
+        JSONArray dataSourcesArray = new JSONArray();
+
+        JSONObject ds1 = new JSONObject();
+        ds1.put("dataSourceID", dataSource1Info.getAsString("dataSourceID"));
+        ds1.put("dataSourceName", dataSource1Info.getAsString("name"));
+
+        JSONObject ds2 = new JSONObject();
+        ds2.put("dataSourceID", dataSource2Info.getAsString("dataSourceID"));
+        ds2.put("dataSourceName", dataSource2Info.getAsString("name"));
+
+        dataSourcesArray.add(ds1);
+        dataSourcesArray.add(ds2);
+
+        integratedDataSourceObj.put("dataSourceID", "INTEGRATED_" + dataSource1Info.getAsString("dataSourceID") + "-" + dataSource2Info.getAsString("dataSourceID"));
+        //integratedDataSourceObj.put("alignmentsIRI", alignmentsIRI.split(Namespaces.Alignments.val())[1]);
+        integratedDataSourceObj.put("iri", dataSource1Info.getAsString("dataSourceID") + "-" + dataSource2Info.getAsString("dataSourceID"));
+        integratedDataSourceObj.put("dataSources", dataSourcesArray);
+        integratedDataSourceObj.put("name", dataSource1Info.getAsString("name").replaceAll(" ", "") + dataSource2Info.getAsString("name").replaceAll(" ", ""));
+        integratedDataSourceObj.put("parsedFileAddress", integratedModelFileName);
+        integratedDataSourceObj.put("integratedVowlJsonFileName", vowlObj.getAsString("vowlJsonFileName"));
+        integratedDataSourceObj.put("integratedVowlJsonFilePath", vowlObj.getAsString("vowlJsonFilePath"));
+
+        // Adding JSON Response in MongoDB Collection named as IntegratedDataSources
+        addIntegratedDataSourceInfoAsMongoCollection(integratedDataSourceObj);
+    }
+
+    private void updateInfo(JSONObject dataSource1Info, JSONObject dataSource2Info, String integratedModelFileName, JSONObject vowlObj) {
+
+    }
+
     //Supporting Methods
-    private String mergeSourcesTDBDatasets(JSONObject dataSource1Info, JSONObject dataSource2Info) {
+    private String integrateTDBDatasets(JSONObject dataSource1Info, JSONObject dataSource2Info) {
 
-        String integratedIRI = "http://www.BDIOntology.com/integratedSchema/"
-                + dataSource1Info.getAsString("name").replaceAll(" ", "")
-                + dataSource2Info.getAsString("name").replaceAll(" ", "");
-
+        String integratedIRI = Namespaces.G.val()
+                + dataSource1Info.getAsString("dataSourceID") + "-"
+                + dataSource2Info.getAsString("dataSourceID");
         System.out.println("********** Integrated IRI ********** " + integratedIRI);
-
         Dataset ds = Utils.getTDBDataset();
         ds.begin(ReadWrite.WRITE);
 
         Model ds1Model = ds.getNamedModel(dataSource1Info.getAsString("iri"));
         Model ds2Model = ds.getNamedModel(dataSource2Info.getAsString("iri"));
-
-
-        //Create RDFS Inference Models
-        /*InfModel ds1InfModel = ModelFactory.createRDFSModel(ds1Model);
-        InfModel ds2InfModel = ModelFactory.createRDFSModel(ds2Model);*/
 
         Model integratedModel = ds1Model.union(ds2Model);
         ds1Model.commit();
@@ -237,6 +264,14 @@ public class SchemaIntegrationResource {
                 find(new Document("dataSourceID", dataSourceId)).iterator();
         return MongoUtil.getMongoObject(client, cursor);
     }
+
+    private String getIntegratedDataSourceInfo(String integratedDataSourceId) {
+        MongoClient client = Utils.getMongoDBClient();
+        MongoCursor<Document> cursor = MongoUtil.getIntegratedDataSourcesCollection(client).
+                find(new Document("dataSourceID", integratedDataSourceId)).iterator();
+        return MongoUtil.getMongoObject(client, cursor);
+    }
+
 
     private void addIntegratedDataSourceInfoAsMongoCollection(JSONObject objBody) {
         System.out.println("Successfully Added to MongoDB");

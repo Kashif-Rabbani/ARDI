@@ -6,7 +6,20 @@ var bdi_integrate_url = window.location.href;
 var url_suffix = bdi_integrate_url.split('/integration/')[1];
 
 var params = url_suffix.split('&');
-var ids_id = params[0];
+var ds1_id = params[0];
+var ds2_id = params[1];
+var integrationType;
+
+function integrationTypeChecker(){
+    if(ds1_id.includes("INTEGRATED_") || ds2_id.includes("INTEGRATED_")){
+        console.log("Integration of a local graph with global graph.");
+        integrationType = "GLOBAL-vs-LOCAL";
+    }
+    else {
+        console.log("Integration between local graphs");
+        integrationType = "LOCAL-vs-LOCAL";
+    }
+}
 //var ds1_id = decodeURI(params[1]);
 //var ds2_id = decodeURI(params[2]);
 //var ds1_name = decodeURI(params[3]);
@@ -26,28 +39,32 @@ paramsObject.integrated_iri = integrated_iri;*/
 console.log(params);
 
 
-function getIntegratedDataSourceInfo() {
+/*function getIntegratedDataSourceInfo() {
     $("#overlay").fadeIn(100);
     $.get('/bdiIntegratedDataSources/' + ids_id, function (data) {
         //$("#overlay").fadeOut(100);
         console.log(data);
         integratedDataInfoObject = data;
-        getAlignments(data.alignmentsIRI);
+        var dataSources = integratedDataInfoObject.dataSources;
+        var constructedAlignmentsIRI;
+        var allDataSources = {};
+        dataSources.forEach(function (val) {
+           console.log(val);
+        });
+        //getAlignments(data.alignmentsIRI);
     });
-}
+}*/
 
-function getAlignments(alignmentIRI) {
+function getAlignments() {
     $("#overlay").fadeIn(100);
-    $.get('/bdiAlignments/' + alignmentIRI, function (data) {
+    $.get('/bdiAlignments/' + ds1_id + '&' + ds2_id, function (data) {
+        console.log("Requesting bdiAlignments");
         //console.log(data);
         $("#overlay").fadeOut(100);
         var i = 1;
         data.forEach(function (val) {
             alignmentsData[i - 1] = val;
             var n = i - 1;
-            //console.log(n);
-            //console.log(val.s + " " + val.o + " " + val.p);
-            //console.log(JSON.stringify(val));
             $('#alignments').find('tbody')
                 .append($('<tr id="row' + n + '">')
                     .append($('<td>')
@@ -70,7 +87,7 @@ function getAlignments(alignmentIRI) {
 
 function acceptButtonClickHandler(acceptButton, i) {
     console.log("AcceptButtonClickHandler");
-    alignmentsData[i].integrated_iri = integratedDataInfoObject.integratedIRI;
+    alignmentsData[i].integrated_iri = params[0] + '-' + params[1];
     console.log(alignmentsData[i]);
     $.ajax({
         type: 'POST',
@@ -91,17 +108,21 @@ function acceptButtonClickHandler(acceptButton, i) {
 }
 
 $(function () {
-    getIntegratedDataSourceInfo();
+    //getIntegratedDataSourceInfo();
+
 });
 
+
 $(document).ready(function () {
-   /* $(document).ajaxSend(function () {
-        $("#overlay").fadeIn(100);
-    });*/
+    /* $(document).ajaxSend(function () {
+         $("#overlay").fadeIn(100);
+     });*/
+
+    getAlignments();
+    integrationTypeChecker();
 
     $(document).on('click', '#acceptAlignment', function () {
         var acceptButton = $("#acceptAlignment");
-        //console.log(JSON.stringify($(this).val()));
         var index = $(this).val();
         acceptButtonClickHandler(acceptButton, index);
     });
@@ -109,10 +130,15 @@ $(document).ready(function () {
     // Click handler for Finish Integration Button
     $("#integratedDataSourcesButton").on('click', function () {
         console.log("Inside integratedDataSourcesButton");
-        console.log(integratedDataInfoObject);
+        var postData = {};
+        postData.iri = params[0] + "-" + params[1];
+        postData.integrationType = integrationType;
+        postData.ds1_id = ds1_id;
+        postData.ds2_id = ds2_id;
+        console.log(postData);
         $.ajax({
             type: 'POST',
-            data: JSON.stringify(integratedDataInfoObject),
+            data: JSON.stringify(postData),
             contentType: 'application/json',
             url: '/finishIntegration',
             success: function (response) {
