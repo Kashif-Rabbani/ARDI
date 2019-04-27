@@ -161,21 +161,33 @@ public class SchemaIntegrationResource {
             JSONObject dataSource1Info = new JSONObject();
             JSONObject dataSource2Info = new JSONObject();
             // Receive the ids of two sources need to be integrated
-            String dataSource1 = getDataSourceInfo(objBody.getAsString("ds1_id"));
-            String dataSource2 = getDataSourceInfo(objBody.getAsString("ds2_id"));
-
-            if (!dataSource1.isEmpty())
-                dataSource1Info = (JSONObject) JSONValue.parse(dataSource1);
-
-            if (!dataSource2.isEmpty())
-                dataSource2Info = (JSONObject) JSONValue.parse(dataSource2);
+            String dataSource1 = null;
+            String dataSource2 = null;
 
 
             if (objBody.getAsString("integrationType").equals("GLOBAL-vs-LOCAL")) {
+                dataSource1 = getIntegratedDataSourceInfo(objBody.getAsString("ds1_id"));
+                dataSource2 = getDataSourceInfo(objBody.getAsString("ds2_id"));
+
+                if (!dataSource1.isEmpty())
+                    dataSource1Info = (JSONObject) JSONValue.parse(dataSource1);
+
+                if (!dataSource2.isEmpty())
+                    dataSource2Info = (JSONObject) JSONValue.parse(dataSource2);
+                System.out.println("Global-vs-Local - About to UpdateInfo");
                 updateInfo(dataSource1Info, dataSource2Info, ConfigManager.getProperty("output_path") + integratedModelFileName, vowlObj);
             }
 
             if (objBody.getAsString("integrationType").equals("LOCAL-vs-LOCAL")) {
+                dataSource1 = getDataSourceInfo(objBody.getAsString("ds1_id"));
+                dataSource2 = getDataSourceInfo(objBody.getAsString("ds2_id"));
+
+                if (!dataSource1.isEmpty())
+                    dataSource1Info = (JSONObject) JSONValue.parse(dataSource1);
+
+                if (!dataSource2.isEmpty())
+                    dataSource2Info = (JSONObject) JSONValue.parse(dataSource2);
+
                 addInfo(dataSource1Info, dataSource2Info, ConfigManager.getProperty("output_path") + integratedModelFileName, vowlObj);
             }
 
@@ -195,10 +207,13 @@ public class SchemaIntegrationResource {
         JSONObject ds1 = new JSONObject();
         ds1.put("dataSourceID", dataSource1Info.getAsString("dataSourceID"));
         ds1.put("dataSourceName", dataSource1Info.getAsString("name"));
+        ds1.put("alignmentsIRI", dataSource1Info.getAsString("dataSourceID") + "-" + dataSource2Info.getAsString("dataSourceID"));
 
         JSONObject ds2 = new JSONObject();
         ds2.put("dataSourceID", dataSource2Info.getAsString("dataSourceID"));
         ds2.put("dataSourceName", dataSource2Info.getAsString("name"));
+        ds2.put("alignmentsIRI", dataSource1Info.getAsString("dataSourceID") + "-" + dataSource2Info.getAsString("dataSourceID"));
+
 
         dataSourcesArray.add(ds1);
         dataSourcesArray.add(ds2);
@@ -216,8 +231,33 @@ public class SchemaIntegrationResource {
         addIntegratedDataSourceInfoAsMongoCollection(integratedDataSourceObj);
     }
 
-    private void updateInfo(JSONObject dataSource1Info, JSONObject dataSource2Info, String integratedModelFileName, JSONObject vowlObj) {
+    private void updateInfo(JSONObject integratedDataSourceInfo, JSONObject dataSource2Info, String integratedModelFileName, JSONObject vowlObj) {
+        JSONArray dataSourcesArray = (JSONArray) JSONValue.parse(integratedDataSourceInfo.getAsString("dataSources"));
+        // New Local Graph data source to be integrated
+        JSONObject ds2 = new JSONObject();
+        ds2.put("dataSourceID", dataSource2Info.getAsString("dataSourceID"));
+        ds2.put("dataSourceName", dataSource2Info.getAsString("name"));
+        ds2.put("alignmentsIRI", integratedDataSourceInfo.getAsString("dataSourceID") + "-" + dataSource2Info.getAsString("dataSourceID"));
 
+        dataSourcesArray.add(ds2);
+
+        MongoClient client = Utils.getMongoDBClient();
+        MongoCollection collection = MongoUtil.getIntegratedDataSourcesCollection(client);
+        System.out.println("Mongo Collection About to Upadte: ");
+        String newDataSourceID = integratedDataSourceInfo.getAsString("dataSourceID") + "-" + dataSource2Info.getAsString("dataSourceID");
+
+        System.out.println("OLD DS ID: " + integratedDataSourceInfo.getAsString("dataSourceID"));
+        System.out.println("NEW DS ID: "+ newDataSourceID);
+
+        collection.updateOne(eq("dataSourceID", integratedDataSourceInfo.getAsString("dataSourceID")), new Document("$set", new Document("dataSourceID", newDataSourceID)));
+        collection.updateOne(eq("dataSourceID", newDataSourceID), new Document("$set", new Document("iri", integratedDataSourceInfo.getAsString("dataSourceID") + "-" + dataSource2Info.getAsString("dataSourceID"))));
+        collection.updateOne(eq("dataSourceID", newDataSourceID), new Document("$set", new Document("integratedVowlJsonFileName", vowlObj.getAsString("vowlJsonFileName"))));
+        collection.updateOne(eq("dataSourceID", newDataSourceID), new Document("$set", new Document("integratedVowlJsonFilePath", vowlObj.getAsString("vowlJsonFilePath"))));
+        collection.updateOne(eq("dataSourceID", newDataSourceID), new Document("$set", new Document("parsedFileAddress", integratedModelFileName)));
+        collection.updateOne(eq("dataSourceID", newDataSourceID), new Document("$set", new Document("dataSources", dataSourcesArray)));
+        collection.updateOne(eq("dataSourceID", newDataSourceID), new Document("$set", new Document("name", integratedDataSourceInfo.getAsString("name").replaceAll(" ", "") + dataSource2Info.getAsString("name").replaceAll(" ", ""))));
+
+        client.close();
     }
 
     //Supporting Methods
@@ -271,7 +311,6 @@ public class SchemaIntegrationResource {
                 find(new Document("dataSourceID", integratedDataSourceId)).iterator();
         return MongoUtil.getMongoObject(client, cursor);
     }
-
 
     private void addIntegratedDataSourceInfoAsMongoCollection(JSONObject objBody) {
         System.out.println("Successfully Added to MongoDB");

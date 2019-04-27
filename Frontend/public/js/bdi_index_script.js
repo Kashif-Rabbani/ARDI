@@ -12,7 +12,8 @@ function getIntegratedFileDetails() {
                     .append($('<td>').append('<input type="checkbox" class="dataSourceCheckbox" name="dataSource" value = "' + dataSource.dataSourceID + '" /> '))
                     .append($('<td>')
                         .text(i)
-                    ).append($('<td>')
+                    ).append($('<td>').text(dataSource.name))
+                    .append($('<td>')
                         .text('http://www.BDIOntology.com/global/' + dataSource.iri)
                     ).append($('<td>')
                         .text( dataSource.parsedFileAddress)
@@ -119,7 +120,13 @@ $(function () {
             object.id2 = dataSources[1];
             console.log(object);
 
-            window.location.href = '/integration/' + dataSources[0] + '&' + dataSources[1];
+            if(object.id1.includes("INTEGRATED_") && object.id2.includes("INTEGRATED_")){
+                console.log("Integration of Global Graphs not allowed yet.");
+            } else {
+                window.location.href = '/integration/' + dataSources[0] + '&' + dataSources[1];
+            }
+
+
 
             /*$.ajax({
                 url: '/integrateDataSources',
