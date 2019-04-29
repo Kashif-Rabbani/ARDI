@@ -12,7 +12,9 @@ import java.io.IOException;
 import java.util.List;
 
 import com.genesis.rdf.model.bdi_ontology.*;
+import org.apache.jena.vocabulary.RDF;
 import org.semarglproject.vocab.OWL;
+import org.semarglproject.vocab.RDFS;
 
 /**
  * Created by snadal on 24/11/16.
@@ -40,6 +42,21 @@ public class RDFUtil {
         ds.begin(ReadWrite.WRITE);
         Model graph = ds.getNamedModel(namedGraph);
         graph.add(new ResourceImpl(s), new PropertyImpl(p), new ResourceImpl(o));
+        graph.commit();
+        graph.close();
+        ds.commit();
+        ds.close();
+    }
+
+    public static void addClassOrPropertyTriple(String namedGraph, String s, String p) {
+        //System.out.println("Adding triple: [namedGraph] "+namedGraph+", [s] "+s+", [p] "+p+", [o] "+o);
+        Dataset ds = Utils.getTDBDataset();
+        ds.begin(ReadWrite.WRITE);
+        Model graph = ds.getNamedModel(namedGraph);
+        if (p.equals("CLASS"))
+            graph.add(new ResourceImpl(s), RDF.type, RDFS.CLASS);
+        if (p.equals("PROPERTY"))
+            graph.add(new ResourceImpl(s), RDF.type, RDF.Property);
         graph.commit();
         graph.close();
         ds.commit();

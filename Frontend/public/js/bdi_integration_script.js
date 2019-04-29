@@ -40,8 +40,8 @@ console.log(params);
 
 function getAlignments() {
     $("#overlay").fadeIn(100);
+    console.log("Requesting bdiAlignments");
     $.get('/bdiAlignments/' + ds1_id + '&' + ds2_id, function (data) {
-        console.log("Requesting bdiAlignments");
         //console.log(data);
         $("#overlay").fadeOut(100);
         var i = 1;
