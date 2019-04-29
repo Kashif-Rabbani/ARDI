@@ -1,0 +1,17 @@
+{
+      "year": "2018",
+      "category": "Vehicles",
+      "info": "Registrations in the year of 2018",
+      "regType": "Registrations Types etc.",
+      "Cycle": {
+        "Year": "2015",
+        "Type": "Mountain Bike",
+	"Usage": "N/A"
+      },
+        "Vehicle": {
+	"Type" : "Luxury",
+        "RegNo": "12243",
+        "Year": "2016",
+        "Model": "Toyota",
+      }
+}

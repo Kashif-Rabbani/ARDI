@@ -44,7 +44,7 @@ public class LogMapMatcher {
         try {
             this.iterateOverMappings(logMap2_matcher.getLogmap2_Mappings());
             this.iterateOverMappings(logMap2_matcher.getLogmap2_DiscardedMappings());
-            this.iterateOverMappings(logMap2_matcher.getLogmap2_HardDiscardedMappings());
+            //this.iterateOverMappings(logMap2_matcher.getLogmap2_HardDiscardedMappings());
         } catch (Exception e) {
             e.printStackTrace();
         }

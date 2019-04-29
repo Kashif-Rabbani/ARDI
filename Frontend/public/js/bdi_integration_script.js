@@ -10,34 +10,17 @@ var ds1_id = params[0];
 var ds2_id = params[1];
 var integrationType;
 
-function integrationTypeChecker(){
-    if(ds1_id.includes("INTEGRATED_") || ds2_id.includes("INTEGRATED_")){
+function integrationTypeChecker() {
+    if (ds1_id.includes("INTEGRATED-") || ds2_id.includes("INTEGRATED-")) {
         console.log("Integration of a local graph with global graph.");
         integrationType = "GLOBAL-vs-LOCAL";
-    }
-    else {
+    } else {
         console.log("Integration between local graphs");
         integrationType = "LOCAL-vs-LOCAL";
     }
 }
-//var ds1_id = decodeURI(params[1]);
-//var ds2_id = decodeURI(params[2]);
-//var ds1_name = decodeURI(params[3]);
-//var ds2_name = decodeURI(params[4]);
-//var align_iri = decodeURI(params[5]);
-//var integrated_iri = decodeURI(params[6]);
-
-
-/*paramsObject.ids_id = ids_id;
-paramsObject.ds1_id = ds1_id;
-paramsObject.ds2_id = ds2_id;
-paramsObject.ds1_name = ds1_name;
-paramsObject.ds2_name = ds2_name;
-paramsObject.align_iri = align_iri;
-paramsObject.integrated_iri = integrated_iri;*/
 
 console.log(params);
-
 
 /*function getIntegratedDataSourceInfo() {
     $("#overlay").fadeIn(100);
@@ -74,7 +57,7 @@ function getAlignments() {
                     ).append($('<td>')
                         .text(val.s)
                     ).append($('<td>')
-                        .text(val.o)
+                        .text(Math.round(val.o * 100) / 100)
                     )
                     .append($('<td>').append('<button type="button" id ="acceptAlignment" class="btn btn-success" value="' + n + '">Accept</button> '))
                     .append($('<td>').append('<button type="button" id ="rejectAlignment" class="btn btn-danger">Reject</button> '))
@@ -109,7 +92,6 @@ function acceptButtonClickHandler(acceptButton, i) {
 
 $(function () {
     //getIntegratedDataSourceInfo();
-
 });
 
 
@@ -120,6 +102,8 @@ $(document).ready(function () {
 
     getAlignments();
     integrationTypeChecker();
+
+    new Tablesort(document.getElementById('alignments'));
 
     $(document).on('click', '#acceptAlignment', function () {
         var acceptButton = $("#acceptAlignment");
@@ -153,5 +137,4 @@ $(document).ready(function () {
         });
     });
 });
-
 

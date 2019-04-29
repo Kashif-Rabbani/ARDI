@@ -14,7 +14,7 @@ function getIntegratedFileDetails() {
                         .text(i)
                     ).append($('<td>').text(dataSource.name))
                     .append($('<td>')
-                        .text('http://www.BDIOntology.com/global/' + dataSource.iri)
+                        .text(dataSource.iri)
                     ).append($('<td>')
                         .text( dataSource.parsedFileAddress)
                     )//.append($('<td>').append($('<a href="/view_data_source?dataSourceID=' + (dataSource.dataSourceID) + '">').append($('<span class="fa fa-search"></span>'))))

@@ -1,0 +1,16 @@
+{
+      "year": "2018",
+      "category": "Vehicles",
+      "info": "Registrations in the year of 2018",
+      "registrationType": "Registrations Types etc.",
+      "Bike": {
+        "RegNo": "1234",
+        "Year": "2015",
+        "Model": "Honda"
+      },
+        "Car": {
+        "CarRegNo": "12243",
+        "CarYear": "2016",
+        "CarModel": "Toyota",
+      }
+}

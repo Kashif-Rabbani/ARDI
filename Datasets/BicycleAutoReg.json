@@ -1,0 +1,16 @@
+{
+      "year": "2018",
+      "Category": "Vehicles",
+      "Info": "Registrations in the year of 2018",
+      "Type": "Transportation",
+      "Bicycle": {
+        "RegNo": "12345",
+        "Year": "2005",
+        "Model": "Bugati"
+      },
+       "Auto": {
+        "AutoRegNo": "12243",
+        "AutoYear": "2016",
+        "AutoModel": "Toyota",
+      }
+}

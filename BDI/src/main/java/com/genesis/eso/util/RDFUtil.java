@@ -46,34 +46,6 @@ public class RDFUtil {
         ds.close();
     }
 
-    public static void testing(String iri) {
-        Dataset ds = Utils.getTDBDataset();
-        ds.begin(ReadWrite.WRITE);
-        System.out.println("INSIDE TESTING AND IRI IS : " + iri);
-        Model graph = ds.getNamedModel(iri);
-
-
-        Resource r = graph.getResource("http://www.bdiontology.com/schema/BicycleAuto/Bicycle/Bicycle_Collection");
-
-        StmtIterator iter = graph.listStatements();
-        while (iter.hasNext()) {
-            Statement stmt = (Statement) iter.next();
-            System.out.println(stmt.getSubject() + " " + stmt.getObject() + " " + stmt.getPredicate());
-        }
-        System.out.println(" getLocalName" + r.getLocalName() + "\n" +
-                " getURI" + r.getURI() + "\n" +
-                " getNameSpace" + r.getNameSpace() + "\n" +
-                "listProperties " + r.listProperties().toString() + "\n" +
-                " " + r + "\n"
-        );
-
-
-        graph.commit();
-        graph.close();
-        ds.commit();
-        ds.close();
-    }
-
     public static void addCustomPropertyTriple(String namedGraph, String s, String p, String o) {
         //System.out.println("Adding triple: [namedGraph] "+namedGraph+", [s] "+s+", [p] "+p+", [o] "+o);
         Dataset ds = Utils.getTDBDataset();

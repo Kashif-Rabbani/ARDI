@@ -40,7 +40,7 @@ public class SchemaIntegrationResource {
             String dataSource1 = null;
             String dataSource2 = null;
             // Receive the ids of two sources
-            if (ds1.contains("INTEGRATED_")) {
+            if (ds1.contains("INTEGRATED-")) {
                 dataSource1 = getIntegratedDataSourceInfo(ds1);
             } else {
                 dataSource1 = getDataSourceInfo(ds1);
@@ -58,10 +58,7 @@ public class SchemaIntegrationResource {
 
             /* Create an IRI for alignments which will be produced by LogMap for the two sources. Note that this IRI is required to store the alignments in the TripleStore. */
 
-            String alignmentsIRI = Namespaces.Alignments.val()
-                    + dataSource1Info.getAsString("dataSourceID")
-                    + "-" +
-                    dataSource2Info.getAsString("dataSourceID");
+            String alignmentsIRI = Namespaces.Alignments.val() + dataSource1Info.getAsString("dataSourceID") + "-" + dataSource2Info.getAsString("dataSourceID");
 
             System.out.println("********** Alignments IRI ********** " + alignmentsIRI);
 
@@ -82,6 +79,7 @@ public class SchemaIntegrationResource {
             });
 
             String iri = integrateTDBDatasets(dataSource1Info, dataSource2Info);
+            System.out.println("Returned IRI: " + iri);
 
             return Response.ok((alignmentsArray)).build();
         } catch (Exception e) {
@@ -104,20 +102,25 @@ public class SchemaIntegrationResource {
 
             String query = " SELECT * WHERE { GRAPH <" + integratedIRI + "> { <" + objBody.getAsString("s") + "> rdf:type ?o ." +
                     "<" + objBody.getAsString("p") + "> rdf:type ?oo .} }";
-
+            final String[] flag = new String[10];
             RDFUtil.runAQuery(RDFUtil.sparqlQueryPrefixes + query, integratedIRI).forEachRemaining(triple -> {
                 System.out.println(triple.get("o") + " oo " + triple.get("oo"));
+                flag[0] = "Query contains result.";
                 if (triple.get("o") != null && triple.get("oo") != null) {
                     if (triple.get("o") == triple.get("oo")) {
                         System.out.println("Alignments between " + triple.get("o").asResource().getLocalName() + " elements.");
-
-                        if (triple.get("o").asResource().getLocalName().equals("Class"))
+                        flag[1] = "Alignments between " + triple.get("o").asResource().getLocalName() + " elements.";
+                        if (triple.get("o").asResource().getLocalName().equals("Class")) {
                             RDFUtil.addCustomPropertyTriple(integratedIRI, objBody.getAsString("s"), "EQUIVALENT_CLASS", objBody.getAsString("p"));
-                        if (triple.get("o").asResource().getLocalName().equals("Property"))
+                        }
+                        if (triple.get("o").asResource().getLocalName().equals("Property")) {
                             RDFUtil.addCustomPropertyTriple(integratedIRI, objBody.getAsString("s"), "EQUIVALENT_PROPERTY", objBody.getAsString("p"));
+                        }
                     }
                 }
             });
+
+            System.out.println(flag[0] + " " + flag[1]);
 
             return Response.ok(("Okay")).build();
         } catch (Exception e) {
@@ -218,9 +221,9 @@ public class SchemaIntegrationResource {
         dataSourcesArray.add(ds1);
         dataSourcesArray.add(ds2);
 
-        integratedDataSourceObj.put("dataSourceID", "INTEGRATED_" + dataSource1Info.getAsString("dataSourceID") + "-" + dataSource2Info.getAsString("dataSourceID"));
+        integratedDataSourceObj.put("dataSourceID", "INTEGRATED-" + dataSource1Info.getAsString("dataSourceID") + "-" + dataSource2Info.getAsString("dataSourceID"));
         //integratedDataSourceObj.put("alignmentsIRI", alignmentsIRI.split(Namespaces.Alignments.val())[1]);
-        integratedDataSourceObj.put("iri", dataSource1Info.getAsString("dataSourceID") + "-" + dataSource2Info.getAsString("dataSourceID"));
+        integratedDataSourceObj.put("iri", Namespaces.G.val() + dataSource1Info.getAsString("dataSourceID") + "-" + dataSource2Info.getAsString("dataSourceID"));
         integratedDataSourceObj.put("dataSources", dataSourcesArray);
         integratedDataSourceObj.put("name", dataSource1Info.getAsString("name").replaceAll(" ", "") + dataSource2Info.getAsString("name").replaceAll(" ", ""));
         integratedDataSourceObj.put("parsedFileAddress", integratedModelFileName);
@@ -247,7 +250,7 @@ public class SchemaIntegrationResource {
         String newDataSourceID = integratedDataSourceInfo.getAsString("dataSourceID") + "-" + dataSource2Info.getAsString("dataSourceID");
 
         System.out.println("OLD DS ID: " + integratedDataSourceInfo.getAsString("dataSourceID"));
-        System.out.println("NEW DS ID: "+ newDataSourceID);
+        System.out.println("NEW DS ID: " + newDataSourceID);
 
         collection.updateOne(eq("dataSourceID", integratedDataSourceInfo.getAsString("dataSourceID")), new Document("$set", new Document("dataSourceID", newDataSourceID)));
         collection.updateOne(eq("dataSourceID", newDataSourceID), new Document("$set", new Document("iri", integratedDataSourceInfo.getAsString("dataSourceID") + "-" + dataSource2Info.getAsString("dataSourceID"))));
@@ -272,6 +275,8 @@ public class SchemaIntegrationResource {
 
         Model ds1Model = ds.getNamedModel(dataSource1Info.getAsString("iri"));
         Model ds2Model = ds.getNamedModel(dataSource2Info.getAsString("iri"));
+        System.out.println("Size of ds1 Model: " + ds1Model.size());
+        System.out.println("Size of ds2 Model: " + ds2Model.size());
 
         Model integratedModel = ds1Model.union(ds2Model);
         ds1Model.commit();
@@ -285,6 +290,8 @@ public class SchemaIntegrationResource {
         integratedDataset.begin(ReadWrite.WRITE);
         Model model = integratedDataset.getNamedModel(integratedIRI);
         model.add(integratedModel);
+        System.out.println("Size of Integrated Model: " + integratedModel.size());
+
         try {
             model.write(new FileOutputStream("Output/integrated-model.ttl"), "TURTLE");
         } catch (FileNotFoundException e) {
