@@ -28,7 +28,6 @@
     "pug": "latest",
     "randomstring": "latest",
     "request": "latest",
-    "serve-favicon": "latest",
     "socket.io": "latest",
     "store": "^2.0.12",
     "underscore": "latest",

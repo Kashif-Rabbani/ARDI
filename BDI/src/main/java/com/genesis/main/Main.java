@@ -9,10 +9,12 @@ import uk.ac.ox.krr.logmap2.*;
 import uk.ac.ox.krr.logmap2.io.FlatAlignmentFormat;
 import uk.ac.ox.krr.logmap2.mappings.objects.MappingObjectStr;
 
+import java.net.URLEncoder;
 import java.util.Set;
 
 public class Main {
     public static String configPath = "config.kashif.properties";
+
     public static void main(String[] args) throws Exception {
         String extractionType = args[0];
         String path = args[1];
@@ -35,6 +37,8 @@ public class Main {
                 //new MySqlDB("employees","jdbc:mysql", "localhost", "root",  "");
                 break;
             case "TRY":
+
+                System.out.println(URLEncoder.encode("http://www.BDIOntology.com/schema/Bike/Bike/Bike Collection", "UTF-16BE"));
                 //This is just to test some functionality independently
                 //RDFUtil.testing();
                 break;

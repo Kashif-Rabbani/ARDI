@@ -4,6 +4,7 @@ import com.genesis.eso.util.MongoUtil;
 import com.genesis.eso.util.RDFUtil;
 import com.genesis.eso.util.Utils;
 import com.genesis.rdf.model.bdi_ontology.Namespaces;
+import com.genesis.rdf.model.bdi_ontology.metamodel.NewSourceLevel2;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
@@ -15,22 +16,31 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.impl.PropertyImpl;
+import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.bson.Document;
+import org.apache.jena.ontology.OntModel;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class SchemaIntegrationHelper {
     public SchemaIntegrationHelper() {
     }
 
     void processAlignment(JSONObject objBody, String integratedIRI, Resource s, String query, String[] flag) {
+
         RDFUtil.runAQuery(RDFUtil.sparqlQueryPrefixes + query, integratedIRI).forEachRemaining(triple -> {
-            System.out.println(triple.get("o") + " oo " + triple.get("oo"));
+            System.out.println(triple.get("o") + " oo " + triple.get("oo") );
             flag[0] = "Query contains result.";
+
             if (triple.get("o") != null && triple.get("oo") != null) {
                 if (triple.get("o") == triple.get("oo")) {
+
                     flag[1] = "Alignments between " + triple.get("o").asResource().getLocalName() + " elements.";
+
                     if (triple.get("o").asResource().getLocalName().equals("Class")) {
                         String newGlobalGraphClassResource = integratedIRI + "/" + s.getURI().split(Namespaces.Schema.val())[1];
                         RDFUtil.addClassOrPropertyTriple(integratedIRI, newGlobalGraphClassResource, "CLASS");
@@ -41,15 +51,59 @@ public class SchemaIntegrationHelper {
                     }
                     if (triple.get("o").asResource().getLocalName().equals("Property")) {
 
+                        HashMap<String, String> propDomainRange = getPropertyDomainRange(objBody, integratedIRI);
+
                         String newGlobalGraphPropertyResource = integratedIRI + "/" + s.getURI().split(Namespaces.Schema.val())[1];
+                        //Add property
                         RDFUtil.addClassOrPropertyTriple(integratedIRI, newGlobalGraphPropertyResource, "PROPERTY");
+                        // Add Domains and Ranges of the new Global Property
+                        RDFUtil.addCustomPropertyTriple(integratedIRI, newGlobalGraphPropertyResource, "DOMAIN", propDomainRange.get("pDomain"));
+                        RDFUtil.addCustomPropertyTriple(integratedIRI, newGlobalGraphPropertyResource, "DOMAIN", propDomainRange.get("sDomain"));
+                        RDFUtil.addCustomPropertyTriple(integratedIRI, newGlobalGraphPropertyResource, "RANGE", propDomainRange.get("pRange"));
+
+                        // Add Equivalent Properties
                         RDFUtil.addCustomPropertyTriple(integratedIRI, newGlobalGraphPropertyResource, "EQUIVALENT_PROPERTY", objBody.getAsString("p"));
                         RDFUtil.addCustomPropertyTriple(integratedIRI, newGlobalGraphPropertyResource, "EQUIVALENT_PROPERTY", objBody.getAsString("s"));
+
+                        //Remove Source1 i.e. s and source2 i.e p properties including domain and ranges
+                        RDFUtil.removeTriple(integratedIRI, objBody.getAsString("p"), NewSourceLevel2.RDFSDomain.val(), propDomainRange.get("pDomain"));
+                        RDFUtil.removeTriple(integratedIRI, objBody.getAsString("s"), NewSourceLevel2.RDFSDomain.val(), propDomainRange.get("sDomain"));
+
+                        RDFUtil.removeTriple(integratedIRI, objBody.getAsString("p"), NewSourceLevel2.RDFSRange.val(), propDomainRange.get("pRange"));
+                        RDFUtil.removeTriple(integratedIRI, objBody.getAsString("s"), NewSourceLevel2.RDFSRange.val(), propDomainRange.get("sRange"));
+
+                        RDFUtil.removeTriple(integratedIRI, objBody.getAsString("p"), "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", NewSourceLevel2.RDFProperty.val());
+                        RDFUtil.removeTriple(integratedIRI, objBody.getAsString("s"), "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", NewSourceLevel2.RDFProperty.val());
+
                         //RDFUtil.addCustomPropertyTriple(integratedIRI, objBody.getAsString("s"), "EQUIVALENT_PROPERTY", objBody.getAsString("p"));
                     }
                 }
             }
         });
+
+
+    }
+
+    private HashMap<String, String> getPropertyDomainRange(JSONObject objBody, String integratedIRI) {
+        HashMap<String, String> propDomainRange = new HashMap<String, String>();
+        Dataset ds = Utils.getTDBDataset();
+        ds.begin(ReadWrite.WRITE);
+        Model graph = ds.getNamedModel(integratedIRI);
+        OntModel ontModel = org.apache.jena.rdf.model.ModelFactory.createOntologyModel();
+        ontModel.addSubModel(graph);
+        /*System.out.println("if Properties: -> Printing Domain and Range: ... ");
+        System.out.println(ontModel.getOntProperty(objBody.getAsString("s")).getDomain());
+        System.out.println(ontModel.getOntProperty(objBody.getAsString("s")).getRange());*/
+        propDomainRange.put("sDomain", ontModel.getOntProperty(objBody.getAsString("s")).getDomain().toString());
+        propDomainRange.put("sRange", ontModel.getOntProperty(objBody.getAsString("s")).getRange().toString());
+        propDomainRange.put("pDomain", ontModel.getOntProperty(objBody.getAsString("p")).getDomain().toString());
+        propDomainRange.put("pRange", ontModel.getOntProperty(objBody.getAsString("p")).getRange().toString());
+        ontModel.close();
+        graph.commit();
+        graph.close();
+        ds.commit();
+        ds.close();
+        return propDomainRange;
     }
 
     void addInfo(JSONObject dataSource1Info, JSONObject dataSource2Info, String integratedModelFileName, JSONObject vowlObj) {

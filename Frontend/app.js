@@ -2,7 +2,7 @@ var config = require(__dirname + '/config');
 var port = config.PORT;
 var express = require('express');
 var path = require('path');
-var favicon = require('serve-favicon');
+//var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
@@ -14,8 +14,8 @@ var flash = require('express-flash');
 var multer = require('multer');
 var uploadd = multer({dest: config.FILES_PATH});
 var passport = require('passport');
-var fs = require('fs');
-var upload = require("express-fileupload");
+//var fs = require('fs');
+//var upload = require("express-fileupload");
 //var formData = require('form-data');
 
 /*****************************************************************************************/
@@ -93,7 +93,7 @@ app.get('/test', test_route.getGraph);
 app.post('/fileupload', file_upload.uploadFile);
 app.post('/triggerExtraction', trigger_extraction.triggerExtraction);
 app.post('/integrateDataSources', integrate_data_Sources.triggerDataSourcesIntegration);
-app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.ico')));
+//app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.ico')));
 
 
 /********** User resource ****************************************************************/
@@ -144,6 +144,7 @@ app.get('/bdiDataSource/:dataSourceID', bdi_data_source_routes.getDataSource);
 app.post('/bdiDataSource', bdi_data_source_routes.postDataSource);
 
 app.get('/bdiAlignments/:ds1_id&:ds2_id', integrate_data_Sources.getAlignments);
+
 app.post('/alignmentsAccept', integrate_data_Sources.acceptAlignment);
 app.post('/finishIntegration', integrate_data_Sources.finishIntegration);
 

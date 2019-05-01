@@ -46,11 +46,11 @@ public class SchemaExtractionResource {
         // Preparing the response to be sent back
         JSONObject resData = prepareResponse(JsonSchemaExtractor.getOutputFile(), JsonSchemaExtractor.getIRI(), objBody, vowlObj);
 
-        // Adding the response to MongoDB
-        addDataSourceInfoAsMongoCollection(resData);
-
         // Adding the RDFS Schema in Jena TDB Triple Store using IRI
         addExtractedSchemaIntoTDBStore(JsonSchemaExtractor.getIRI());
+
+        // Adding the response to MongoDB
+        addDataSourceInfoAsMongoCollection(resData);
 
         return Response.ok(new Gson().toJson("JSON")).build();
     }

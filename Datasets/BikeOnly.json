@@ -1,0 +1,16 @@
+{
+      "LaunchYear": "2018",
+      "BikeCategory": "Vehicles",
+      "BikeSpecificInfo": "Registrations in the year of 2018",
+      "TypeOfBike": "Registrations Types etc.",
+      "Bike": {
+        "BikeRegNo": "1234",
+        "BikeYear": "2015",
+        "BikeModel": "Honda"
+      },
+        "Tradedetails": {
+        "TradingSince": 1995,
+        "Achievements": "Gold",
+        "Miscellaneous": "M",
+      }
+}

@@ -1,6 +1,7 @@
 package com.genesis.eso.util;
 
 import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntProperty;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdf.model.impl.PropertyImpl;
@@ -9,6 +10,7 @@ import org.apache.jena.rdf.model.impl.ResourceImpl;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.genesis.rdf.model.bdi_ontology.*;
@@ -18,13 +20,14 @@ import org.semarglproject.vocab.RDFS;
 
 /**
  * Created by snadal on 24/11/16.
+ * Updated by Kashif-Rabbani 01-03-2019
  */
 public class RDFUtil {
 
     public static String sparqlQueryPrefixes =
             "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
-            "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
-            "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
+                    "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
+                    "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
 
     public static void addTriple(OntModel model, String s, String p, String o) {
         model.add(new ResourceImpl(s), new PropertyImpl(p), new ResourceImpl(o));
@@ -72,12 +75,30 @@ public class RDFUtil {
             graph.add(new ResourceImpl(s), new PropertyImpl(OWL.EQUIVALENT_CLASS), new ResourceImpl(o));
         if (p.equals("EQUIVALENT_PROPERTY"))
             graph.add(new ResourceImpl(s), new PropertyImpl(OWL.EQUIVALENT_PROPERTY), new ResourceImpl(o));
+        if (p.equals("DOMAIN"))
+            graph.add(new ResourceImpl(s), new PropertyImpl(RDFS.DOMAIN), new ResourceImpl(o));
+        if (p.equals("RANGE"))
+            graph.add(new ResourceImpl(s), new PropertyImpl(RDFS.RANGE), new ResourceImpl(o));
         graph.commit();
         graph.close();
         ds.commit();
         ds.close();
     }
 
+    public static void removeTriple(String namedGraph, String s, String p, String o) {
+        Dataset ds = Utils.getTDBDataset();
+        ds.begin(ReadWrite.WRITE);
+        Model graph = ds.getNamedModel(namedGraph);
+        //OntModel ontModel = org.apache.jena.rdf.model.ModelFactory.createOntologyModel();
+        //ontModel.addSubModel(graph);
+
+        graph.remove(new ResourceImpl(s), new PropertyImpl(p), new ResourceImpl(o));
+
+        graph.commit();
+        graph.close();
+        ds.commit();
+        ds.close();
+    }
 
     public static void addBatchOfTriples(String namedGraph, List<Tuple3<String, String, String>> triples) {
         //System.out.println("Adding triple: [namedGraph] "+namedGraph+", [s] "+s+", [p] "+p+", [o] "+o);

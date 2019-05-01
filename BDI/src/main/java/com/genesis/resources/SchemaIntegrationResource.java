@@ -98,7 +98,7 @@ public class SchemaIntegrationResource {
             Resource p = ResourceFactory.createResource(objBody.getAsString("p"));
             System.out.println(s.getLocalName() + " " + p.getLocalName() + " URI "+ s.getURI());
 
-            String query = " SELECT * WHERE { GRAPH <" + integratedIRI + "> { <" + objBody.getAsString("s") + "> rdf:type ?o ." + "<" + objBody.getAsString("p") + "> rdf:type ?oo .} }";
+            String query = " SELECT * WHERE { GRAPH <" + integratedIRI + "> { <" + objBody.getAsString("s") + "> rdf:type ?o ." + "<" + objBody.getAsString("p") + "> rdf:type ?oo .  } }";
 
             final String[] flag = new String[10];
 
