@@ -1,17 +1,15 @@
 {
-      "LaunchYear": "2018",
-      "BicycleCategory": "Vehicles",
-      "BicycleSpecific Information": "Registrations in the year of 2018",
-      "BicycleType": "Mountain",
+      "Launch Year": "2018",
+      "Bicycle Info": "Vehicles",
       "Bicycle": {
-        "BicycleRegistration number": "12345",
-        "BicyclePurchase Year": "2005",
-        "BicycleModel": "XXX"
+        "Registration Number": "12345",
+        "Year of Purchase": "2005",
+        "Bicycle Model": "XXX"
       },
-      "CompanyDetails": {
-        "TypeofClients": "X",
-        "TotalClients": 100,
-        "PermanentClients": 50,
-        "OtherInfo": "Well eastablished Company"
+      "Bicing Details": {
+        "Type of Clients": "X",
+        "Total Clients": 100,
+        "Permanent Clients": 50,
+	"Other Info": "Not Any"
       }
 }

@@ -11,8 +11,12 @@ var ds2_id = params[1];
 var integrationType;
 
 function integrationTypeChecker() {
-    if (ds1_id.includes("INTEGRATED-") || ds2_id.includes("INTEGRATED-")) {
-        console.log("Integration of a local graph with global graph.");
+
+    if (ds1_id.includes("INTEGRATED-") && ds2_id.includes("INTEGRATED-")) {
+        console.log("Integration of a global graph vs global graph.");
+        integrationType = "GLOBAL-vs-GLOBAL";
+    } else if (ds1_id.includes("INTEGRATED-")) {
+        console.log("Integration of a Global graph vs Local graph.");
         integrationType = "GLOBAL-vs-LOCAL";
     } else {
         console.log("Integration between local graphs");
@@ -71,6 +75,9 @@ function getAlignments() {
 function acceptButtonClickHandler(acceptButton, i) {
     console.log("AcceptButtonClickHandler");
     alignmentsData[i].integrated_iri = params[0] + '-' + params[1];
+    alignmentsData[i].ds1_id = params[0];
+    alignmentsData[i].ds2_id = params[1];
+
     console.log(alignmentsData[i]);
     $.ajax({
         type: 'POST',

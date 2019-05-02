@@ -25,6 +25,7 @@ import static com.mongodb.client.model.Filters.eq;
 @Path("bdi")
 public class SchemaIntegrationResource {
     private final SchemaIntegrationHelper schemaIntegrationHelper = new SchemaIntegrationHelper();
+
     @GET
     @Path("getSchemaAlignments/{dataSource1_id}/{dataSource2_id}")
     @Consumes("text/plain")
@@ -96,13 +97,20 @@ public class SchemaIntegrationResource {
             String integratedIRI = Namespaces.G.val() + objBody.getAsString("integrated_iri");
             Resource s = ResourceFactory.createResource(objBody.getAsString("s"));
             Resource p = ResourceFactory.createResource(objBody.getAsString("p"));
-            System.out.println(s.getLocalName() + " " + p.getLocalName() + " URI "+ s.getURI());
+            System.out.println(s.getLocalName() + " " + p.getLocalName() + " URI " + s.getURI());
 
             String query = " SELECT * WHERE { GRAPH <" + integratedIRI + "> { <" + objBody.getAsString("s") + "> rdf:type ?o ." + "<" + objBody.getAsString("p") + "> rdf:type ?oo .  } }";
 
             final String[] flag = new String[10];
 
-            schemaIntegrationHelper.processAlignment(objBody, integratedIRI, s, query, flag);
+            if (objBody.getAsString("ds1_id").contains("INTEGRATED-") && objBody.getAsString("ds2_id").contains("INTEGRATED-")) {
+                System.out.println("GLOBAL-vs-GLOBAL");
+            } else if (objBody.getAsString("ds1_id").contains("INTEGRATED-")) {
+                System.out.println("GLOBAL-vs-LOCAL");
+            } else {
+                schemaIntegrationHelper.processAlignment(objBody, integratedIRI, s, query, flag);
+                System.out.println("LOCAL-vs-LOCAL");
+            }
 
             System.out.println(flag[0] + " " + flag[1]);
             if (flag[0] != null && flag[1] != null) {

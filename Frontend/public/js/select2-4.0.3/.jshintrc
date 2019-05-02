@@ -17,6 +17,7 @@
     "window": false,
     "$": true,
     "alert": true,
+    "Tablesort": true,
     "JSON": true,
     "XMLHttpRequest": true,
     "FormData": true
