@@ -114,6 +114,37 @@ public class RDFUtil {
         ds.close();
     }
 
+    public static boolean isNamedGraphAlreadyExists(String namedGraph) {
+        boolean flag = false;
+        Dataset ds = Utils.getTDBDataset();
+        ds.begin(ReadWrite.WRITE);
+        if (ds.containsNamedModel(namedGraph)) {
+            flag = true;
+        }
+        ds.commit();
+        ds.close();
+        return flag;
+    }
+
+
+    public static boolean removeNamedGraph(String namedGraph) {
+        boolean flag;
+        Dataset ds = Utils.getTDBDataset();
+        ds.begin(ReadWrite.WRITE);
+        try {
+            ds.removeNamedModel(namedGraph);
+
+            flag = true;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+            flag = false;
+        }
+        ds.commit();
+        ds.close();
+        return flag;
+    }
+
 
     public static ResultSet runAQuery(String sparqlQuery, String namedGraph) {
         Dataset ds = Utils.getTDBDataset();

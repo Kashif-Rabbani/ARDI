@@ -1,10 +1,11 @@
 {
-      "Launch Year": "2018",
-      "Bicycle Info": "Vehicles",
+      "Year of Purchase": "2018",
+      "Info": "Vehicles",
+      "Bicycle Manufacturer": "ABC",
       "Bicycle": {
         "Registration Number": "12345",
-        "Year of Purchase": "2005",
-        "Bicycle Model": "XXX"
+        "Year of Release": "2005",
+        "Model": "XXX"
       },
       "Bicing Details": {
         "Type of Clients": "X",

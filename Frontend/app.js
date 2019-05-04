@@ -211,10 +211,10 @@ app.get('/view/:resource_name&:dsn', checkAuthenticated, function (req, res) {
     res.render('bdi_integration', {user: req.session.passport.user, ids_id :req.params.ids_id, ds1_name: req.params.ds1_name, ds2_name: req.params.ds2_name });
 });*/
 
-app.get('/integration/:ids1&:ids2', checkAuthenticated, function (req, res) {
+app.get('/integration/:ids1&:ids2&:ds1_name&:ds2_name', checkAuthenticated, function (req, res) {
     console.log(req.params);
     console.log(req.query);
-    res.render('bdi_integration', {user: req.session.passport.user, ids1 :req.params.ids1, ids2: req.params.ids2 });
+    res.render('bdi_integration', {user: req.session.passport.user, ids1 :req.params.ids1, ids2: req.params.ids2, ds1_name: req.params.ds1_name, ds2_name: req.params.ds2_name });
 });
 
 /********** Global graph section ***************************************************************/

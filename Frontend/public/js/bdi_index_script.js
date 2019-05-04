@@ -16,7 +16,7 @@ function getIntegratedFileDetails() {
                     .append($('<td>')
                         .text(dataSource.iri)
                     ).append($('<td>')
-                        .text( dataSource.parsedFileAddress)
+                        .text(dataSource.parsedFileAddress)
                     )//.append($('<td>').append($('<a href="/view_data_source?dataSourceID=' + (dataSource.dataSourceID) + '">').append($('<span class="fa fa-search"></span>'))))
                     .append($('<td>').append($('<a href="/view/' + (dataSource.integratedVowlJsonFileName) + '&Integrated' + '">').append($('<span class="fa fa-search"></span>')))
                     )
@@ -35,7 +35,7 @@ function getParsedFileDetails() {
             var dataSource = JSON.parse(value);
             $('#dataSources').find('tbody')
                 .append($('<tr>')
-                    .append($('<td>').append('<input type="checkbox" class="dataSourceCheckbox" name="dataSource" value = "' + dataSource.dataSourceID + '" /> '))
+                    .append($('<td>').append('<input type="checkbox" class="dataSourceCheckbox" name="dataSource" value = "' + dataSource.dataSourceID + "__" + dataSource.name + '" /> '))
                     .append($('<td>')
                         .text(i)
                     ).append($('<td>')
@@ -54,7 +54,7 @@ function getParsedFileDetails() {
     });
 }
 
-function goToAlignmentsView(data) {
+/*function goToAlignmentsView(data) {
     //console.log("Inside Alignments" + data + '/integration/:ids_id&ds1_id&:ds2_id&:ds1_name&:ds2_name&:align_iri');
     var d = JSON.parse(data);
     // var url = '/integration/' + d.integratedDataSourceID + '&' + d.dataSourceID1 + '&' + d.dataSourceID2 + '&' +
@@ -65,146 +65,7 @@ function goToAlignmentsView(data) {
 
     $("#overlay").fadeOut(300);
     window.location.href = url;
-}
-
-$(function () {
-    getParsedFileDetails();
-    getIntegratedFileDetails();
-});
-$(document).ready(function () {
-
-    $(document).ajaxSend(function () {
-        $("#overlay").fadeIn(100);
-    });
-
-    $(document).ajaxStop(function () {
-        $("#overlay").fadeOut(100);
-    });
-    $("body").on('change', 'input[type=checkbox]', function () {
-        var checkedCheckedBoxes = $('input[type=checkbox]:checked').length;
-        var integrateButton = $("#integrateDataSourcesButton");
-        if (checkedCheckedBoxes > 2) {
-            $(this).prop('checked', false);
-            console.log("You can maximum select two sources at a time.");
-        }
-
-        if (checkedCheckedBoxes === 2) {
-            integrateButton.removeClass("disabled");
-            integrateButton.prop('disabled', false);
-        }
-        if (checkedCheckedBoxes < 2) {
-            integrateButton.addClass("disabled");
-            integrateButton.prop('disabled', true);
-        }
-        /*if (!integrateButton.hasClass('disabled')) {
-
-        }*/
-    });
-
-
-});
-
-$(function () {
-    $('#integrateDataSourcesButton').on("click", function (e) {
-        e.preventDefault();
-        if (!$("#integrateDataSourcesButton").hasClass('disabled')) {
-            console.log("Clicked #integrateDataSourcesButton");
-
-            var dataSources = [];
-            $.each($("input[name='dataSource']:checked"), function () {
-                dataSources.push($(this).val());
-            });
-            console.log("Selected data Sources are: " + dataSources.join(", "));
-            var object = {};
-            object.id1 = dataSources[0];
-            object.id2 = dataSources[1];
-            console.log(object);
-
-            if(object.id1.includes("INTEGRATED_") && object.id2.includes("INTEGRATED_")){
-                console.log("Integration of Global Graphs not allowed yet.");
-            } else {
-                window.location.href = '/integration/' + dataSources[0] + '&' + dataSources[1];
-            }
-
-
-
-            /*$.ajax({
-                url: '/integrateDataSources',
-                method: "POST",
-                data: object
-            }).done(function (data) {
-                console.log('Success');
-                console.log(data);
-                goToAlignmentsView(data);
-            }).fail(function (err) {
-                alert("Error Integrating sources " + JSON.stringify(err));
-            });*/
-        }
-    });
-
-});
-
-
-//bdi_index_file_upload Script
-
-
-$(function () {
-
-    $('#dataSourceForm').on("submit", function (e) {
-        e.preventDefault();
-        var dataSource = new FormData();
-        switch ($('.nav-tabs .active').attr('id')) {
-
-            case "json-tab":
-                if ($("#file_path").get(0).files.length === 0) {
-                    console.log("jsonfile");
-                    return false;
-                }
-                dataSource.append("givenName", $("#givenName").val());
-                dataSource.append("givenType", "json");
-                // Get the files from input, create new FormData.
-                var files = $('#file_path').get(0).files;
-
-                // Append the files to the formData.
-                for (var i = 0; i < files.length; i++) {
-                    var file = files[i];
-                    dataSource.append('JSON_FILE', file, file.name);
-                }
-                break;
-
-            case "xml-tab":
-                if ($("#xml_path").get(0).files.length === 0) {
-                    console.log("xmltab");
-                    return false;
-                }
-                dataSource.append("givenName", $("#givenName").val());
-                dataSource.append("givenType", "xml");
-                // Get the files from input, create new FormData.
-                var filesXML = $('#xml_path').get(0).files;
-
-                // Append the files to the formData.
-                for (var x = 0; x < filesXML.length; x++) {
-                    var fileXML = filesXML[x];
-                    dataSource.append('XML_FILE', fileXML, fileXML.name);
-                }
-
-                break;
-
-            case "sqldatabase-tab":
-
-                if ($("#sql_path").val() === '') {
-                    console.log("sqldb");
-                    return false;
-                }
-                dataSource.append("givenName", $("#givenName").val());
-                dataSource.append("givenType", "SQL");
-                dataSource.append("sql_jdbc", $("#sql_path").val());
-                break;
-        }
-        handler(dataSource);
-    });
-    handleProgressBar();
-});
+}*/
 
 function handler(dataSource) {
     $.ajax({
@@ -305,3 +166,131 @@ function handleProgressBar() {
         $('.progress-bar').width('0%');
     });
 }
+
+$(function () {
+    getParsedFileDetails();
+    getIntegratedFileDetails();
+    $('#dataSourceForm').on("submit", function (e) {
+        e.preventDefault();
+        var dataSource = new FormData();
+        switch ($('.nav-tabs .active').attr('id')) {
+
+            case "json-tab":
+                if ($("#file_path").get(0).files.length === 0) {
+                    console.log("jsonfile");
+                    return false;
+                }
+                dataSource.append("givenName", $("#givenName").val());
+                dataSource.append("givenType", "json");
+                // Get the files from input, create new FormData.
+                var files = $('#file_path').get(0).files;
+
+                // Append the files to the formData.
+                for (var i = 0; i < files.length; i++) {
+                    var file = files[i];
+                    dataSource.append('JSON_FILE', file, file.name);
+                }
+                break;
+
+            case "xml-tab":
+                if ($("#xml_path").get(0).files.length === 0) {
+                    console.log("xmltab");
+                    return false;
+                }
+                dataSource.append("givenName", $("#givenName").val());
+                dataSource.append("givenType", "xml");
+                // Get the files from input, create new FormData.
+                var filesXML = $('#xml_path').get(0).files;
+
+                // Append the files to the formData.
+                for (var x = 0; x < filesXML.length; x++) {
+                    var fileXML = filesXML[x];
+                    dataSource.append('XML_FILE', fileXML, fileXML.name);
+                }
+
+                break;
+
+            case "sqldatabase-tab":
+
+                if ($("#sql_path").val() === '') {
+                    console.log("sqldb");
+                    return false;
+                }
+                dataSource.append("givenName", $("#givenName").val());
+                dataSource.append("givenType", "SQL");
+                dataSource.append("sql_jdbc", $("#sql_path").val());
+                break;
+        }
+        handler(dataSource);
+    });
+    $('#integrateDataSourcesButton').on("click", function (e) {
+        e.preventDefault();
+        if (!$("#integrateDataSourcesButton").hasClass('disabled')) {
+            console.log("Clicked #integrateDataSourcesButton");
+
+            var dataSources = [];
+            $.each($("input[name='dataSource']:checked"), function () {
+                dataSources.push($(this).val());
+            });
+            console.log("Selected data Sources are: " + dataSources.join(", "));
+            var object = {};
+            object.id1 = dataSources[0].split("__")[0];
+            object.id2 = dataSources[1].split("__")[0];
+            object.s1Name = dataSources[0].split("__")[1];
+            object.s2Name = dataSources[1].split("__")[1];
+            console.log(object);
+
+            if (object.id1.includes("INTEGRATED_") && object.id2.includes("INTEGRATED_")) {
+                console.log("Integration of Global Graphs not allowed yet.");
+            } else {
+                window.location.href = '/integration/' + object.id1 + '&' + object.id2 + '&' + object.s1Name + '&' + object.s2Name;
+            }
+
+
+            /*$.ajax({
+                url: '/integrateDataSources',
+                method: "POST",
+                data: object
+            }).done(function (data) {
+                console.log('Success');
+                console.log(data);
+                goToAlignmentsView(data);
+            }).fail(function (err) {
+                alert("Error Integrating sources " + JSON.stringify(err));
+            });*/
+        }
+    });
+    handleProgressBar();
+});
+$(document).ready(function () {
+
+    $(document).ajaxSend(function () {
+        $("#overlay").fadeIn(100);
+    });
+
+    $(document).ajaxStop(function () {
+        $("#overlay").fadeOut(100);
+    });
+    $("body").on('change', 'input[type=checkbox]', function () {
+        var checkedCheckedBoxes = $('input[type=checkbox]:checked').length;
+        var integrateButton = $("#integrateDataSourcesButton");
+        if (checkedCheckedBoxes > 2) {
+            $(this).prop('checked', false);
+            console.log("You can maximum select two sources at a time.");
+        }
+
+        if (checkedCheckedBoxes === 2) {
+            integrateButton.removeClass("disabled");
+            integrateButton.prop('disabled', false);
+        }
+        if (checkedCheckedBoxes < 2) {
+            integrateButton.addClass("disabled");
+            integrateButton.prop('disabled', true);
+        }
+        /*if (!integrateButton.hasClass('disabled')) {
+
+        }*/
+    });
+
+
+});

@@ -6,6 +6,7 @@ var bdi_integrate_url = window.location.href;
 var url_suffix = bdi_integrate_url.split('/integration/')[1];
 
 var params = url_suffix.split('&');
+// console.log(params);
 var ds1_id = params[0];
 var ds2_id = params[1];
 var integrationType;
@@ -60,8 +61,8 @@ function getAlignments() {
                         .text(val.p)
                     ).append($('<td>')
                         .text(val.s)
-                    ).append($('<td>')
-                        .text(Math.round(val.o * 100) / 100)
+                    ).append($('<td>').text(val.confidence)
+                        //.text(Math.round(val.o * 100) / 100)
                     )
                     .append($('<td>').append('<button type="button" id ="acceptAlignment" class="btn btn-success" value="' + n + '">Accept</button> '))
                     .append($('<td>').append('<button type="button" id ="rejectAlignment" class="btn btn-danger">Reject</button> '))
@@ -70,6 +71,8 @@ function getAlignments() {
             ++i;
         });
     });
+    console.log("Alignments Data");
+    console.log(alignmentsData);
 }
 
 function acceptButtonClickHandler(acceptButton, i) {
@@ -98,15 +101,22 @@ function acceptButtonClickHandler(acceptButton, i) {
 }
 
 $(function () {
-    //getIntegratedDataSourceInfo();
 });
 
 
 $(document).ready(function () {
-    /* $(document).ajaxSend(function () {
-         $("#overlay").fadeIn(100);
-     });*/
+    window.addEventListener('beforeunload', (event) => {
+        // Cancel the event as stated by the standard.
+        console.log("beforeunload");
+        event.preventDefault();
+        // Chrome requires returnValue to be set.
+        event.returnValue = "Please click 'Stay on this Page' and we will give you candy";
+    });
 
+
+  /*  window.onbeforeunload = function (e) {
+        return "Please click 'Stay on this Page' and we will give you candy";
+    };*/
     getAlignments();
     integrationTypeChecker();
 
@@ -144,4 +154,3 @@ $(document).ready(function () {
         });
     });
 });
-

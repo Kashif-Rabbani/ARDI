@@ -58,6 +58,14 @@ public class SchemaIntegrationResource {
 
             System.out.println("********** Alignments IRI ********** " + alignmentsIRI);
 
+            //check if such IRI namedGraph Already Exists? If yes, then remove it.
+          /*  if(RDFUtil.isNamedGraphAlreadyExists(alignmentsIRI)){
+                if(RDFUtil.removeNamedGraph(alignmentsIRI)){
+                    System.out.println("Named Graph  + " + alignmentsIRI + " removed.");
+                }
+            }*/
+
+
             // Calling LogMapMatcher class to extract, and save the alignments
             new LogMapMatcher(
                     dataSource1Info.getAsString("parsedFileAddress"),
@@ -70,7 +78,11 @@ public class SchemaIntegrationResource {
                 JSONObject alignments = new JSONObject();
                 alignments.put("s", triple.get("s").toString());
                 alignments.put("p", triple.get("p").toString());
-                alignments.put("o", triple.get("o").toString());
+                alignments.put("confidence", triple.get("o").toString().split("__")[0]);
+                alignments.put("mapping_type", triple.get("o").toString().split("__")[1]);
+                alignments.put("lexical_confidence", triple.get("o").toString().split("__")[2]);
+                alignments.put("structural_confidence", triple.get("o").toString().split("__")[3]);
+                alignments.put("mapping_direction", triple.get("o").toString().split("__")[4]);
                 alignmentsArray.add(alignments);
             });
 

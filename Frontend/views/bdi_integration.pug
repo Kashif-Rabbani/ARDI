@@ -1,7 +1,7 @@
 extends bdi_layout
 block headers
-    script(src='/js/bdi_integration_script.js')
-    script(src='/js/tablesort.js')
+    //script(src='/js/bdi_integration_script.js')
+    //script(src='/js/tablesort.js')
 block content
     #overlay
         .cv-spinner
@@ -56,3 +56,6 @@ block content
                 tbody
         #divv.text-center
             button#integratedDataSourcesButton.btn.btn-outline-dark.btn-md.align-center.btn-block(type="button") Finish Integration
+
+    script(src='/js/bdi_integration_script.js')
+    script(src='/js/tablesort.js')
