@@ -53,21 +53,52 @@ function getAlignments() {
         data.forEach(function (val) {
             alignmentsData[i - 1] = val;
             var n = i - 1;
-            $('#alignments').find('tbody')
-                .append($('<tr id="row' + n + '">')
-                    .append($('<td>')
-                        .text(i)
-                    ).append($('<td>')
-                        .text(val.p)
-                    ).append($('<td>')
-                        .text(val.s)
-                    ).append($('<td>').text(val.confidence)
-                        //.text(Math.round(val.o * 100) / 100)
-                    )
-                    .append($('<td>').append('<button type="button" id ="acceptAlignment" class="btn btn-success" value="' + n + '">Accept</button> '))
-                    .append($('<td>').append('<button type="button" id ="rejectAlignment" class="btn btn-danger">Reject</button> '))
-                );
+            console.log(val.mapping_type);
+            if (val.mapping_type === 'DATA-PROPERTY') {
+                $('#alignments').find('#alignmentsBody')
+                    .append($('<tr id="row' + n + '">')
+                        /*.append($('<td>').text(i))*/
+                        .append($('<td>')
+                            .text(val.s)
+                        ).append($('<td>')
+                            .text(val.p)
+                        ).append($('<td>').text(Math.round(val.confidence * 100) / 100)
+                        )
+                        .append($('<td>').append('<button type="button" id ="acceptAlignment" class="btn btn-success" value="' + n + '">Accept</button> '))
+                        .append($('<td>').append('<button type="button" id ="rejectAlignment" class="btn btn-danger">Reject</button> '))
+                    );
+            }
 
+            if (val.mapping_type === 'OBJECT-PROPERTY') {
+                $('#alignmentsObjProp').find('#alignmentsBodyObjectProperties')
+                    .append($('<tr id="row' + n + '">')
+                        // .append($('<td>').text(i))
+                        .append($('<td>')
+                            .text(val.s)
+                        ).append($('<td>')
+                            .text(val.p)
+                        ).append($('<td>').text(Math.round(val.confidence * 100) / 100)
+                        )
+                        .append($('<td>').append('<button type="button" id ="acceptAlignment" class="btn btn-success" value="' + n + '">Accept</button> '))
+                        .append($('<td>').append('<button type="button" id ="rejectAlignment" class="btn btn-danger">Reject</button> '))
+                    );
+            }
+
+
+            if (val.mapping_type === 'CLASS') {
+                $('#alignmentsClass').find('#alignmentsBodyClasses')
+                    .append($('<tr id="row' + n + '">')
+                        // .append($('<td>').text(i))
+                        .append($('<td>')
+                            .text(val.s)
+                        ).append($('<td>')
+                            .text(val.p)
+                        ).append($('<td>').text(Math.round(val.confidence * 100) / 100)
+                        )
+                        .append($('<td>').append('<button type="button" id ="acceptAlignment" class="btn btn-success" value="' + n + '">Accept</button> '))
+                        .append($('<td>').append('<button type="button" id ="rejectAlignment" class="btn btn-danger">Reject</button> '))
+                    );
+            }
             ++i;
         });
     });
@@ -100,23 +131,14 @@ function acceptButtonClickHandler(acceptButton, i) {
     });
 }
 
-$(function () {
-});
-
-
 $(document).ready(function () {
-    window.addEventListener('beforeunload', (event) => {
-        // Cancel the event as stated by the standard.
-        console.log("beforeunload");
-        event.preventDefault();
-        // Chrome requires returnValue to be set.
-        event.returnValue = "Please click 'Stay on this Page' and we will give you candy";
-    });
-
-
-  /*  window.onbeforeunload = function (e) {
-        return "Please click 'Stay on this Page' and we will give you candy";
-    };*/
+    /* window.addEventListener('beforeunload', (event) => {
+            // Cancel the event as stated by the standard.
+            console.log("beforeunload");
+            event.preventDefault();
+            // Chrome requires returnValue to be set.
+            event.returnValue = "Please click 'Stay on this Page' and we will give you candy";
+        });*/
     getAlignments();
     integrationTypeChecker();
 
@@ -130,7 +152,7 @@ $(document).ready(function () {
 
     // Click handler for Finish Integration Button
     $("#integratedDataSourcesButton").on('click', function () {
-        console.log("Inside integratedDataSourcesButton");
+        console.log("IntegratedDataSourcesButton Clicked");
         var postData = {};
         postData.iri = params[0] + "-" + params[1];
         postData.integrationType = integrationType;

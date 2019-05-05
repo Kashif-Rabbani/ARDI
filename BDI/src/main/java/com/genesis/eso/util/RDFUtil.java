@@ -104,6 +104,11 @@ public class RDFUtil {
         //System.out.println("Adding triple: [namedGraph] "+namedGraph+", [s] "+s+", [p] "+p+", [o] "+o);
         Dataset ds = Utils.getTDBDataset();
         ds.begin(ReadWrite.WRITE);
+        System.out.println("DS.CONTAINS-NAMED-MODEL:  " + ds.containsNamedModel(namedGraph));
+        System.out.println("Named Graph: " + namedGraph);
+        if(ds.containsNamedModel(namedGraph)){
+            ds.removeNamedModel(namedGraph);
+        }
         Model graph = ds.getNamedModel(namedGraph);
         for (Tuple3<String, String, String> t : triples) {
             graph.add(new ResourceImpl(t._1), new PropertyImpl(t._2), new ResourceImpl(t._3));
