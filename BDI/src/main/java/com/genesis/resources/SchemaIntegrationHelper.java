@@ -5,7 +5,6 @@ import com.genesis.eso.util.RDFUtil;
 import com.genesis.eso.util.SQLiteUtils;
 import com.genesis.eso.util.Utils;
 import com.genesis.rdf.model.bdi_ontology.Namespaces;
-import com.genesis.rdf.model.bdi_ontology.metamodel.NewSourceLevel2;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
@@ -17,8 +16,6 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.impl.PropertyImpl;
-import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.bson.Document;
 import org.apache.jena.ontology.OntModel;
 
@@ -33,6 +30,7 @@ public class SchemaIntegrationHelper {
     }
 
     void processAlignment(JSONObject objBody, String integratedIRI, Resource s, String query, String[] checkIfQueryContainsResult) {
+
         RDFUtil.runAQuery(RDFUtil.sparqlQueryPrefixes + query, integratedIRI).forEachRemaining(triple -> {
             System.out.println(triple.get("o") + " oo " + triple.get("oo"));
             checkIfQueryContainsResult[0] = "Query Returned Result > 0";
@@ -41,8 +39,15 @@ public class SchemaIntegrationHelper {
                 if (triple.get("o") == triple.get("oo")) {
 
                     checkIfQueryContainsResult[1] = "Alignments between " + triple.get("o").asResource().getLocalName() + " elements.";
-                    // Classes
+
+                    // Classes p (source 1 Class) and s (source2 Class)
                     if (triple.get("o").asResource().getLocalName().equals("Class")) {
+
+                        String sql = "INSERT INTO Class (id,classA,classB,countPropClassA,countPropClassB,listPropClassA,listPropClassB,actionType) VALUES (" +
+                                objBody.getAsString("p") + "," +
+                                objBody.getAsString("s") + "," +
+                                " );";
+
                         String newGlobalGraphClassResource = integratedIRI + "/" + s.getURI().split(Namespaces.Schema.val())[1];
                         RDFUtil.addClassOrPropertyTriple(integratedIRI, newGlobalGraphClassResource, "CLASS");
 
@@ -51,34 +56,20 @@ public class SchemaIntegrationHelper {
                         //RDFUtil.addCustomPropertyTriple(integratedIRI, objBody.getAsString("s"), "EQUIVALENT_CLASS", objBody.getAsString("p"));
                     }
 
-                    // Properties p and s
+                    // Properties p (source 1 property) and s (source2 Property)
                     if (triple.get("o").asResource().getLocalName().equals("Property")) {
-
-                        HashMap<String, String> propDomainRange = getPropertyDomainRange(objBody, integratedIRI);
-
-                        String newGlobalGraphPropertyResource = integratedIRI + "/" + s.getURI().split(Namespaces.Schema.val())[1];
-                        //Add property
-                        RDFUtil.addClassOrPropertyTriple(integratedIRI, newGlobalGraphPropertyResource, "PROPERTY");
-                        // Add Domains and Ranges of the new Global Property
-                        RDFUtil.addCustomPropertyTriple(integratedIRI, newGlobalGraphPropertyResource, "DOMAIN", propDomainRange.get("pDomain"));
-                        RDFUtil.addCustomPropertyTriple(integratedIRI, newGlobalGraphPropertyResource, "DOMAIN", propDomainRange.get("sDomain"));
-                        RDFUtil.addCustomPropertyTriple(integratedIRI, newGlobalGraphPropertyResource, "RANGE", propDomainRange.get("pRange"));
-
-                        // Add Equivalent Properties
-                        RDFUtil.addCustomPropertyTriple(integratedIRI, newGlobalGraphPropertyResource, "EQUIVALENT_PROPERTY", objBody.getAsString("p"));
-                        RDFUtil.addCustomPropertyTriple(integratedIRI, newGlobalGraphPropertyResource, "EQUIVALENT_PROPERTY", objBody.getAsString("s"));
-
-                        //Remove Source1 i.e. s and source2 i.e p properties including domain and ranges
-                        RDFUtil.removeTriple(integratedIRI, objBody.getAsString("p"), NewSourceLevel2.RDFSDomain.val(), propDomainRange.get("pDomain"));
-                        RDFUtil.removeTriple(integratedIRI, objBody.getAsString("s"), NewSourceLevel2.RDFSDomain.val(), propDomainRange.get("sDomain"));
-
-                        RDFUtil.removeTriple(integratedIRI, objBody.getAsString("p"), NewSourceLevel2.RDFSRange.val(), propDomainRange.get("pRange"));
-                        RDFUtil.removeTriple(integratedIRI, objBody.getAsString("s"), NewSourceLevel2.RDFSRange.val(), propDomainRange.get("sRange"));
-
-                        RDFUtil.removeTriple(integratedIRI, objBody.getAsString("p"), "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", NewSourceLevel2.RDFProperty.val());
-                        RDFUtil.removeTriple(integratedIRI, objBody.getAsString("s"), "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", NewSourceLevel2.RDFProperty.val());
-
-                        //RDFUtil.addCustomPropertyTriple(integratedIRI, objBody.getAsString("s"), "EQUIVALENT_PROPERTY", objBody.getAsString("p"));
+                        HashMap<String, String> propDomainRange = getPropertiesInfo(objBody, integratedIRI);
+                        String sql = "INSERT INTO Property " +
+                                "(id,PropertyA,PropertyB,DomainPropA,DomainPropB,RangePropA,RangePropB,AlignmentType,hasSameName,actionType) VALUES (" +
+                                objBody.getAsString("p") + "," +
+                                objBody.getAsString("s") + "," +
+                                propDomainRange.get("pDomain") + "," +
+                                propDomainRange.get("sDomain") + "," +
+                                propDomainRange.get("pRange") + "," +
+                                propDomainRange.get("sRange") + "," +
+                                propDomainRange.get("hasSameName") + "," +
+                                objBody.getAsString("actionType") +
+                                " ); ";
                     }
                 }
             }
@@ -87,26 +78,34 @@ public class SchemaIntegrationHelper {
 
     }
 
-    private HashMap<String, String> getPropertyDomainRange(JSONObject objBody, String integratedIRI) {
-        HashMap<String, String> propDomainRange = new HashMap<String, String>();
+    private HashMap<String, String> getPropertiesInfo(JSONObject objBody, String integratedIRI) {
+        HashMap<String, String> propCharacteristics = new HashMap<String, String>();
         Dataset ds = Utils.getTDBDataset();
         ds.begin(ReadWrite.WRITE);
         Model graph = ds.getNamedModel(integratedIRI);
         OntModel ontModel = org.apache.jena.rdf.model.ModelFactory.createOntologyModel();
         ontModel.addSubModel(graph);
-        /*System.out.println("if Properties: -> Printing Domain and Range: ... ");
-        System.out.println(ontModel.getOntProperty(objBody.getAsString("s")).getDomain());
-        System.out.println(ontModel.getOntProperty(objBody.getAsString("s")).getRange());*/
-        propDomainRange.put("sDomain", ontModel.getOntProperty(objBody.getAsString("s")).getDomain().toString());
-        propDomainRange.put("sRange", ontModel.getOntProperty(objBody.getAsString("s")).getRange().toString());
-        propDomainRange.put("pDomain", ontModel.getOntProperty(objBody.getAsString("p")).getDomain().toString());
-        propDomainRange.put("pRange", ontModel.getOntProperty(objBody.getAsString("p")).getRange().toString());
+
+        System.out.println("if Properties: -> Printing Domain and Range: ... ");
+        System.out.println(ontModel.getOntProperty(objBody.getAsString("s")).getLocalName());
+        System.out.println(ontModel.getOntProperty(objBody.getAsString("p")).getLocalName());
+
+        propCharacteristics.put("sDomain", ontModel.getOntProperty(objBody.getAsString("s")).getDomain().toString());
+        propCharacteristics.put("sRange", ontModel.getOntProperty(objBody.getAsString("s")).getRange().toString());
+        propCharacteristics.put("pDomain", ontModel.getOntProperty(objBody.getAsString("p")).getDomain().toString());
+        propCharacteristics.put("pRange", ontModel.getOntProperty(objBody.getAsString("p")).getRange().toString());
+
+        if (ontModel.getOntProperty(objBody.getAsString("s")).getLocalName().equals(ontModel.getOntProperty(objBody.getAsString("p")).getLocalName())) {
+            propCharacteristics.put("hasSameName", "TRUE");
+        } else {
+            propCharacteristics.put("hasSameName", "FALSE");
+        }
         ontModel.close();
         graph.commit();
         graph.close();
         ds.commit();
         ds.close();
-        return propDomainRange;
+        return propCharacteristics;
     }
 
     void addInfo(JSONObject dataSource1Info, JSONObject dataSource2Info, String integratedModelFileName, JSONObject vowlObj) {
@@ -241,7 +240,7 @@ public class SchemaIntegrationHelper {
         client.close();
     }
 
-     void initAlignmentTables() {
+    void initAlignmentTables() {
         List<String> propertyTableAttributes = new ArrayList<>();
         propertyTableAttributes.add("id");
         propertyTableAttributes.add("PropertyA");
@@ -251,7 +250,7 @@ public class SchemaIntegrationHelper {
         propertyTableAttributes.add("RangePropA");
         propertyTableAttributes.add("RangePropB");
         propertyTableAttributes.add("AlignmentType");
-        propertyTableAttributes.add("isSameURN");
+        propertyTableAttributes.add("hasSameName");
         propertyTableAttributes.add("actionType");
 
         List<String> classTableAttributes = new ArrayList<>();
@@ -261,7 +260,6 @@ public class SchemaIntegrationHelper {
         classTableAttributes.add("countPropClassA");
         classTableAttributes.add("countPropClassB");
         classTableAttributes.add("listPropClassA");
-
         classTableAttributes.add("listPropClassB");
         classTableAttributes.add("actionType");
 

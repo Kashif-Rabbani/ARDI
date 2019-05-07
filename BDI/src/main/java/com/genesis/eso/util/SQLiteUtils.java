@@ -13,7 +13,7 @@ public class SQLiteUtils {
     public static void createTable(String table, List<String> attributes) {
         SQLiteConnection conn = Utils.getSQLiteConnection();
 
-        String droptable = "DROP TABLE IF EXISTS "+table+";";
+        String droptable = "DROP TABLE IF EXISTS " + table + ";";
         try {
             SQLiteStatement stmt = conn.prepare(droptable);
             stmt.step();
@@ -24,10 +24,10 @@ public class SQLiteUtils {
         }
 
         conn = Utils.getSQLiteConnection();
-        StringBuilder SQL = new StringBuilder("CREATE TABLE "+table+" (");
-        attributes.forEach(a -> SQL.append(a+" text,"));
+        StringBuilder SQL = new StringBuilder("CREATE TABLE " + table + " (");
+        attributes.forEach(a -> SQL.append(a + " text,"));
 
-        String createStatement = SQL.toString().substring(0,SQL.toString().length()-1) + ");";
+        String createStatement = SQL.toString().substring(0, SQL.toString().length() - 1) + ");";
 
         try {
             SQLiteStatement stmt = conn.prepare(createStatement);
@@ -44,14 +44,14 @@ public class SQLiteUtils {
         SQLiteConnection conn = Utils.getSQLiteConnection();
 
         data.forEach(tuple -> {
-            String SQL = "INSERT INTO "+table+" ";
+            String SQL = "INSERT INTO " + table + " ";
             StringBuilder schema = new StringBuilder("(");
             StringBuilder values = new StringBuilder("(");
-            ((JSONArray)tuple).forEach(datum -> {
-                schema.append(((JSONObject)datum).getAsString("attribute")+",");
-                values.append("'"+((JSONObject)datum).getAsString("value").replace("'","")+"',");
+            ((JSONArray) tuple).forEach(datum -> {
+                schema.append(((JSONObject) datum).getAsString("attribute") + ",");
+                values.append("'" + ((JSONObject) datum).getAsString("value").replace("'", "") + "',");
             });
-            SQL += schema.substring(0,schema.length()-1)+") VALUES "+values.substring(0,values.length()-1)+");";
+            SQL += schema.substring(0, schema.length() - 1) + ") VALUES " + values.substring(0, values.length() - 1) + ");";
 
             try {
                 SQLiteStatement stmt = conn.prepare(SQL);
@@ -63,6 +63,16 @@ public class SQLiteUtils {
         conn.dispose();
     }
 
+    public static void executeQuery(String table, String SQL) {
+        SQLiteConnection conn = Utils.getSQLiteConnection();
+        try {
+            SQLiteStatement stmt = conn.prepare(SQL);
+            stmt.step();
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+        }
+        conn.dispose();
+    }
 
 
     public static JSONArray executeSelect(String sql, List<String> features) {
@@ -74,8 +84,8 @@ public class SQLiteUtils {
                 JSONArray arr = new JSONArray();
                 for (int i = 0; i < features.size(); ++i) {
                     JSONObject datum = new JSONObject();
-                    datum.put("feature",features.get(i));
-                    datum.put("value",stmt.columnString(i));
+                    datum.put("feature", features.get(i));
+                    datum.put("value", stmt.columnString(i));
                     arr.add(datum);
                 }
                 data.add(arr);
