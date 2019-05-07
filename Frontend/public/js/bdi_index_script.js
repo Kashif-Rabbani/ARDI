@@ -9,7 +9,7 @@ function getIntegratedFileDetails() {
             var dataSource = JSON.parse(value);
             $('#integratedDataSources').find('tbody')
                 .append($('<tr>')
-                    .append($('<td>').append('<input type="checkbox" class="dataSourceCheckbox" name="dataSource" value = "' + dataSource.dataSourceID + '" /> '))
+                    .append($('<td>').append('<input type="checkbox" class="dataSourceCheckbox" name="dataSource" value = "' + dataSource.dataSourceID + "__" + dataSource.name +  '" /> '))
                     .append($('<td>')
                         .text(i)
                     ).append($('<td>').text(dataSource.name))

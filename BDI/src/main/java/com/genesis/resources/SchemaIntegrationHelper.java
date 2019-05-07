@@ -31,9 +31,8 @@ public class SchemaIntegrationHelper {
     }
 
     void processAlignment(JSONObject objBody, String integratedIRI, Resource s, String query, String[] flag) {
-
         RDFUtil.runAQuery(RDFUtil.sparqlQueryPrefixes + query, integratedIRI).forEachRemaining(triple -> {
-            System.out.println(triple.get("o") + " oo " + triple.get("oo") );
+            System.out.println(triple.get("o") + " oo " + triple.get("oo"));
             flag[0] = "Query contains result.";
 
             if (triple.get("o") != null && triple.get("oo") != null) {
