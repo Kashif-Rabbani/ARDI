@@ -20,7 +20,7 @@ exports.triggerDataSourcesIntegration = function (req, res) {
         console.log("Last Request Saved Time: " + temp);
 
         temp.setSeconds(temp.getSeconds() + 5);
-        console.log("Last Request + 5 Seconds: "+ temp);
+        console.log("Last Request + 5 Seconds: " + temp);
 
         store.set('lastRequestTime', {time: new Date()});
 
@@ -28,7 +28,7 @@ exports.triggerDataSourcesIntegration = function (req, res) {
         store.set('lastRequestTime', {time: new Date()});
     }
 
-    console.log("Printing TEMP outside " + temp );
+    console.log("Printing TEMP outside " + temp);
 
     if (new Date() < temp) {
         console.log("Aborting duplicate Request");
@@ -48,19 +48,19 @@ exports.triggerDataSourcesIntegration = function (req, res) {
                 console.log("TimeOut Function");
             }, 10000);*/
 
-               request.post({
-                   url: url,
-                   body: JSON.stringify(objDataSource)
-               }, function done(error, response, body) {
-                   if (!error && response.statusCode === 200) {
-                       console.log(body);
+            request.post({
+                url: url,
+                body: JSON.stringify(objDataSource)
+            }, function done(error, response, body) {
+                if (!error && response.statusCode === 200) {
+                    console.log(body);
 
-                       //res.redirect('/');
-                       res.status(200).send(body);
-                   } else {
-                       res.status(500).send("Error in the backend");
-                   }
-               });
+                    //res.redirect('/');
+                    res.status(200).send(body);
+                } else {
+                    res.status(500).send("Error in the backend");
+                }
+            });
             //res.status(200).send("DONE");
         }
     }
@@ -90,7 +90,9 @@ exports.acceptAlignment = function (req, res, next) {
         !(req.body.hasOwnProperty('mapping_direction')) || req.body.mapping_direction == null ||
         !(req.body.hasOwnProperty('mapping_type')) || req.body.mapping_type == null ||
         !(req.body.hasOwnProperty('structural_confidence')) || req.body.structural_confidence == null ||
-        !(req.body.hasOwnProperty('integrated_iri')) || req.body.integrated_iri == null) {
+        !(req.body.hasOwnProperty('integrated_iri')) || req.body.integrated_iri == null ||
+        !(req.body.hasOwnProperty('actionType')) || req.body.actionType == null
+    ) {
         res.status(400).json({msg: "(Bad Request) data format: {P, S, O, ID}"});
     } else {
         var objDataSource = req.body;

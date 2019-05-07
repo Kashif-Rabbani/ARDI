@@ -2,6 +2,7 @@ package com.genesis.resources;
 
 import com.genesis.eso.util.ConfigManager;
 import com.genesis.eso.util.RDFUtil;
+import com.genesis.eso.util.SQLiteUtils;
 import com.genesis.eso.util.Utils;
 import com.genesis.rdf.LogMapMatcher;
 import com.genesis.rdf.model.bdi_ontology.Namespaces;
@@ -13,12 +14,15 @@ import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
+import scala.actors.threadpool.Arrays;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -36,6 +40,7 @@ public class SchemaIntegrationResource {
             JSONObject dataSource2Info = new JSONObject();
             String dataSource1 = null;
             String dataSource2 = null;
+
             // Receive the ids of two sources
             if (ds1.contains("INTEGRATED-")) {
                 dataSource1 = schemaIntegrationHelper.getIntegratedDataSourceInfo(ds1);
@@ -55,17 +60,6 @@ public class SchemaIntegrationResource {
             /* Create an IRI for alignments which will be produced by LogMap for the two sources. Note that this IRI is required to store the alignments in the TripleStore. */
 
             String alignmentsIRI = Namespaces.Alignments.val() + dataSource1Info.getAsString("dataSourceID") + "-" + dataSource2Info.getAsString("dataSourceID");
-
-            System.out.println("********** Alignments IRI ********** " + alignmentsIRI);
-
-            //check if such IRI namedGraph Already Exists? If yes, then remove it.
-          /*  if(RDFUtil.isNamedGraphAlreadyExists(alignmentsIRI)){
-                if(RDFUtil.removeNamedGraph(alignmentsIRI)){
-                    System.out.println("Named Graph  + " + alignmentsIRI + " removed.");
-                }
-            }*/
-
-
             // Calling LogMapMatcher class to extract, and save the alignments
             new LogMapMatcher(
                     dataSource1Info.getAsString("parsedFileAddress"),
@@ -89,11 +83,14 @@ public class SchemaIntegrationResource {
             String iri = schemaIntegrationHelper.integrateTDBDatasets(dataSource1Info, dataSource2Info);
             System.out.println("Returned IRI: " + iri);
 
+            schemaIntegrationHelper.initAlignmentTables();
+
             return Response.ok((alignmentsArray)).build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
+
 
     @POST
     @Path("acceptAlignment/")
@@ -113,19 +110,19 @@ public class SchemaIntegrationResource {
 
             String query = " SELECT * WHERE { GRAPH <" + integratedIRI + "> { <" + objBody.getAsString("s") + "> rdf:type ?o ." + "<" + objBody.getAsString("p") + "> rdf:type ?oo .  } }";
 
-            final String[] flag = new String[10];
+            final String[] checkIfQueryContainsResult = new String[5];
 
             if (objBody.getAsString("ds1_id").contains("INTEGRATED-") && objBody.getAsString("ds2_id").contains("INTEGRATED-")) {
                 System.out.println("GLOBAL-vs-GLOBAL");
             } else if (objBody.getAsString("ds1_id").contains("INTEGRATED-")) {
                 System.out.println("GLOBAL-vs-LOCAL");
             } else {
-                schemaIntegrationHelper.processAlignment(objBody, integratedIRI, s, query, flag);
+                schemaIntegrationHelper.processAlignment(objBody, integratedIRI, s, query, checkIfQueryContainsResult);
                 System.out.println("LOCAL-vs-LOCAL");
             }
 
-            System.out.println(flag[0] + " " + flag[1]);
-            if (flag[0] != null && flag[1] != null) {
+            System.out.println(checkIfQueryContainsResult[0] + " " + checkIfQueryContainsResult[1]);
+            if (checkIfQueryContainsResult[0] != null && checkIfQueryContainsResult[1] != null) {
                 return Response.ok(("AlignmentSucceeded")).build();
             } else {
                 return Response.ok(("AlignmentFailed")).build();

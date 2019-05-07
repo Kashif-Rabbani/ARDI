@@ -2,6 +2,7 @@ package com.genesis.resources;
 
 import com.genesis.eso.util.MongoUtil;
 import com.genesis.eso.util.RDFUtil;
+import com.genesis.eso.util.SQLiteUtils;
 import com.genesis.eso.util.Utils;
 import com.genesis.rdf.model.bdi_ontology.Namespaces;
 import com.genesis.rdf.model.bdi_ontology.metamodel.NewSourceLevel2;
@@ -25,21 +26,22 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class SchemaIntegrationHelper {
     public SchemaIntegrationHelper() {
     }
 
-    void processAlignment(JSONObject objBody, String integratedIRI, Resource s, String query, String[] flag) {
+    void processAlignment(JSONObject objBody, String integratedIRI, Resource s, String query, String[] checkIfQueryContainsResult) {
         RDFUtil.runAQuery(RDFUtil.sparqlQueryPrefixes + query, integratedIRI).forEachRemaining(triple -> {
             System.out.println(triple.get("o") + " oo " + triple.get("oo"));
-            flag[0] = "Query contains result.";
+            checkIfQueryContainsResult[0] = "Query Returned Result > 0";
 
             if (triple.get("o") != null && triple.get("oo") != null) {
                 if (triple.get("o") == triple.get("oo")) {
 
-                    flag[1] = "Alignments between " + triple.get("o").asResource().getLocalName() + " elements.";
-
+                    checkIfQueryContainsResult[1] = "Alignments between " + triple.get("o").asResource().getLocalName() + " elements.";
+                    // Classes
                     if (triple.get("o").asResource().getLocalName().equals("Class")) {
                         String newGlobalGraphClassResource = integratedIRI + "/" + s.getURI().split(Namespaces.Schema.val())[1];
                         RDFUtil.addClassOrPropertyTriple(integratedIRI, newGlobalGraphClassResource, "CLASS");
@@ -48,6 +50,8 @@ public class SchemaIntegrationHelper {
                         RDFUtil.addCustomPropertyTriple(integratedIRI, newGlobalGraphClassResource, "EQUIVALENT_CLASS", objBody.getAsString("s"));
                         //RDFUtil.addCustomPropertyTriple(integratedIRI, objBody.getAsString("s"), "EQUIVALENT_CLASS", objBody.getAsString("p"));
                     }
+
+                    // Properties p and s
                     if (triple.get("o").asResource().getLocalName().equals("Property")) {
 
                         HashMap<String, String> propDomainRange = getPropertyDomainRange(objBody, integratedIRI);
@@ -235,5 +239,34 @@ public class SchemaIntegrationHelper {
         collection.updateMany(Filters.eq("integratedDataSourceID", iri), new Document("$set", new Document("integratedVowlJsonFilePath", vowlObj.getAsString("vowlJsonFilePath"))));
         collection.updateMany(Filters.eq("integratedDataSourceID", iri), new Document("$set", new Document("integratedVowlJsonFileName", vowlObj.getAsString("vowlJsonFileName"))));
         client.close();
+    }
+
+     void initAlignmentTables() {
+        List<String> propertyTableAttributes = new ArrayList<>();
+        propertyTableAttributes.add("id");
+        propertyTableAttributes.add("PropertyA");
+        propertyTableAttributes.add("PropertyB");
+        propertyTableAttributes.add("DomainPropA");
+        propertyTableAttributes.add("DomainPropB");
+        propertyTableAttributes.add("RangePropA");
+        propertyTableAttributes.add("RangePropB");
+        propertyTableAttributes.add("AlignmentType");
+        propertyTableAttributes.add("isSameURN");
+        propertyTableAttributes.add("actionType");
+
+        List<String> classTableAttributes = new ArrayList<>();
+        classTableAttributes.add("id");
+        classTableAttributes.add("classA");
+        classTableAttributes.add("classB");
+        classTableAttributes.add("countPropClassA");
+        classTableAttributes.add("countPropClassB");
+        classTableAttributes.add("listPropClassA");
+
+        classTableAttributes.add("listPropClassB");
+        classTableAttributes.add("actionType");
+
+        SQLiteUtils.createTable("Property", propertyTableAttributes);
+        SQLiteUtils.createTable("Class", classTableAttributes);
+
     }
 }

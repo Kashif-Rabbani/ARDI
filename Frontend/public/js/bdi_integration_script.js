@@ -53,7 +53,6 @@ function getAlignments() {
         data.forEach(function (val) {
             alignmentsData[i - 1] = val;
             var n = i - 1;
-            console.log(val.mapping_type);
             if (val.mapping_type === 'DATA-PROPERTY') {
                 $('#alignments').find('#alignmentsBody')
                     .append($('<tr id="row' + n + '">')
@@ -111,6 +110,7 @@ function acceptButtonClickHandler(acceptButton, i) {
     alignmentsData[i].integrated_iri = params[0] + '-' + params[1];
     alignmentsData[i].ds1_id = params[0];
     alignmentsData[i].ds2_id = params[1];
+    alignmentsData[i].actionType = "ACCEPTED";
 
     console.log(alignmentsData[i]);
     $.ajax({
