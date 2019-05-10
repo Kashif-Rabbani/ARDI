@@ -19,8 +19,8 @@ public class MongoUtil {
         return client.getDatabase(ConfigManager.getProperty("system_bdi_db_name")).getCollection("dataSources");
     }
 
-    public static MongoCollection<Document> getLAVMappingCollection(MongoClient client) {
-        return client.getDatabase(ConfigManager.getProperty("system_bdi_db_name")).getCollection("LAVMappings");
+    public static MongoCollection<Document> getAlignmentsCollection(MongoClient client) {
+        return client.getDatabase(ConfigManager.getProperty("system_bdi_db_name")).getCollection("alignments");
     }
 
     public static String getMongoObject(MongoClient client, MongoCursor<Document> cursor) {

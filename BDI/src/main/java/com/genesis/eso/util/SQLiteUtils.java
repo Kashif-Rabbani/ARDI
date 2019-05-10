@@ -6,42 +6,47 @@ import com.almworks.sqlite4java.SQLiteStatement;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 
+import java.io.IOException;
 import java.util.List;
 
 public class SQLiteUtils {
 
     public static void createTable(String table, List<String> attributes) {
-        SQLiteConnection conn = Utils.getSQLiteConnection();
+        SqliteSafeDBWithPool sqliteSafeDBWithPool = new SqliteSafeDBWithPool();
+
+        SQLiteConnection conn = sqliteSafeDBWithPool.getConnection();
 
         String droptable = "DROP TABLE IF EXISTS " + table + ";";
         try {
-            SQLiteStatement stmt = conn.prepare(droptable);
+            SQLiteStatement stmt = sqliteSafeDBWithPool.query(conn,droptable);
             stmt.step();
         } catch (SQLiteException e) {
             e.printStackTrace();
-        } finally {
-            conn.dispose();
         }
 
-        conn = Utils.getSQLiteConnection();
         StringBuilder SQL = new StringBuilder("CREATE TABLE " + table + " (");
         attributes.forEach(a -> SQL.append(a + " s,"));
 
         String createStatement = SQL.toString().substring(0, SQL.toString().length() - 1) + ");";
 
         try {
-            SQLiteStatement stmt = conn.prepare(createStatement);
+            SQLiteStatement stmt = sqliteSafeDBWithPool.query(conn,createStatement);
             stmt.step();
         } catch (SQLiteException e) {
             e.printStackTrace();
-        } finally {
-            conn.dispose();
         }
 
+
+     /*   try {
+            sqliteSafeDBWithPool.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
     }
 
     public static void insertData(String table, JSONArray data) {
-        SQLiteConnection conn = Utils.getSQLiteConnection();
+        SqliteSafeDBWithPool sqliteSafeDBWithPool = new SqliteSafeDBWithPool();
+        SQLiteConnection conn = sqliteSafeDBWithPool.getConnection();
 
         data.forEach(tuple -> {
             String SQL = "INSERT INTO " + table + " ";
@@ -54,32 +59,46 @@ public class SQLiteUtils {
             SQL += schema.substring(0, schema.length() - 1) + ") VALUES " + values.substring(0, values.length() - 1) + ");";
 
             try {
-                SQLiteStatement stmt = conn.prepare(SQL);
+                sqliteSafeDBWithPool.beginTransaction();
+                SQLiteStatement stmt = sqliteSafeDBWithPool.query(conn,SQL);
                 stmt.step();
+                sqliteSafeDBWithPool.commitTransaction();
             } catch (SQLiteException e) {
                 e.printStackTrace();
             }
         });
-        conn.dispose();
+        try {
+            sqliteSafeDBWithPool.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void executeQuery(String SQL) {
-        SQLiteConnection conn = Utils.getSQLiteConnection();
+        SqliteSafeDBWithPool sqliteSafeDBWithPool = new SqliteSafeDBWithPool();
+        SQLiteConnection conn = sqliteSafeDBWithPool.getConnection();
         try {
-            SQLiteStatement stmt = conn.prepare(SQL);
+            sqliteSafeDBWithPool.beginTransaction();
+            SQLiteStatement stmt = sqliteSafeDBWithPool.query(conn,SQL);
             stmt.step();
+            sqliteSafeDBWithPool.commitTransaction();
         } catch (SQLiteException e) {
             e.printStackTrace();
         }
-        conn.dispose();
+        try {
+            sqliteSafeDBWithPool.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
     public static JSONArray executeSelect(String sql, List<String> features) {
-        SQLiteConnection conn = Utils.getSQLiteConnection();
+        SqliteSafeDBWithPool sqliteSafeDBWithPool = new SqliteSafeDBWithPool();
+        SQLiteConnection conn = sqliteSafeDBWithPool.getConnection();
         JSONArray data = new JSONArray();
         try {
-            SQLiteStatement stmt = conn.prepare(sql);
+            SQLiteStatement stmt = sqliteSafeDBWithPool.query(conn, sql);
             while (stmt.step()) {
                 JSONArray arr = new JSONArray();
                 for (int i = 0; i < features.size(); ++i) {
@@ -92,8 +111,11 @@ public class SQLiteUtils {
             }
         } catch (SQLiteException e) {
             e.printStackTrace();
-        } finally {
-            conn.dispose();
+        }
+        try {
+            sqliteSafeDBWithPool.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return data;
     }

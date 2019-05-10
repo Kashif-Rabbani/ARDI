@@ -43,9 +43,9 @@ public class SchemaIntegrationHelper {
                     // Classes p (source 1 Class) and s (source2 Class)
                     if (triple.get("o").asResource().getLocalName().equals("Class")) {
 
-                        String sql = "INSERT INTO Class (id,classA,classB,countPropClassA,countPropClassB,listPropClassA,listPropClassB,actionType) VALUES (" +
-                                objBody.getAsString("p") + "," +
-                                objBody.getAsString("s") + "," +
+                        String sql = "INSERT INTO Class (classA,classB,countPropClassA,countPropClassB,listPropClassA,listPropClassB,actionType) VALUES (" +
+                                "'" + objBody.getAsString("p") + "'" + "," +
+                                "'" + objBody.getAsString("s") + "'" + "," +
                                 " );";
 
                         String newGlobalGraphClassResource = integratedIRI + "/" + s.getURI().split(Namespaces.Schema.val())[1];
@@ -61,22 +61,23 @@ public class SchemaIntegrationHelper {
                         HashMap<String, String> propDomainRange = getPropertiesInfo(objBody, integratedIRI);
                         String sql = "INSERT INTO Property " +
                                 "(PropertyA,PropertyB,DomainPropA,DomainPropB,RangePropA,RangePropB,AlignmentType,hasSameName,actionType) VALUES (" +
-                                "" + objBody.getAsString("p")+ "" + ',' +
-                                "" + objBody.getAsString("s")+ "" + ',' +
-                                "" + propDomainRange.get("pDomain")+ "" + ',' +
-                                "" + propDomainRange.get("sDomain")+ "" + ',' +
-                                "" + propDomainRange.get("pRange")+ "" + ',' +
-                                "" + propDomainRange.get("sRange")+ "" + ',' +
-                                "" + " Property" + "" + ',' +
-                                "" + propDomainRange.get("hasSameName")+ "" + ',' +
-                                "" + objBody.getAsString("actionType")+ "" +
+                                "'" + objBody.getAsString("p") + "'" + ',' +
+                                "'" + objBody.getAsString("s") + "'" + ',' +
+                                "'" + propDomainRange.get("pDomain") + "'" + ',' +
+                                "'" + propDomainRange.get("sDomain") + "'" + ',' +
+                                "'" + propDomainRange.get("pRange") + "'" + ',' +
+                                "'" + propDomainRange.get("sRange") + "'" + ',' +
+                                "'" + " Property" + "'" + ',' +
+                                "'" + propDomainRange.get("hasSameName") + "'" + ',' +
+                                "'" + objBody.getAsString("actionType") + "'" +
                                 " ); ";
                         System.out.println("Inserting into SQLite Table Property");
                         SQLiteUtils.executeQuery(sql);
                         List<String> features = new ArrayList<>();
                         features.add("actionType");
                         System.out.println("SELECT query....");
-                        SQLiteUtils.executeSelect("SELECT actionType FROM Property", features);
+                        JSONArray returnValue = SQLiteUtils.executeSelect("SELECT actionType FROM Property", features);
+                        System.out.println(returnValue.toJSONString());
                     }
                 }
             }
