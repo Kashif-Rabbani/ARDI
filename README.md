@@ -27,12 +27,16 @@
 #### Libraries 
 
  - **LogMap Matcher external dependency library**
-    - Jar file is generated from [logmap-customized-repo](https://github.com/Kashif-Rabbani/logmap-matcher) (This project is forked from [logmap-original-repo](https://github.com/ernestojimenezruiz/logmap-matcher)). 
 
-    - The generated Jar file is already imported in the POM. Please run the following command to add the jar file as a maven dependency before generating the package file. `mvn install:install-file -Dfile=/home/kashif/Documents/GIT/BDI/BDI/lib/logmap-matcher-3.0.jar -DgroupId=uk.ox.logmap -DartifactId=logmap-matcher -Dversion=3.0 -Dpackaging=jar`
-    
-    - Updates are made in the forked project. For more details see the commits history. 
-    
+    - LogMap is added as an external library (JAR) in this project. Please find the jar in this directory [LogMapJar](https://github.com/genesis-upc/BDI/tree/master/BDI/lib).
+
+    - Jar file is generated from [logmap-customized-repo](https://github.com/Kashif-Rabbani/logmap-matcher) (This project is forked from [logmap-original-repo](https://github.com/ernestojimenezruiz/logmap-matcher)). Updates are made in the forked project. For more details see the commits history. 
+
+    - The generated Jar file is already imported in the POM. Please run the following command to add the jar file as a maven dependency before generating the package file. 
+
+    ```sh
+        mvn install:install-file -Dfile=/home/kashif/Documents/GIT/BDI/BDI/lib/logmap-matcher-3.0.jar -DgroupId=uk.ox.logmap -DartifactId=logmap-matcher -Dversion=3.0 -Dpackaging=jar
+    ```
     - Command to generate jar with dependencies: `mvn clean install` and `mvn clean compile assembly:single` 
     - Jar file: OWL2VOWL-0.3.6.jar 
     - Jar file is available in the lib folder of BDI Project. 
