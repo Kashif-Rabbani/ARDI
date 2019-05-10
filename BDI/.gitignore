@@ -58,3 +58,6 @@ Input/*
 
 TDBTDB
 TDBTDB/*
+
+native-libs
+native-libs/*

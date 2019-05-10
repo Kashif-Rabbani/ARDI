@@ -25,7 +25,7 @@ public class SQLiteUtils {
 
         conn = Utils.getSQLiteConnection();
         StringBuilder SQL = new StringBuilder("CREATE TABLE " + table + " (");
-        attributes.forEach(a -> SQL.append(a + " text,"));
+        attributes.forEach(a -> SQL.append(a + " s,"));
 
         String createStatement = SQL.toString().substring(0, SQL.toString().length() - 1) + ");";
 
@@ -63,7 +63,7 @@ public class SQLiteUtils {
         conn.dispose();
     }
 
-    public static void executeQuery(String table, String SQL) {
+    public static void executeQuery(String SQL) {
         SQLiteConnection conn = Utils.getSQLiteConnection();
         try {
             SQLiteStatement stmt = conn.prepare(SQL);

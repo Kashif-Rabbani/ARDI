@@ -5,6 +5,7 @@ import com.genesis.eso.util.Utils;
 import com.genesis.rdf.model.bdi_ontology.JsonSchemaExtractor;
 import com.genesis.rdf.model.bdi_ontology.XmlSchemaExtractor;
 import com.genesis.rdf.model.bdi_ontology.rdb.MySqlDB;
+import com.genesis.resources.SchemaIntegrationHelper;
 import uk.ac.ox.krr.logmap2.*;
 import uk.ac.ox.krr.logmap2.io.FlatAlignmentFormat;
 import uk.ac.ox.krr.logmap2.mappings.objects.MappingObjectStr;
@@ -37,8 +38,8 @@ public class Main {
                 //new MySqlDB("employees","jdbc:mysql", "localhost", "root",  "");
                 break;
             case "TRY":
-
-                System.out.println(URLEncoder.encode("http://www.BDIOntology.com/schema/Bike/Bike/Bike Collection", "UTF-16BE"));
+                SchemaIntegrationHelper schemaIntegrationHelper = new SchemaIntegrationHelper();
+                schemaIntegrationHelper.initAlignmentTables();
                 //This is just to test some functionality independently
                 //RDFUtil.testing();
                 break;

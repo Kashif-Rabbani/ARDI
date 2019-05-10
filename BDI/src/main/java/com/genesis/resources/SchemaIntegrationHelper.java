@@ -60,16 +60,23 @@ public class SchemaIntegrationHelper {
                     if (triple.get("o").asResource().getLocalName().equals("Property")) {
                         HashMap<String, String> propDomainRange = getPropertiesInfo(objBody, integratedIRI);
                         String sql = "INSERT INTO Property " +
-                                "(id,PropertyA,PropertyB,DomainPropA,DomainPropB,RangePropA,RangePropB,AlignmentType,hasSameName,actionType) VALUES (" +
-                                objBody.getAsString("p") + "," +
-                                objBody.getAsString("s") + "," +
-                                propDomainRange.get("pDomain") + "," +
-                                propDomainRange.get("sDomain") + "," +
-                                propDomainRange.get("pRange") + "," +
-                                propDomainRange.get("sRange") + "," +
-                                propDomainRange.get("hasSameName") + "," +
-                                objBody.getAsString("actionType") +
+                                "(PropertyA,PropertyB,DomainPropA,DomainPropB,RangePropA,RangePropB,AlignmentType,hasSameName,actionType) VALUES (" +
+                                "" + objBody.getAsString("p")+ "" + ',' +
+                                "" + objBody.getAsString("s")+ "" + ',' +
+                                "" + propDomainRange.get("pDomain")+ "" + ',' +
+                                "" + propDomainRange.get("sDomain")+ "" + ',' +
+                                "" + propDomainRange.get("pRange")+ "" + ',' +
+                                "" + propDomainRange.get("sRange")+ "" + ',' +
+                                "" + " Property" + "" + ',' +
+                                "" + propDomainRange.get("hasSameName")+ "" + ',' +
+                                "" + objBody.getAsString("actionType")+ "" +
                                 " ); ";
+                        System.out.println("Inserting into SQLite Table Property");
+                        SQLiteUtils.executeQuery(sql);
+                        List<String> features = new ArrayList<>();
+                        features.add("actionType");
+                        System.out.println("SELECT query....");
+                        SQLiteUtils.executeSelect("SELECT actionType FROM Property", features);
                     }
                 }
             }
@@ -240,9 +247,9 @@ public class SchemaIntegrationHelper {
         client.close();
     }
 
-    void initAlignmentTables() {
+    public void initAlignmentTables() {
         List<String> propertyTableAttributes = new ArrayList<>();
-        propertyTableAttributes.add("id");
+        //propertyTableAttributes.add("id");
         propertyTableAttributes.add("PropertyA");
         propertyTableAttributes.add("PropertyB");
         propertyTableAttributes.add("DomainPropA");
@@ -254,7 +261,7 @@ public class SchemaIntegrationHelper {
         propertyTableAttributes.add("actionType");
 
         List<String> classTableAttributes = new ArrayList<>();
-        classTableAttributes.add("id");
+        //classTableAttributes.add("id");
         classTableAttributes.add("classA");
         classTableAttributes.add("classB");
         classTableAttributes.add("countPropClassA");

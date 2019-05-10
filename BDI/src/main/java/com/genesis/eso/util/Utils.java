@@ -1,5 +1,6 @@
 package com.genesis.eso.util;
 
+import com.almworks.sqlite4java.SQLite;
 import com.almworks.sqlite4java.SQLiteConnection;
 import com.almworks.sqlite4java.SQLiteException;
 import com.mongodb.MongoClient;
@@ -46,8 +47,16 @@ public class Utils {
     }
 
     public static SQLiteConnection getSQLiteConnection() {
+
         SQLiteConnection conn = new SQLiteConnection(new File(ConfigManager.getProperty("sqlite_db")));
+
         try {
+            System.setProperty("sqlite4java.library.path", "native-libs");
+            if(conn.isOpen()){
+                System.out.println("Connection was already open: --- ");
+                conn.dispose();
+            }
+
             conn.open(true);
         } catch (SQLiteException e) {
             e.printStackTrace();
