@@ -120,8 +120,10 @@ function acceptButtonClickHandler(acceptButton, i) {
         url: '/alignmentsAccept',
         success: function (response) {
             $("#overlay").fadeOut(100);
-            console.log('Success');
-            $("#row" + i).addClass("d-none");
+            console.log(response);
+            if(response === "AlignmentSucceeded"){
+                $("#row" + i).addClass("d-none");
+            }
         },
         error: function (response) {
             alert('failure' + JSON.stringify(response));

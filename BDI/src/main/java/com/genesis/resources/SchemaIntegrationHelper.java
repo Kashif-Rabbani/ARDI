@@ -42,18 +42,26 @@ public class SchemaIntegrationHelper {
 
                     // Classes p (source 1 Class) and s (source2 Class)
                     if (triple.get("o").asResource().getLocalName().equals("Class")) {
+                        String sparqlClassAProperties = " SELECT DISTINCT ?p WHERE { GRAPH <" + integratedIRI + "> { ?p rdfs:domain <" + objBody.getAsString("s") + "> . } }";
+                        String sparqlClassBProperties = " SELECT DISTINCT ?p WHERE { GRAPH <" + integratedIRI + "> { ?p rdfs:domain <" + objBody.getAsString("p") + "> . } }";
+
+                        List<String> listPropertiesClassA = getSparqlQueryResult(integratedIRI, sparqlClassAProperties);
+                        List<String> listPropertiesClassB = getSparqlQueryResult(integratedIRI, sparqlClassBProperties);
+
+                        System.out.println(String.join(",", listPropertiesClassA));
+                        System.out.println(String.join(",", listPropertiesClassB));
 
                         String sql = "INSERT INTO Class (classA,classB,countPropClassA,countPropClassB,listPropClassA,listPropClassB,actionType) VALUES (" +
                                 "'" + objBody.getAsString("p") + "'" + "," +
                                 "'" + objBody.getAsString("s") + "'" + "," +
+                                "'" + listPropertiesClassA.size() + "'" + "," +
+                                "'" + listPropertiesClassB.size() + "'" + "," +
+                                "'" + String.join(",", listPropertiesClassA) + "'" + "," +
+                                "'" + String.join(",", listPropertiesClassB) + "'" + "," +
+                                "'" + objBody.getAsString("actionType") + "'" +
                                 " );";
-
-                        String newGlobalGraphClassResource = integratedIRI + "/" + s.getURI().split(Namespaces.Schema.val())[1];
-                        RDFUtil.addClassOrPropertyTriple(integratedIRI, newGlobalGraphClassResource, "CLASS");
-
-                        RDFUtil.addCustomPropertyTriple(integratedIRI, newGlobalGraphClassResource, "EQUIVALENT_CLASS", objBody.getAsString("p"));
-                        RDFUtil.addCustomPropertyTriple(integratedIRI, newGlobalGraphClassResource, "EQUIVALENT_CLASS", objBody.getAsString("s"));
-                        //RDFUtil.addCustomPropertyTriple(integratedIRI, objBody.getAsString("s"), "EQUIVALENT_CLASS", objBody.getAsString("p"));
+                        System.out.println("Inserting into SQLite Table Class");
+                        SQLiteUtils.executeQuery(sql);
                     }
 
                     // Properties p (source 1 property) and s (source2 Property)
@@ -67,7 +75,7 @@ public class SchemaIntegrationHelper {
                                 "'" + propDomainRange.get("sDomain") + "'" + ',' +
                                 "'" + propDomainRange.get("pRange") + "'" + ',' +
                                 "'" + propDomainRange.get("sRange") + "'" + ',' +
-                                "'" + " Property" + "'" + ',' +
+                                "'" + objBody.getAsString("mapping_type") + "'" + ',' +
                                 "'" + propDomainRange.get("hasSameName") + "'" + ',' +
                                 "'" + objBody.getAsString("actionType") + "'" +
                                 " ); ";
@@ -233,7 +241,7 @@ public class SchemaIntegrationHelper {
         return MongoUtil.getMongoObject(client, cursor);
     }
 
-    void addIntegratedDataSourceInfoAsMongoCollection(JSONObject objBody) {
+    private void addIntegratedDataSourceInfoAsMongoCollection(JSONObject objBody) {
         System.out.println("Successfully Added to MongoDB");
         MongoClient client = Utils.getMongoDBClient();
         MongoUtil.getIntegratedDataSourcesCollection(client).insertOne(Document.parse(objBody.toJSONString()));
@@ -248,6 +256,13 @@ public class SchemaIntegrationHelper {
         client.close();
     }
 
+    private List<String> getSparqlQueryResult(String namedGraph, String query){
+        List<String> temp = new ArrayList<>();
+        RDFUtil.runAQuery(RDFUtil.sparqlQueryPrefixes + query, namedGraph).forEachRemaining(triple -> {
+            temp.add(triple.get("p").toString());
+        });
+        return temp;
+    }
     public void initAlignmentTables() {
         List<String> propertyTableAttributes = new ArrayList<>();
         //propertyTableAttributes.add("id");
