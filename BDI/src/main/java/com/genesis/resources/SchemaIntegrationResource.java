@@ -117,7 +117,7 @@ public class SchemaIntegrationResource {
             } else if (objBody.getAsString("ds1_id").contains("INTEGRATED-")) {
                 System.out.println("GLOBAL-vs-LOCAL");
             } else {
-                schemaIntegrationHelper.processAlignment(objBody, integratedIRI, s, query, checkIfQueryContainsResult);
+                schemaIntegrationHelper.processAlignment(objBody, integratedIRI, s, p, query, checkIfQueryContainsResult, "LOCAL-vs-LOCAL");
                 System.out.println("LOCAL-vs-LOCAL");
             }
 
@@ -139,10 +139,16 @@ public class SchemaIntegrationResource {
     public Response GET_finishIntegration(String body) {
         JSONObject objBody = (JSONObject) JSONValue.parse(body);
         System.out.println("[GET /finishIntegration" + "/" + objBody.getAsString("iri"));
-        String integratedIRI = objBody.getAsString("iri");
-        integratedIRI = Namespaces.G.val() + integratedIRI;
+        String integratedIRI = Namespaces.G.val() + objBody.getAsString("iri");
+
+        JSONObject dataSource1Info = new JSONObject();
+        JSONObject dataSource2Info = new JSONObject();
         try {
-            // Add the integratedModel into TDB
+            objBody.put("integratedIRI", integratedIRI);
+            //System.out.println(objBody.toJSONString()); {"iri":"wfFEEDGx-FBFLAdRr","integrationType":"LOCAL-vs-LOCAL","integratedIRI":"http:\/\/www.BDIOntology.com\/global\/wfFEEDGx-FBFLAdRr","ds2_id":"FBFLAdRr","ds1_id":"wfFEEDGx"}
+
+
+           /* // Write the integrated Graph into file by reading from TDB
             Dataset integratedDataset = Utils.getTDBDataset();
             integratedDataset.begin(ReadWrite.WRITE);
             Model model = integratedDataset.getNamedModel(integratedIRI);
@@ -159,21 +165,13 @@ public class SchemaIntegrationResource {
             integratedDataset.commit();
             integratedDataset.end();
             integratedDataset.close();
+
             //Convert RDFS to VOWL (Visualization Framework) Compatible JSON
             JSONObject vowlObj = Utils.oWl2vowl(ConfigManager.getProperty("output_path") + integratedModelFileName);
 
-            //updateIntegratedDataSourceInfo(objBody.getAsString("integratedDataSourceID"), vowlObj);
-
-            JSONObject dataSource1Info = new JSONObject();
-            JSONObject dataSource2Info = new JSONObject();
-            // Receive the ids of two sources need to be integrated
-            String dataSource1 = null;
-            String dataSource2 = null;
-
-
             if (objBody.getAsString("integrationType").equals("GLOBAL-vs-LOCAL")) {
-                dataSource1 = schemaIntegrationHelper.getIntegratedDataSourceInfo(objBody.getAsString("ds1_id"));
-                dataSource2 = schemaIntegrationHelper.getDataSourceInfo(objBody.getAsString("ds2_id"));
+                String dataSource1 = schemaIntegrationHelper.getIntegratedDataSourceInfo(objBody.getAsString("ds1_id"));
+                String dataSource2 = schemaIntegrationHelper.getDataSourceInfo(objBody.getAsString("ds2_id"));
 
                 if (!dataSource1.isEmpty())
                     dataSource1Info = (JSONObject) JSONValue.parse(dataSource1);
@@ -185,8 +183,8 @@ public class SchemaIntegrationResource {
             }
 
             if (objBody.getAsString("integrationType").equals("LOCAL-vs-LOCAL")) {
-                dataSource1 = schemaIntegrationHelper.getDataSourceInfo(objBody.getAsString("ds1_id"));
-                dataSource2 = schemaIntegrationHelper.getDataSourceInfo(objBody.getAsString("ds2_id"));
+                String dataSource1 = schemaIntegrationHelper.getDataSourceInfo(objBody.getAsString("ds1_id"));
+                String dataSource2 = schemaIntegrationHelper.getDataSourceInfo(objBody.getAsString("ds2_id"));
 
                 if (!dataSource1.isEmpty())
                     dataSource1Info = (JSONObject) JSONValue.parse(dataSource1);
@@ -195,7 +193,7 @@ public class SchemaIntegrationResource {
                     dataSource2Info = (JSONObject) JSONValue.parse(dataSource2);
 
                 schemaIntegrationHelper.addInfo(dataSource1Info, dataSource2Info, ConfigManager.getProperty("output_path") + integratedModelFileName, vowlObj);
-            }
+            }*/
 
             return Response.ok(("Okay")).build();
         } catch (Exception e) {

@@ -29,8 +29,7 @@ public class SchemaIntegrationHelper {
     public SchemaIntegrationHelper() {
     }
 
-    void processAlignment(JSONObject objBody, String integratedIRI, Resource s, String query, String[] checkIfQueryContainsResult) {
-
+    void processAlignment(JSONObject objBody, String integratedIRI, Resource s, Resource p, String query, String[] checkIfQueryContainsResult, String integrationType) {
         RDFUtil.runAQuery(RDFUtil.sparqlQueryPrefixes + query, integratedIRI).forEachRemaining(triple -> {
             System.out.println(triple.get("o") + " oo " + triple.get("oo"));
             checkIfQueryContainsResult[0] = "Query Returned Result > 0";
@@ -81,11 +80,6 @@ public class SchemaIntegrationHelper {
                                 " ); ";
                         System.out.println("Inserting into SQLite Table Property");
                         SQLiteUtils.executeQuery(sql);
-                        List<String> features = new ArrayList<>();
-                        features.add("actionType");
-                        System.out.println("SELECT query....");
-                        JSONArray returnValue = SQLiteUtils.executeSelect("SELECT actionType FROM Property", features);
-                        System.out.println(returnValue.toJSONString());
                     }
                 }
             }
@@ -256,16 +250,16 @@ public class SchemaIntegrationHelper {
         client.close();
     }
 
-    private List<String> getSparqlQueryResult(String namedGraph, String query){
+    private List<String> getSparqlQueryResult(String namedGraph, String query) {
         List<String> temp = new ArrayList<>();
         RDFUtil.runAQuery(RDFUtil.sparqlQueryPrefixes + query, namedGraph).forEachRemaining(triple -> {
             temp.add(triple.get("p").toString());
         });
         return temp;
     }
-    public void initAlignmentTables() {
+
+    public static List<String> getPropertyTableFeatures() {
         List<String> propertyTableAttributes = new ArrayList<>();
-        //propertyTableAttributes.add("id");
         propertyTableAttributes.add("PropertyA");
         propertyTableAttributes.add("PropertyB");
         propertyTableAttributes.add("DomainPropA");
@@ -275,9 +269,11 @@ public class SchemaIntegrationHelper {
         propertyTableAttributes.add("AlignmentType");
         propertyTableAttributes.add("hasSameName");
         propertyTableAttributes.add("actionType");
+        return propertyTableAttributes;
+    }
 
+    public static List<String> getClassTableFeatures() {
         List<String> classTableAttributes = new ArrayList<>();
-        //classTableAttributes.add("id");
         classTableAttributes.add("classA");
         classTableAttributes.add("classB");
         classTableAttributes.add("countPropClassA");
@@ -285,9 +281,11 @@ public class SchemaIntegrationHelper {
         classTableAttributes.add("listPropClassA");
         classTableAttributes.add("listPropClassB");
         classTableAttributes.add("actionType");
+        return classTableAttributes;
+    }
 
-        SQLiteUtils.createTable("Property", propertyTableAttributes);
-        SQLiteUtils.createTable("Class", classTableAttributes);
-
+    public void initAlignmentTables() {
+        SQLiteUtils.createTable("Property", getPropertyTableFeatures());
+        SQLiteUtils.createTable("Class", getClassTableFeatures());
     }
 }

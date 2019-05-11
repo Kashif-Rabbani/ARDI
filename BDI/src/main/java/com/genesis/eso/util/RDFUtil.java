@@ -66,13 +66,15 @@ public class RDFUtil {
         ds.close();
     }
 
-    public static void addCustomPropertyTriple(String namedGraph, String s, String p, String o) {
+    public static void addCustomTriple(String namedGraph, String s, String p, String o) {
         //System.out.println("Adding triple: [namedGraph] "+namedGraph+", [s] "+s+", [p] "+p+", [o] "+o);
         Dataset ds = Utils.getTDBDataset();
         ds.begin(ReadWrite.WRITE);
         Model graph = ds.getNamedModel(namedGraph);
         if (p.equals("EQUIVALENT_CLASS"))
             graph.add(new ResourceImpl(s), new PropertyImpl(OWL.EQUIVALENT_CLASS), new ResourceImpl(o));
+        if (p.equals("SUB_CLASS_OF"))
+            graph.add(new ResourceImpl(s), new PropertyImpl(RDFS.SUB_CLASS_OF), new ResourceImpl(o));
         if (p.equals("EQUIVALENT_PROPERTY"))
             graph.add(new ResourceImpl(s), new PropertyImpl(OWL.EQUIVALENT_PROPERTY), new ResourceImpl(o));
         if (p.equals("DOMAIN"))
@@ -94,6 +96,34 @@ public class RDFUtil {
 
         graph.remove(new ResourceImpl(s), new PropertyImpl(p), new ResourceImpl(o));
 
+        graph.commit();
+        graph.close();
+        ds.commit();
+        ds.close();
+    }
+
+
+    public static void removePropertyCompletely(String namedGraph, String property, String domain, String range) {
+        Dataset ds = Utils.getTDBDataset();
+        ds.begin(ReadWrite.WRITE);
+        Model graph = ds.getNamedModel(namedGraph);
+        graph.remove(new ResourceImpl(property), RDF.type , RDF.Property);
+        graph.remove(new ResourceImpl(property), new PropertyImpl(RDFS.DOMAIN) , new ResourceImpl(domain));
+        graph.remove(new ResourceImpl(property), new PropertyImpl(RDFS.RANGE) , new ResourceImpl(range));
+        graph.commit();
+        graph.close();
+        ds.commit();
+        ds.close();
+    }
+
+
+    public static void addCompleteProperty(String namedGraph, String property, String domain, String range) {
+        Dataset ds = Utils.getTDBDataset();
+        ds.begin(ReadWrite.WRITE);
+        Model graph = ds.getNamedModel(namedGraph);
+        graph.add(new ResourceImpl(property), RDF.type , RDF.Property);
+        graph.add(new ResourceImpl(property), new PropertyImpl(RDFS.DOMAIN) , new ResourceImpl(domain));
+        graph.add(new ResourceImpl(property), new PropertyImpl(RDFS.RANGE) , new ResourceImpl(range));
         graph.commit();
         graph.close();
         ds.commit();

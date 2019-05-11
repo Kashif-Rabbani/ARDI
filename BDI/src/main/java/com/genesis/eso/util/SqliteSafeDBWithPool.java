@@ -61,7 +61,7 @@ public class SqliteSafeDBWithPool implements Closeable {
      * get a sqlite connection with current thread
      * @return
      */
-    protected SQLiteConnection getConnection(){
+    public SQLiteConnection getConnection(){
         System.setProperty("sqlite4java.library.path", "native-libs");
         SQLiteConnection connection = pools.get();
         if(connection==null){

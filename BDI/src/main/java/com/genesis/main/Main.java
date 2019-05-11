@@ -1,16 +1,28 @@
 package com.genesis.main;
 
+import com.almworks.sqlite4java.SQLiteConnection;
+import com.almworks.sqlite4java.SQLiteStatement;
 import com.genesis.eso.util.RDFUtil;
+import com.genesis.eso.util.SQLiteUtils;
+import com.genesis.eso.util.SqliteSafeDBWithPool;
 import com.genesis.eso.util.Utils;
 import com.genesis.rdf.model.bdi_ontology.JsonSchemaExtractor;
 import com.genesis.rdf.model.bdi_ontology.XmlSchemaExtractor;
 import com.genesis.rdf.model.bdi_ontology.rdb.MySqlDB;
 import com.genesis.resources.SchemaIntegrationHelper;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
+import net.minidev.json.JSONValue;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 import uk.ac.ox.krr.logmap2.*;
 import uk.ac.ox.krr.logmap2.io.FlatAlignmentFormat;
 import uk.ac.ox.krr.logmap2.mappings.objects.MappingObjectStr;
 
 import java.net.URLEncoder;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.HashMap;
 import java.util.Set;
 
 public class Main {
@@ -38,10 +50,7 @@ public class Main {
                 //new MySqlDB("employees","jdbc:mysql", "localhost", "root",  "");
                 break;
             case "TRY":
-                SchemaIntegrationHelper schemaIntegrationHelper = new SchemaIntegrationHelper();
-                schemaIntegrationHelper.initAlignmentTables();
-                //This is just to test some functionality independently
-                //RDFUtil.testing();
+                //This is just to test some functionality independently - Pass the argument like this : TRY N
                 break;
             default:
                 System.out.println("Please provide the arguments in a correct way: " +
@@ -54,6 +63,7 @@ public class Main {
                         " Password, Database Name and Server e.g. localhost in a following order: \n\t" +
                         " UserName,Password,databaseName,databaseServer");
         }
+
     }
 
 }

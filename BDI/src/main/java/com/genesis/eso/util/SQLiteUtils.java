@@ -110,6 +110,7 @@ public class SQLiteUtils {
                 data.add(arr);
             }
         } catch (SQLiteException e) {
+            System.out.println(e.getMessage());
             e.printStackTrace();
         }
         try {

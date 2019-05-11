@@ -168,7 +168,7 @@ $(document).ready(function () {
             url: '/finishIntegration',
             success: function (response) {
                 console.log('Success');
-                window.location.href = '/';
+                //window.location.href = '/';
             },
             error: function (response) {
                 alert('failure' + JSON.stringify(response));
