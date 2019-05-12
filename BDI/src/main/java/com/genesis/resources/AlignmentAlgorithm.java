@@ -17,7 +17,6 @@ public class AlignmentAlgorithm {
         alignClasses();
         alignProperties();
     }
-
     private void alignProperties() {
         JSONArray propertiesData = SQLiteUtils.executeSelect("SELECT * FROM Property", SchemaIntegrationHelper.getPropertyTableFeatures());
         propertiesData.forEach(node -> {
@@ -31,23 +30,28 @@ public class AlignmentAlgorithm {
 
             switch (data.get("actionType")) {
                 case "ACCEPTED":
-                    String query = "SELECT * FROM Class WHERE classA = '" + data.get("DomainPropA") + "' and classB = '" + data.get("DomainPropB") + "'";
-                    System.out.println(query);
-                    JSONArray result = SQLiteUtils.executeSelect(query,
-                            SchemaIntegrationHelper.getClassTableFeatures());
-                    if (result.size() > 0) {
-                        System.out.println("CLASSES PRESENT");
-                        // Remove Properties from aligned Classes
-                        RDFUtil.removeProperty(basicInfo.getAsString("integratedIRI"), data.get("PropertyA"), data.get("DomainPropA"), data.get("RangePropA"));
-                        RDFUtil.removeProperty(basicInfo.getAsString("integratedIRI"), data.get("PropertyB"), data.get("DomainPropB"), data.get("RangePropB"));
+                    switch (data.get("AlignmentType")) {
+                        case "OBJECT-PROPERTY":
+                            System.out.println("OBJECT-PROPERTY");
+                            break;
+                        case "DATA-PROPERTY":
+                            System.out.println("DATA-PROPERTY");
+                            String query = "SELECT * FROM Class WHERE classA = '" + data.get("DomainPropA") + "' and classB = '" + data.get("DomainPropB") + "'";
+                            System.out.println(query);
+                            JSONArray result = SQLiteUtils.executeSelect(query, SchemaIntegrationHelper.getClassTableFeatures());
+                            if (result.size() > 0) {
+                                System.out.println("CLASSES PRESENT");
+                                // Remove Properties from aligned Classes
+                                RDFUtil.removeProperty(basicInfo.getAsString("integratedIRI"), data.get("PropertyA"), data.get("DomainPropA"), data.get("RangePropA"));
+                                RDFUtil.removeProperty(basicInfo.getAsString("integratedIRI"), data.get("PropertyB"), data.get("DomainPropB"), data.get("RangePropB"));
 
-                        // Add Property
-                        //Move the Properties to the Parent class
-                        String domainOfNewProperty = basicInfo.getAsString("integratedIRI") + "/"
-                                + ResourceFactory.createResource(data.get("DomainPropA")).getLocalName() + "_"
-                                + ResourceFactory.createResource(data.get("DomainPropB")).getLocalName();
-                        RDFUtil.addProperty(basicInfo.getAsString("integratedIRI"), data.get("PropertyA"),domainOfNewProperty,data.get("RangePropA") );
-
+                                //Move the Properties to the Parent class
+                                String domainOfNewProperty = basicInfo.getAsString("integratedIRI") + "/"
+                                        + ResourceFactory.createResource(data.get("DomainPropA")).getLocalName() + "_"
+                                        + ResourceFactory.createResource(data.get("DomainPropB")).getLocalName();
+                                RDFUtil.addProperty(basicInfo.getAsString("integratedIRI"), data.get("PropertyA"), domainOfNewProperty, data.get("RangePropA"));
+                            }
+                            break;
                     }
                     break;
                 case "REJECTED":

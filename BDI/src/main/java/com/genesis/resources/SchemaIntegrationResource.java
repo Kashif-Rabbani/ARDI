@@ -139,9 +139,11 @@ public class SchemaIntegrationResource {
         JSONObject dataSource2Info = new JSONObject();
         try {
             objBody.put("integratedIRI", integratedIRI);
-            //System.out.println(objBody.toJSONString()); {"iri":"wfFEEDGx-FBFLAdRr","integrationType":"LOCAL-vs-LOCAL","integratedIRI":"http:\/\/www.BDIOntology.com\/global\/wfFEEDGx-FBFLAdRr","ds2_id":"FBFLAdRr","ds1_id":"wfFEEDGx"}
-            new AlignmentAlgorithm(objBody);
-
+            //System.out.println(objBody.toJSONString()); {"iri":"wfFEEDGx-FBFLAdRr","integrationType":"LOCAL-vs-LOCAL",
+            // "integratedIRI":"http:\/\/www.BDIOntology.com\/global\/wfFEEDGx-FBFLAdRr","ds2_id":"FBFLAdRr","ds1_id":"wfFEEDGx"}
+            //new AlignmentAlgorithm(objBody);
+            new Mappings(objBody);
+/*
             // Write the integrated Graph into file by reading from TDB
             Dataset integratedDataset = Utils.getTDBDataset();
             integratedDataset.begin(ReadWrite.WRITE);
@@ -187,7 +189,7 @@ public class SchemaIntegrationResource {
                     dataSource2Info = (JSONObject) JSONValue.parse(dataSource2);
 
                 schemaIntegrationHelper.addInfo(dataSource1Info, dataSource2Info, ConfigManager.getProperty("output_path") + integratedModelFileName, vowlObj);
-            }
+            }*/
 
             return Response.ok(("Okay")).build();
         } catch (Exception e) {

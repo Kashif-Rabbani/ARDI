@@ -24,10 +24,9 @@ import org.semarglproject.vocab.RDFS;
  */
 public class RDFUtil {
 
-    public static String sparqlQueryPrefixes =
-            "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
-                    "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
-                    "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
+    public static String sparqlQueryPrefixes = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
+            "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
+            "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n";
 
     public static void addTriple(OntModel model, String s, String p, String o) {
         model.add(new ResourceImpl(s), new PropertyImpl(p), new ResourceImpl(o));
@@ -107,9 +106,9 @@ public class RDFUtil {
         Dataset ds = Utils.getTDBDataset();
         ds.begin(ReadWrite.WRITE);
         Model graph = ds.getNamedModel(namedGraph);
-        graph.remove(new ResourceImpl(property), RDF.type , RDF.Property);
-        graph.remove(new ResourceImpl(property), new PropertyImpl(RDFS.DOMAIN) , new ResourceImpl(domain));
-        graph.remove(new ResourceImpl(property), new PropertyImpl(RDFS.RANGE) , new ResourceImpl(range));
+        graph.remove(new ResourceImpl(property), RDF.type, RDF.Property);
+        graph.remove(new ResourceImpl(property), new PropertyImpl(RDFS.DOMAIN), new ResourceImpl(domain));
+        graph.remove(new ResourceImpl(property), new PropertyImpl(RDFS.RANGE), new ResourceImpl(range));
         graph.commit();
         graph.close();
         ds.commit();
@@ -121,9 +120,9 @@ public class RDFUtil {
         Dataset ds = Utils.getTDBDataset();
         ds.begin(ReadWrite.WRITE);
         Model graph = ds.getNamedModel(namedGraph);
-        graph.add(new ResourceImpl(property), RDF.type , RDF.Property);
-        graph.add(new ResourceImpl(property), new PropertyImpl(RDFS.DOMAIN) , new ResourceImpl(domain));
-        graph.add(new ResourceImpl(property), new PropertyImpl(RDFS.RANGE) , new ResourceImpl(range));
+        graph.add(new ResourceImpl(property), RDF.type, RDF.Property);
+        graph.add(new ResourceImpl(property), new PropertyImpl(RDFS.DOMAIN), new ResourceImpl(domain));
+        graph.add(new ResourceImpl(property), new PropertyImpl(RDFS.RANGE), new ResourceImpl(range));
         graph.commit();
         graph.close();
         ds.commit();
@@ -136,7 +135,7 @@ public class RDFUtil {
         ds.begin(ReadWrite.WRITE);
         System.out.println("DS.CONTAINS-NAMED-MODEL:  " + ds.containsNamedModel(namedGraph));
         System.out.println("Named Graph: " + namedGraph);
-        if(ds.containsNamedModel(namedGraph)){
+        if (ds.containsNamedModel(namedGraph)) {
             ds.removeNamedModel(namedGraph);
         }
         Model graph = ds.getNamedModel(namedGraph);
