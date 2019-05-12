@@ -103,7 +103,7 @@ public class RDFUtil {
     }
 
 
-    public static void removePropertyCompletely(String namedGraph, String property, String domain, String range) {
+    public static void removeProperty(String namedGraph, String property, String domain, String range) {
         Dataset ds = Utils.getTDBDataset();
         ds.begin(ReadWrite.WRITE);
         Model graph = ds.getNamedModel(namedGraph);
@@ -117,7 +117,7 @@ public class RDFUtil {
     }
 
 
-    public static void addCompleteProperty(String namedGraph, String property, String domain, String range) {
+    public static void addProperty(String namedGraph, String property, String domain, String range) {
         Dataset ds = Utils.getTDBDataset();
         ds.begin(ReadWrite.WRITE);
         Model graph = ds.getNamedModel(namedGraph);

@@ -14,6 +14,8 @@ public class AlignmentAlgorithm {
 
     public AlignmentAlgorithm(JSONObject obj) {
         this.basicInfo = obj;
+        alignClasses();
+        alignProperties();
     }
 
     private void alignProperties() {
@@ -35,7 +37,17 @@ public class AlignmentAlgorithm {
                             SchemaIntegrationHelper.getClassTableFeatures());
                     if (result.size() > 0) {
                         System.out.println("CLASSES PRESENT");
-                        //Move the Properties 
+                        // Remove Properties from aligned Classes
+                        RDFUtil.removeProperty(basicInfo.getAsString("integratedIRI"), data.get("PropertyA"), data.get("DomainPropA"), data.get("RangePropA"));
+                        RDFUtil.removeProperty(basicInfo.getAsString("integratedIRI"), data.get("PropertyB"), data.get("DomainPropB"), data.get("RangePropB"));
+
+                        // Add Property
+                        //Move the Properties to the Parent class
+                        String domainOfNewProperty = basicInfo.getAsString("integratedIRI") + "/"
+                                + ResourceFactory.createResource(data.get("DomainPropA")).getLocalName() + "_"
+                                + ResourceFactory.createResource(data.get("DomainPropB")).getLocalName();
+                        RDFUtil.addProperty(basicInfo.getAsString("integratedIRI"), data.get("PropertyA"),domainOfNewProperty,data.get("RangePropA") );
+
                     }
                     break;
                 case "REJECTED":
@@ -61,7 +73,7 @@ public class AlignmentAlgorithm {
                     Resource classA = ResourceFactory.createResource(classRow.get("classA"));
                     Resource classB = ResourceFactory.createResource(classRow.get("classB"));
 
-                    if (basicInfo.getAsString("integrationType").equals("localVslocal")) {
+                    if (basicInfo.getAsString("integrationType").equals("LOCAL-vs-LOCAL")) {
                         //newGlobalGraphClassResource = integratedIRI + "/" + classA.getURI().split(Namespaces.Schema.val())[1];
                         newGlobalGraphClassResource = basicInfo.getAsString("integratedIRI") + "/" + classA.getLocalName() + "_" + classB.getLocalName();
                     }

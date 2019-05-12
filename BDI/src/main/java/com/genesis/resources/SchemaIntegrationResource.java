@@ -2,7 +2,6 @@ package com.genesis.resources;
 
 import com.genesis.eso.util.ConfigManager;
 import com.genesis.eso.util.RDFUtil;
-import com.genesis.eso.util.SQLiteUtils;
 import com.genesis.eso.util.Utils;
 import com.genesis.rdf.LogMapMatcher;
 import com.genesis.rdf.model.bdi_ontology.Namespaces;
@@ -14,17 +13,12 @@ import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
-import scala.actors.threadpool.Arrays;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.mongodb.client.model.Filters.eq;
 
 @Path("bdi")
 public class SchemaIntegrationResource {
@@ -146,9 +140,9 @@ public class SchemaIntegrationResource {
         try {
             objBody.put("integratedIRI", integratedIRI);
             //System.out.println(objBody.toJSONString()); {"iri":"wfFEEDGx-FBFLAdRr","integrationType":"LOCAL-vs-LOCAL","integratedIRI":"http:\/\/www.BDIOntology.com\/global\/wfFEEDGx-FBFLAdRr","ds2_id":"FBFLAdRr","ds1_id":"wfFEEDGx"}
+            new AlignmentAlgorithm(objBody);
 
-
-           /* // Write the integrated Graph into file by reading from TDB
+            // Write the integrated Graph into file by reading from TDB
             Dataset integratedDataset = Utils.getTDBDataset();
             integratedDataset.begin(ReadWrite.WRITE);
             Model model = integratedDataset.getNamedModel(integratedIRI);
@@ -193,7 +187,7 @@ public class SchemaIntegrationResource {
                     dataSource2Info = (JSONObject) JSONValue.parse(dataSource2);
 
                 schemaIntegrationHelper.addInfo(dataSource1Info, dataSource2Info, ConfigManager.getProperty("output_path") + integratedModelFileName, vowlObj);
-            }*/
+            }
 
             return Response.ok(("Okay")).build();
         } catch (Exception e) {
