@@ -145,6 +145,8 @@ $(document).ready(function () {
     integrationTypeChecker();
 
     new Tablesort(document.getElementById('alignments'));
+    new Tablesort(document.getElementById('alignmentsClass'));
+    new Tablesort(document.getElementById('alignmentsObjProp'));
 
     $(document).on('click', '#acceptAlignment', function () {
         var acceptButton = $("#acceptAlignment");

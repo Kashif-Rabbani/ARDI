@@ -26,7 +26,8 @@ public class Mappings {
     public Mappings(JSONObject objBody) {
         this.basicInfo = objBody;
         getSourcesInfo();
-        createSameAsMappings();
+        toGlobalURI(basicInfo.getAsString("integratedIRI"));
+        //createSameAsMappings();
     }
 
     private void createSameAsMappings() {
@@ -57,22 +58,25 @@ public class Mappings {
                 System.out.print(" --- " + globalGraphStatement.getObject().toString());
                 System.out.println();
 
+
+                String globalURN = "";
+                if (globalGraphStatement.getSubject().getURI().toLowerCase().contains(Namespaces.G.val().toLowerCase())) {
+                    globalURN = globalGraphStatement.getSubject().getURI().split(Namespaces.G.val())[1];
+                    //System.out.print(globalURN + " ---- ");
+                }
+
+
                 while (localGraphAIterator.hasNext()) {
                     Statement localGraphStatement = localGraphAIterator.next();
 
-                    if(globalGraphStatement.getSubject().getURI().toLowerCase().contains(Namespaces.G.val().toLowerCase())){
-                        String globalURN = globalGraphStatement.getSubject().getURI().split(Namespaces.G.val())[1];
-                        System.out.print(globalURN + " ---- " );
+                    String localURN = "";
+
+                    if (localGraphStatement.getSubject().getURI().toLowerCase().contains(Namespaces.Schema.val().toLowerCase())) {
+                        localURN = localGraphStatement.getSubject().getURI().split(Namespaces.Schema.val())[1];
+                        //System.out.print(localURN);
                     }
 
-                    if(localGraphStatement.getSubject().getURI().toLowerCase().contains(Namespaces.Schema.val().toLowerCase())){
-                        String localURN = localGraphStatement.getSubject().getURI().split(Namespaces.Schema.val())[1];
-                        System.out.print( localURN);
-                    }
-
-                    System.out.println();
-
-                    if (globalGraphStatement.equals(localGraphStatement)) {
+                    if (globalURN.equals(localURN)) {
                         if (localGraphStatement.getPredicate().equals(new ResourceImpl(RDF.TYPE))) {
                             System.out.print(" A " + localGraphStatement.getSubject().getURI());
                             System.out.print(" --- " + localGraphStatement.getPredicate().getURI());
@@ -84,7 +88,14 @@ public class Mappings {
 
                 while (localGraphBIterator.hasNext()) {
                     Statement localGraphStatement = localGraphBIterator.next();
-                    if (globalGraphStatement.equals(localGraphStatement)) {
+
+                    String localURN = "";
+                    if (localGraphStatement.getSubject().getURI().toLowerCase().contains(Namespaces.Schema.val().toLowerCase())) {
+                        localURN = localGraphStatement.getSubject().getURI().split(Namespaces.Schema.val())[1];
+                        //System.out.print(localURN);
+                    }
+
+                    if (globalURN.equals(localURN)) {
                         if (localGraphStatement.getPredicate().equals(new ResourceImpl(RDF.TYPE))) {
                             System.out.print(" B " + localGraphStatement.getSubject().getURI());
                             System.out.print(" --- " + localGraphStatement.getPredicate().getURI());
@@ -136,6 +147,10 @@ public class Mappings {
         String ret = "";
         if (s.toLowerCase().contains(Namespaces.Schema.val().toLowerCase())) {
             String urn = s.split(Namespaces.Schema.val())[1];
+            //String uri = s.split(Namespaces.Schema.val())[0];
+            ret = Namespaces.G.val() + urn;
+        } else if (s.toLowerCase().contains(Namespaces.G.val().toLowerCase())) {
+            String urn = s.split(Namespaces.G.val())[1];
             //String uri = s.split(Namespaces.Schema.val())[0];
             ret = Namespaces.G.val() + urn;
         }

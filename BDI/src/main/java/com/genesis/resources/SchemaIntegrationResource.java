@@ -139,28 +139,13 @@ public class SchemaIntegrationResource {
         JSONObject dataSource2Info = new JSONObject();
         try {
             objBody.put("integratedIRI", integratedIRI);
-            //System.out.println(objBody.toJSONString()); {"iri":"wfFEEDGx-FBFLAdRr","integrationType":"LOCAL-vs-LOCAL",
-            // "integratedIRI":"http:\/\/www.BDIOntology.com\/global\/wfFEEDGx-FBFLAdRr","ds2_id":"FBFLAdRr","ds1_id":"wfFEEDGx"}
-            //new AlignmentAlgorithm(objBody);
-            new Mappings(objBody);
-/*
-            // Write the integrated Graph into file by reading from TDB
-            Dataset integratedDataset = Utils.getTDBDataset();
-            integratedDataset.begin(ReadWrite.WRITE);
-            Model model = integratedDataset.getNamedModel(integratedIRI);
+            //System.out.println(objBody.toJSONString()); {"iri":"wfFEEDGx-FBFLAdRr","integrationType":"LOCAL-vs-LOCAL", "integratedIRI":"http:\/\/www.BDIOntology.com\/global\/wfFEEDGx-FBFLAdRr","ds2_id":"FBFLAdRr","ds1_id":"wfFEEDGx"}
 
-            String integratedModelFileName = objBody.getAsString("iri") + ".ttl";
-            //String integratedModelFileName = objBody.getAsString("dataSource1Name") + "-" + objBody.getAsString("dataSource2Name") + ".ttl";
-            try {
-                model.write(new FileOutputStream(ConfigManager.getProperty("output_path") + integratedModelFileName), "TURTLE");
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-            model.commit();
-            model.close();
-            integratedDataset.commit();
-            integratedDataset.end();
-            integratedDataset.close();
+            new AlignmentAlgorithm(objBody);
+
+            new Mappings(objBody);
+
+            String integratedModelFileName = writeToFile(objBody.getAsString("iri"), integratedIRI);
 
             //Convert RDFS to VOWL (Visualization Framework) Compatible JSON
             JSONObject vowlObj = Utils.oWl2vowl(ConfigManager.getProperty("output_path") + integratedModelFileName);
@@ -189,12 +174,33 @@ public class SchemaIntegrationResource {
                     dataSource2Info = (JSONObject) JSONValue.parse(dataSource2);
 
                 schemaIntegrationHelper.addInfo(dataSource1Info, dataSource2Info, ConfigManager.getProperty("output_path") + integratedModelFileName, vowlObj);
-            }*/
+            }
 
             return Response.ok(("Okay")).build();
         } catch (Exception e) {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    private String writeToFile(String iri, String integratedIRI) {
+        // Write the integrated Graph into file by reading from TDB
+        Dataset integratedDataset = Utils.getTDBDataset();
+        integratedDataset.begin(ReadWrite.WRITE);
+        Model model = integratedDataset.getNamedModel(integratedIRI);
+        System.out.println("iri: " + iri);
+        String integratedModelFileName = iri + ".ttl";
+        //String integratedModelFileName = objBody.getAsString("dataSource1Name") + "-" + objBody.getAsString("dataSource2Name") + ".ttl";
+        try {
+            model.write(new FileOutputStream(ConfigManager.getProperty("output_path") + integratedModelFileName), "TURTLE");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        model.commit();
+        model.close();
+        integratedDataset.commit();
+        integratedDataset.end();
+        integratedDataset.close();
+        return integratedModelFileName;
     }
 }

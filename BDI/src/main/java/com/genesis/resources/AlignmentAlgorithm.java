@@ -17,6 +17,7 @@ public class AlignmentAlgorithm {
         alignClasses();
         alignProperties();
     }
+
     private void alignProperties() {
         JSONArray propertiesData = SQLiteUtils.executeSelect("SELECT * FROM Property", SchemaIntegrationHelper.getPropertyTableFeatures());
         propertiesData.forEach(node -> {
@@ -33,12 +34,15 @@ public class AlignmentAlgorithm {
                     switch (data.get("AlignmentType")) {
                         case "OBJECT-PROPERTY":
                             System.out.println("OBJECT-PROPERTY");
+                            //TODO Handle the Object Property
                             break;
                         case "DATA-PROPERTY":
                             System.out.println("DATA-PROPERTY");
                             String query = "SELECT * FROM Class WHERE classA = '" + data.get("DomainPropA") + "' and classB = '" + data.get("DomainPropB") + "'";
                             System.out.println(query);
                             JSONArray result = SQLiteUtils.executeSelect(query, SchemaIntegrationHelper.getClassTableFeatures());
+
+                            //TODO Case 1 -  When classes of the properties are aligned
                             if (result.size() > 0) {
                                 System.out.println("CLASSES PRESENT");
                                 // Remove Properties from aligned Classes
@@ -47,10 +51,13 @@ public class AlignmentAlgorithm {
 
                                 //Move the Properties to the Parent class
                                 String domainOfNewProperty = basicInfo.getAsString("integratedIRI") + "/"
-                                        + ResourceFactory.createResource(data.get("DomainPropA")).getLocalName() + "_"
-                                        + ResourceFactory.createResource(data.get("DomainPropB")).getLocalName();
+                                        + ResourceFactory.createResource(data.get("DomainPropA")).getLocalName();
+                                        //+ "_" + ResourceFactory.createResource(data.get("DomainPropB")).getLocalName();
                                 RDFUtil.addProperty(basicInfo.getAsString("integratedIRI"), data.get("PropertyA"), domainOfNewProperty, data.get("RangePropA"));
                             }
+
+                            //TODO Case 2 - When classes of the properties are not aligned
+
                             break;
                     }
                     break;
@@ -79,9 +86,9 @@ public class AlignmentAlgorithm {
 
                     if (basicInfo.getAsString("integrationType").equals("LOCAL-vs-LOCAL")) {
                         //newGlobalGraphClassResource = integratedIRI + "/" + classA.getURI().split(Namespaces.Schema.val())[1];
-                        newGlobalGraphClassResource = basicInfo.getAsString("integratedIRI") + "/" + classA.getLocalName() + "_" + classB.getLocalName();
+                        newGlobalGraphClassResource = basicInfo.getAsString("integratedIRI") + "/" + classA.getLocalName();
                     }
-
+                    System.out.println("GG Resource: " + newGlobalGraphClassResource);
                     RDFUtil.addClassOrPropertyTriple(basicInfo.getAsString("integratedIRI"), newGlobalGraphClassResource, "CLASS");
                     RDFUtil.addCustomTriple(basicInfo.getAsString("integratedIRI"), classRow.get("classA"), "SUB_CLASS_OF", newGlobalGraphClassResource);
                     RDFUtil.addCustomTriple(basicInfo.getAsString("integratedIRI"), classRow.get("classB"), "SUB_CLASS_OF", newGlobalGraphClassResource);
