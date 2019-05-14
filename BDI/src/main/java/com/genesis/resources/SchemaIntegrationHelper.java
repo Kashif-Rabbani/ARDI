@@ -170,7 +170,7 @@ public class SchemaIntegrationHelper {
         System.out.println("NEW DS ID: " + newDataSourceID);
 
         collection.updateOne(Filters.eq("dataSourceID", integratedDataSourceInfo.getAsString("dataSourceID")), new Document("$set", new Document("dataSourceID", newDataSourceID)));
-        collection.updateOne(Filters.eq("dataSourceID", newDataSourceID), new Document("$set", new Document("iri", integratedDataSourceInfo.getAsString("dataSourceID") + "-" + dataSource2Info.getAsString("dataSourceID"))));
+        collection.updateOne(Filters.eq("dataSourceID", newDataSourceID), new Document("$set", new Document("iri", Namespaces.G.val() + integratedDataSourceInfo.getAsString("dataSourceID") + "-" + dataSource2Info.getAsString("dataSourceID"))));
         collection.updateOne(Filters.eq("dataSourceID", newDataSourceID), new Document("$set", new Document("integratedVowlJsonFileName", vowlObj.getAsString("vowlJsonFileName"))));
         collection.updateOne(Filters.eq("dataSourceID", newDataSourceID), new Document("$set", new Document("integratedVowlJsonFilePath", vowlObj.getAsString("vowlJsonFilePath"))));
         collection.updateOne(Filters.eq("dataSourceID", newDataSourceID), new Document("$set", new Document("parsedFileAddress", integratedModelFileName)));
@@ -250,7 +250,7 @@ public class SchemaIntegrationHelper {
         client.close();
     }
 
-    private List<String> getSparqlQueryResult(String namedGraph, String query) {
+    public  List<String> getSparqlQueryResult(String namedGraph, String query) {
         List<String> temp = new ArrayList<>();
         RDFUtil.runAQuery(RDFUtil.sparqlQueryPrefixes + query, namedGraph).forEachRemaining(triple -> {
             temp.add(triple.get("p").toString());

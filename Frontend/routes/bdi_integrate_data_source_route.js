@@ -68,7 +68,8 @@ exports.triggerDataSourcesIntegration = function (req, res) {
 };
 
 exports.getAlignments = function (req, res, next) {
-    console.log("Triggered getAlignments");
+    req.connection.setTimeout( 1000 * 60 * 10 ); // ten minutes
+    console.log("Triggered getAlignments at : " + new Date());
     console.log("Params: " + req.params);
     request.get(config.BDI_DATA_LAYER_URL + "getSchemaAlignments/" + req.params.ds1_id + "/" + req.params.ds2_id, function (error, response, body) {
         if (!error && response.statusCode === 200) {

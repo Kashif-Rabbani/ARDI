@@ -2,6 +2,7 @@ package com.genesis.rdf;
 
 import com.genesis.eso.util.ConfigManager;
 import com.genesis.eso.util.RDFUtil;
+import com.genesis.eso.util.Tuple2;
 import com.genesis.eso.util.Tuple3;
 import uk.ac.ox.krr.logmap2.LogMap2_Matcher;
 import uk.ac.ox.krr.logmap2.mappings.objects.MappingObjectStr;
@@ -15,6 +16,15 @@ public class LogMapMatcher {
     private String iri_onto2;
     private String alignments_iri;
     private List<Tuple3<String, String, String>> alignmentsTriples = new ArrayList<>();
+    private List<Tuple3<String, String, String>> classesAlignments = new ArrayList<>();
+
+    public List<Tuple3<String, String, String>> getAlignmentsTriples() {
+        return alignmentsTriples;
+    }
+
+    public List<Tuple3<String, String, String>> getClassesAlignments() {
+        return classesAlignments;
+    }
 
     private LogMap2_Matcher logMap2_matcher = null;
 
@@ -59,6 +69,7 @@ public class LogMapMatcher {
         for (MappingObjectStr mapping : mappings) {
             if (mapping.isClassMapping()) {
                 this.alignmentsTriples.add(new Tuple3<>(mapping.getIRIStrEnt1(), mapping.getIRIStrEnt2(), Double.toString(mapping.getConfidence()) + "__CLASS__" + mapping.getLexicalConfidenceMapping() + "__" + mapping.getStructuralConfidenceMapping() + "__" + mapping.getMappingDirection()));
+                this.classesAlignments.add(new Tuple3<>(mapping.getIRIStrEnt1(), mapping.getIRIStrEnt2(), Double.toString(mapping.getConfidence())));
                 //System.out.println("isClassMapping" + mapping.getIRIStrEnt1() + "* - * " + mapping.getIRIStrEnt2() + "* - * " + mapping.getMappingDirection() + "* - * " + mapping.getConfidence());
             } else if (mapping.isObjectPropertyMapping()) {
                 this.alignmentsTriples.add(new Tuple3<>(mapping.getIRIStrEnt1(), mapping.getIRIStrEnt2(), Double.toString(mapping.getConfidence()) + "__OBJECT-PROPERTY__" + mapping.getLexicalConfidenceMapping() + "__" + mapping.getStructuralConfidenceMapping() + "__" + mapping.getMappingDirection()));

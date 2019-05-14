@@ -5,6 +5,7 @@ var config = require(__dirname + '/../config'),
     request = require('request');
 
 exports.triggerExtraction = function (req, res) {
+    req.connection.setTimeout( 1000 * 60 * 10 ); // ten minutes
     console.log(req.body);
     req.body = req.body[0];
 
