@@ -1,0 +1,18 @@
+.remove-margin {
+    margin: 0px;
+}
+.remove-padding{
+    padding: 0px;
+}
+
+table {
+    table-layout: fixed;
+}
+
+.accept-reject-buttons{
+    width: 100px;
+}
+
+.confidence-td{
+    width: 180px;
+}

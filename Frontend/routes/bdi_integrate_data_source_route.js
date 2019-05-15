@@ -87,10 +87,10 @@ exports.acceptAlignment = function (req, res, next) {
     if (!(req.body.hasOwnProperty('p')) || req.body.p == null ||
         !(req.body.hasOwnProperty('s')) || req.body.s == null ||
         !(req.body.hasOwnProperty('confidence')) || req.body.confidence == null ||
-        !(req.body.hasOwnProperty('lexical_confidence')) || req.body.lexical_confidence == null ||
-        !(req.body.hasOwnProperty('mapping_direction')) || req.body.mapping_direction == null ||
-        !(req.body.hasOwnProperty('mapping_type')) || req.body.mapping_type == null ||
-        !(req.body.hasOwnProperty('structural_confidence')) || req.body.structural_confidence == null ||
+     //   !(req.body.hasOwnProperty('lexical_confidence')) || req.body.lexical_confidence == null ||
+     //   !(req.body.hasOwnProperty('mapping_direction')) || req.body.mapping_direction == null ||
+     //   !(req.body.hasOwnProperty('mapping_type')) || req.body.mapping_type == null ||
+      //  !(req.body.hasOwnProperty('structural_confidence')) || req.body.structural_confidence == null ||
         !(req.body.hasOwnProperty('integrated_iri')) || req.body.integrated_iri == null ||
         !(req.body.hasOwnProperty('actionType')) || req.body.actionType == null
     ) {

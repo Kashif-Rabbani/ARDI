@@ -1,5 +1,5 @@
 var integratedDataInfoObject = {};
-var alignmentsData = {};
+var alignmentsInfo = [];
 
 var bdi_integrate_url = window.location.href;
 //var url_prefix = bdi_integrate_url.split('/integration/')[0];
@@ -51,77 +51,173 @@ function getAlignments() {
         $("#overlay").fadeOut(100);
         var i = 1;
         data.forEach(function (val) {
-            alignmentsData[i - 1] = val;
             var n = i - 1;
             if (val.mapping_type === 'DATA-PROPERTY') {
+                alignmentsInfo.push(val);
                 $('#alignments').find('#alignmentsBody')
                     .append($('<tr id="row' + n + '">')
                         /*.append($('<td>').text(i))*/
-                        .append($('<td>')
-                            .text(val.s)
-                        ).append($('<td>')
-                            .text(val.p)
-                        ).append($('<td>').text(Math.round(val.confidence * 100) / 100)
-                        )
-                        .append($('<td>').append('<button type="button" id ="acceptAlignment" class="btn btn-success" value="' + n + '">Accept</button> '))
-                        .append($('<td>').append('<button type="button" id ="rejectAlignment" class="btn btn-danger">Reject</button> '))
+                            .append($('<td>')
+                                .text(val.s)
+                            ).append($('<td>')
+                                .text(val.p)
+                            ).append($('<td>').text(Math.round(val.confidence * 100) / 100)
+                            )
+                            .append($('<td class="accept-reject-buttons">').append('<button type="button" id ="acceptAlignment" class="btn btn-success" value="' + alignmentsInfo.indexOf(val) + '">Accept</button> '))
+                            .append($('<td class="accept-reject-buttons">').append('<button type="button" id ="rejectAlignment" class="btn btn-danger">Reject</button> '))
                     );
             }
 
             if (val.mapping_type === 'OBJECT-PROPERTY') {
+                alignmentsInfo.push(val);
                 $('#alignmentsObjProp').find('#alignmentsBodyObjectProperties')
                     .append($('<tr id="row' + n + '">')
                         // .append($('<td>').text(i))
-                        .append($('<td>')
-                            .text(val.s)
-                        ).append($('<td>')
-                            .text(val.p)
-                        ).append($('<td>').text(Math.round(val.confidence * 100) / 100)
-                        )
-                        .append($('<td>').append('<button type="button" id ="acceptAlignment" class="btn btn-success" value="' + n + '">Accept</button> '))
-                        .append($('<td>').append('<button type="button" id ="rejectAlignment" class="btn btn-danger">Reject</button> '))
+                            .append($('<td>')
+                                .text(val.s)
+                            ).append($('<td>')
+                                .text(val.p)
+                            ).append($('<td>').text(Math.round(val.confidence * 100) / 100)
+                            )
+                            .append($('<td>').append('<button type="button" id ="acceptAlignment" class="btn btn-success" value=\"" + alignmentsInfo.indexOf(val) + "\">Accept</button> '))
+                            .append($('<td>').append('<button type="button" id ="rejectAlignment" class="btn btn-danger">Reject</button> '))
                     );
             }
 
+            if (integrationType === "GLOBAL-vs-LOCAL") {
+                if (val.mapping_type === 'CLASS') {
+                    var otherClasses = val.other_classes;
+                    var superClasses = val.super_classes;
+                    //superClasses.push(superClasses[0]);
+                    var temp = 1;
+                    if (superClasses.length > 0) {
+                        $("#SuperClassNote").append("<p style=\"color:deepskyblue\">Sub Classes are collapsed under Super Classes. It is recommended to align with the Super Class.</p>");
+                    }
 
-            if (val.mapping_type === 'CLASS') {
-                $('#alignmentsClass').find('#alignmentsBodyClasses')
-                    .append($('<tr id="row' + n + '">')
-                        // .append($('<td>').text(i))
-                        .append($('<td>')
-                            .text(val.s)
-                        ).append($('<td>')
-                            .text(val.p)
-                        ).append($('<td>').text(Math.round(val.confidence * 100) / 100)
-                        )
-                        .append($('<td>').append('<button type="button" id ="acceptAlignment" class="btn btn-success" value="' + n + '">Accept</button> '))
-                        .append($('<td>').append('<button type="button" id ="rejectAlignment" class="btn btn-danger">Reject</button> '))
-                    );
+                    superClasses.forEach(function (superClass) {
+                        var iteratorCount = 0;
+                        var headerRow;
+                        var bodyRows = [];
+                        superClass.forEach(function (alignment) {
+                            alignmentsInfo.push(alignment);
+                            if (iteratorCount === 0) {
+                                headerRow =
+                                    "<tr id=\"row\">\n" +
+                                    "\t<td>" + alignment.s + "</td>\n" +
+                                    "\t<td>" + alignment.p + "</td>\n" +
+                                    "\t<td class='confidence-td'>" + Math.round(alignment.confidence * 100) / 100 + "</td>\n" +
+                                    "\t<td class='accept-reject-buttons'><button type=\"button\" id=\"acceptAlignment\" class=\"btn btn-success\" value=\"'" + alignmentsInfo.indexOf(alignment) + "'\">Accept</button> </td>\n" +
+                                    "\t<td class='accept-reject-buttons'><button type=\"button\" id=\"rejectAlignment\" class=\"btn btn-danger\">Reject</button> </td>\n" +
+                                    "</tr>";
+                            } else {
+                                bodyRows.push(
+                                    "<tr id=\"row\">\n" +
+                                    "\t<td>" + alignment.s + "</td>\n" +
+                                    "\t<td>" + alignment.p + "</td>\n" +
+                                    "\t<td class='confidence-td'>" + Math.round(alignment.confidence * 100) / 100 + "</td>\n" +
+                                    "\t<td class='accept-reject-buttons'><button type=\"button\" id=\"acceptAlignment\" class=\"btn btn-success\" value=\"'" + alignmentsInfo.indexOf(alignment) + "'\">Accept</button> </td>\n" +
+                                    "\t<td class='accept-reject-buttons'><button type=\"button\" id=\"rejectAlignment\" class=\"btn btn-danger\">Reject</button> </td>\n" +
+                                    "</tr>");
+                            }
+                            iteratorCount++;
+                        });
+
+
+                        var cardElement = "<div class=\"card bg-light bg-white border-0\">\n" +
+                            "    <div class=\"card-header remove-padding bg-white border-bottom-0 \">\n" +
+                            "        <div class=\"row\">\n" +
+                            "            <div class=\"col-md-11\" id=\"id\">\n" +
+                            "                <table class=\"table table-hover remove-margin\" id=\"headerTable" + temp + "\">\n" +
+                            "                   <tbody id=\"headerTableBody" + temp + "\">\n" +
+                            "                    \n" + headerRow +
+                            "                  </tbody>\n" +
+                            "                </table>\n" +
+                            "            </div>\n" +
+                            "            <div class=\"col-md-1 text-center\"><button class=\"btn btn-link\" data-toggle=\"collapse\" data-target=\"#dropDownData" + temp + "\" id=\"dropDownButton\"><i class=\"fas fa-chevron-circle-down fa-2x\" style=\"color:#18bc9c;\"></i></button></div>\n" +
+                            "        </div>\n" +
+                            "    </div>\n" +
+                            "    <div class=\"collapse\" id=\"dropDownData" + temp + "\" aria-labelledby=\"headingOne\" data-parent=\"#accordion\">\n" +
+                            "        <div class=\"card-body\">\n" +
+                            "            <div class=\"row\">\n" +
+                            "                <div class=\"col-md-11\" id=\"idd\">\n" +
+                            "                    <table class=\"table table-hover remove-margin\" id=\"bodyTable" + temp + "\">\n" +
+                            "                       <tbody class='bg-light' id=\"bodyTableBody" + temp + "\">\n" +
+                            "                         \n" + bodyRows.join(" ") +
+                            "                       </tbody>\n" +
+                            "                    </table>\n" +
+                            "                </div>\n" +
+                            "                <div class=\"col-md-1 \"></div>\n" +
+                            "            </div>\n" +
+                            "        </div>\n" +
+                            "    </div>\n" +
+                            "</div>";
+
+                        $("#superClass").append(cardElement);
+                        temp++;
+                    });
+
+                    otherClasses.forEach(function (classVal) {
+                        alignmentsInfo.push(classVal);
+                        $('#alignmentsClass').find('#alignmentsBodyClasses')
+                            .append($('<tr id="row' + n + '">')
+                                // .append($('<td>').text(i))
+                                    .append($('<td>')
+                                        .text(classVal.s)
+                                    ).append($('<td>')
+                                        .text(classVal.p)
+                                    ).append($('<td>').text(Math.round(classVal.confidence * 100) / 100)
+                                    )
+                                    .append($('<td>').append('<button type="button" id ="acceptAlignment" class="btn btn-success" value="' + alignmentsInfo.indexOf(classVal) + '">Accept</button> '))
+                                    .append($('<td>').append('<button type="button" id ="rejectAlignment" class="btn btn-danger">Reject</button> '))
+                            );
+                    });
+                }
             }
+            if (integrationType === "LOCAL-vs-LOCAL") {
+                if (val.mapping_type === 'CLASS') {
+                    alignmentsInfo.push(val);
+                    $('#alignmentsClass').find('#alignmentsBodyClasses')
+                        .append($('<tr id="row' + n + '">')
+                            // .append($('<td>').text(i))
+                                .append($('<td>')
+                                    .text(val.s)
+                                ).append($('<td>')
+                                    .text(val.p)
+                                ).append($('<td>').text(Math.round(val.confidence * 100) / 100)
+                                )
+                                .append($('<td>').append('<button type="button" id ="acceptAlignment" class="btn btn-success" value="' + alignmentsInfo.indexOf(val) + '">Accept</button> '))
+                                .append($('<td>').append('<button type="button" id ="rejectAlignment" class="btn btn-danger">Reject</button> '))
+                        );
+                }
+            }
+
             ++i;
         });
     });
-    console.log("Alignments Data");
-    console.log(alignmentsData);
+    console.log("Alignments Info");
+    console.log(alignmentsInfo);
 }
 
 function acceptButtonClickHandler(acceptButton, i) {
     console.log("AcceptButtonClickHandler");
-    alignmentsData[i].integrated_iri = params[0] + '-' + params[1];
-    alignmentsData[i].ds1_id = params[0];
-    alignmentsData[i].ds2_id = params[1];
-    alignmentsData[i].actionType = "ACCEPTED";
+    console.log(i);
+    console.log(alignmentsInfo[i]);
+    var data = alignmentsInfo[i];
+    data.integrated_iri = params[0] + '-' + params[1];
+    data.ds1_id = params[0];
+    data.ds2_id = params[1];
+    data.actionType = "ACCEPTED";
 
-    console.log(alignmentsData[i]);
+    console.log(data);
     $.ajax({
         type: 'POST',
-        data: JSON.stringify(alignmentsData[i]),
+        data: JSON.stringify(data),
         contentType: 'application/json',
         url: '/alignmentsAccept',
         success: function (response) {
             $("#overlay").fadeOut(100);
             console.log(response);
-            if(response === "AlignmentSucceeded"){
+            if (response === "AlignmentSucceeded") {
                 $("#row" + i).addClass("d-none");
             }
         },

@@ -148,7 +148,7 @@ public class GlobalVsLocal {
             JSONObject containerObject = new JSONObject();
             containerObject.put("s", superClass._1);
             containerObject.put("p", groupedClass);
-            containerObject.put("o", superClass._2);
+            containerObject.put("confidence", superClass._2);
             // Adding the object into wrapper Array
             wrapperArray.add(containerObject);
 

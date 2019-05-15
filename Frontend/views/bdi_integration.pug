@@ -2,6 +2,7 @@ extends bdi_layout
 block headers
     //script(src='/js/bdi_integration_script.js')
     //script(src='/js/tablesort.js')
+    link(rel='stylesheet', href='/stylesheets/bdi_style.css')
 block content
     #overlay
         .cv-spinner
@@ -54,19 +55,24 @@ block content
                             | Align Classes
 
             .card-body
-                p(style="color:orange")
-                    | Note that the Collection Classes can only be aligned with Collection Classes
+                p(style="color:deepskyblue")
+                    | Note that the Collection Classes can only be aligned with the Collection Classes.
 
-                table.table.table-hover#alignmentsClass
-                    thead
-                        tr
-                            th Mappings from #{ds1_name}
-                            th Mappings from #{ds2_name}
-                            th Confidence
-                            th Accept
-                            th Reject
-                    tbody#alignmentsBodyClasses
+                .row
+                    .col-md-11
+                        table.table.table-hover.border-0#alignmentsClass
+                            thead
+                                tr
+                                    th Mappings from #{ds1_name}
+                                    th Mappings from #{ds2_name}
+                                    th.confidence-td Confidence
+                                    th.accept-reject-buttons Accept
+                                    th.accept-reject-buttons Reject
 
+                            tbody#alignmentsBodyClasses
+                    .col-md-1
+                div#SuperClassNote
+                div#superClass
 
         .card.bg-light.mb-3.bg-white
             .card-header
@@ -80,9 +86,9 @@ block content
                         tr
                             th Mappings from #{ds1_name}
                             th Mappings from #{ds2_name}
-                            th Confidence
-                            th Accept
-                            th Reject
+                            th.confidence-td Confidence
+                            th.accept-reject-buttons Accept
+                            th.accept-reject-buttons Reject
                     tbody#alignmentsBody
 
         .card.bg-light.mb-3.bg-white
@@ -97,9 +103,9 @@ block content
                         tr
                             th Mappings from #{ds1_name}
                             th Mappings from #{ds2_name}
-                            th Confidence
-                            th Accept
-                            th Reject
+                            th.confidence-td Confidence
+                            th.accept-reject-buttons Accept
+                            th.accept-reject-buttons Reject
                     tbody#alignmentsBodyObjectProperties
 
 
