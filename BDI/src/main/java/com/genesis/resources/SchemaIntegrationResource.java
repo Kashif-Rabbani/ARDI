@@ -1,9 +1,11 @@
 package com.genesis.resources;
 
+import com.genesis.alignment.AlignmentAlgorithm;
+import com.genesis.alignment.GlobalVsLocal;
 import com.genesis.eso.util.ConfigManager;
 import com.genesis.eso.util.RDFUtil;
 import com.genesis.eso.util.Utils;
-import com.genesis.rdf.LogMapMatcher;
+import com.genesis.alignment.LogMapMatcher;
 import com.genesis.rdf.model.bdi_ontology.Namespaces;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;

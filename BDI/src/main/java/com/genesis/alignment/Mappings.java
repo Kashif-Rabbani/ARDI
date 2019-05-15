@@ -1,14 +1,16 @@
-package com.genesis.resources;
+package com.genesis.alignment;
 
 import com.genesis.eso.util.Utils;
 import com.genesis.rdf.model.bdi_ontology.Namespaces;
+import com.genesis.resources.SchemaIntegrationHelper;
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
-import org.apache.jena.ontology.OntModel;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.ReadWrite;
-import org.apache.jena.rdf.model.*;
-import org.apache.jena.rdf.model.impl.PropertyImpl;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ResIterator;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.util.ResourceUtils;
 import org.semarglproject.vocab.RDF;

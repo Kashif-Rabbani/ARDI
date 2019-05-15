@@ -1,10 +1,10 @@
-package com.genesis.resources;
+package com.genesis.alignment;
 
 import com.genesis.eso.util.RDFUtil;
 import com.genesis.eso.util.Tuple2;
 import com.genesis.eso.util.Tuple3;
-import com.genesis.rdf.LogMapMatcher;
 import com.genesis.rdf.model.bdi_ontology.Namespaces;
+import com.genesis.resources.SchemaIntegrationHelper;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 
@@ -14,18 +14,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-class GlobalVsLocal {
+public class GlobalVsLocal {
     private JSONObject dataSource1Info = new JSONObject();
     private JSONObject dataSource2Info = new JSONObject();
     private JSONArray alignmentsArray = new JSONArray();
     private final SchemaIntegrationHelper schemaIntegrationHelper = new SchemaIntegrationHelper();
 
-    GlobalVsLocal(JSONObject a, JSONObject b) {
+    public GlobalVsLocal(JSONObject a, JSONObject b) {
         this.dataSource1Info = a;
         this.dataSource2Info = b;
     }
 
-    JSONArray runGlobalVsLocalIntegration() {
+    public JSONArray runGlobalVsLocalIntegration() {
         /* Create an IRI for alignments which will be produced by LogMap for the two sources. Note that this IRI is required to store the alignments in the TripleStore. */
         String alignmentsIRI = Namespaces.Alignments.val() + dataSource1Info.getAsString("dataSourceID") + "-" + dataSource2Info.getAsString("dataSourceID");
 

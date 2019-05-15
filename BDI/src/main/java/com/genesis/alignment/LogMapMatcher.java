@@ -1,8 +1,7 @@
-package com.genesis.rdf;
+package com.genesis.alignment;
 
 import com.genesis.eso.util.ConfigManager;
 import com.genesis.eso.util.RDFUtil;
-import com.genesis.eso.util.Tuple2;
 import com.genesis.eso.util.Tuple3;
 import uk.ac.ox.krr.logmap2.LogMap2_Matcher;
 import uk.ac.ox.krr.logmap2.mappings.objects.MappingObjectStr;

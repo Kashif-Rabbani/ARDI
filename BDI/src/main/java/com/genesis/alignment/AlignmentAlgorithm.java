@@ -1,7 +1,8 @@
-package com.genesis.resources;
+package com.genesis.alignment;
 
 import com.genesis.eso.util.RDFUtil;
 import com.genesis.eso.util.SQLiteUtils;
+import com.genesis.resources.SchemaIntegrationHelper;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import org.apache.jena.rdf.model.Resource;

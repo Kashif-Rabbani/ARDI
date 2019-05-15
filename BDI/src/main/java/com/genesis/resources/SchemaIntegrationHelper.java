@@ -221,14 +221,14 @@ public class SchemaIntegrationHelper {
         return integratedIRI;
     }
 
-    String getDataSourceInfo(String dataSourceId) {
+    public String getDataSourceInfo(String dataSourceId) {
         MongoClient client = Utils.getMongoDBClient();
         MongoCursor<Document> cursor = MongoUtil.getDataSourcesCollection(client).
                 find(new Document("dataSourceID", dataSourceId)).iterator();
         return MongoUtil.getMongoObject(client, cursor);
     }
 
-    String getIntegratedDataSourceInfo(String integratedDataSourceId) {
+    public String getIntegratedDataSourceInfo(String integratedDataSourceId) {
         MongoClient client = Utils.getMongoDBClient();
         MongoCursor<Document> cursor = MongoUtil.getIntegratedDataSourcesCollection(client).
                 find(new Document("dataSourceID", integratedDataSourceId)).iterator();
