@@ -1,6 +1,8 @@
 package com.genesis.resources;
 
-import com.genesis.eso.util.*;
+import com.genesis.eso.util.ConfigManager;
+import com.genesis.eso.util.RDFUtil;
+import com.genesis.eso.util.Utils;
 import com.genesis.rdf.LogMapMatcher;
 import com.genesis.rdf.model.bdi_ontology.Namespaces;
 import net.minidev.json.JSONArray;
@@ -17,11 +19,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Path("bdi")
 public class SchemaIntegrationResource {
@@ -52,117 +49,7 @@ public class SchemaIntegrationResource {
                 if (!dataSource1.isEmpty() && !dataSource2.isEmpty()) {
                     dataSource1Info = (JSONObject) JSONValue.parse(dataSource1);
                     dataSource2Info = (JSONObject) JSONValue.parse(dataSource2);
-
-                    /* Create an IRI for alignments which will be produced by LogMap for the two sources. Note that this IRI is required to store the alignments in the TripleStore. */
-                    String alignmentsIRI = Namespaces.Alignments.val() + dataSource1Info.getAsString("dataSourceID") + "-" + dataSource2Info.getAsString("dataSourceID");
-
-                    // Calling LogMapMatcher class to extract, and save the alignments
-                    LogMapMatcher logMapMatcher = new LogMapMatcher(dataSource1Info.getAsString("parsedFileAddress"), dataSource2Info.getAsString("parsedFileAddress"), alignmentsIRI);
-
-                    RDFUtil.runAQuery("SELECT * WHERE { GRAPH <" + alignmentsIRI + "> {?s ?p ?o} }", alignmentsIRI).forEachRemaining(triple -> {
-                        JSONObject alignments = new JSONObject();
-                        alignments.put("s", triple.get("s").toString());
-                        alignments.put("p", triple.get("p").toString());
-                        alignments.put("confidence", triple.get("o").toString().split("__")[0]);
-                        alignments.put("mapping_type", triple.get("o").toString().split("__")[1]);
-                        alignments.put("lexical_confidence", triple.get("o").toString().split("__")[2]);
-                        alignments.put("structural_confidence", triple.get("o").toString().split("__")[3]);
-                        alignments.put("mapping_direction", triple.get("o").toString().split("__")[4]);
-                        alignmentsArray.add(alignments);
-                    });
-
-                    List<Tuple3<String, String, String>> classAlignments = logMapMatcher.getClassesAlignments();
-
-                    Map<String, List<Tuple3<String, String, String>>> c = classAlignments.stream().collect(Collectors.groupingBy(w -> w._2));
-
-                    String iri = dataSource1Info.getAsString("iri");
-
-                    JSONArray superAndSubClassesArray = new JSONArray();
-                    JSONArray onlyClassesArray = new JSONArray();
-
-                    c.forEach((groupedClass, listOfClassPairs) -> {
-                        System.out.println("Grouped Class: ------------> "+ groupedClass);
-
-                        Map<Tuple2<String, String>, List<String>> superClassesPlusSubClasses = new HashMap<>();
-                        List<String> classes = new ArrayList<>();
-                        List<Tuple2> classesAndConfidence = new ArrayList<>();
-
-                        for (Tuple3 classPair : listOfClassPairs) {
-                            //System.out.println(classPair._1);
-                            if (classPair._1.toString().contains(Namespaces.G.val())) {
-                                String query = " SELECT DISTINCT ?p WHERE { GRAPH <" + iri + "> { ?p rdfs:subClassOf <" + classPair._1.toString() + "> . } }";
-                                //System.out.println(query);
-                                List<String> subClasses = schemaIntegrationHelper.getSparqlQueryResult(iri, query);
-                                //System.out.println(subClasses.toString());
-                                superClassesPlusSubClasses.put(new Tuple2(classPair._1.toString(), classPair._3.toString()), subClasses);
-                            } else {
-                                classes.add(classPair._1.toString());
-                                classesAndConfidence.add(new Tuple2(classPair._1.toString(),classPair._3.toString()));
-                            }
-                        }
-                        System.out.println();
-                        System.out.println(" ********************************************************* ");
-                        System.out.println("Printing  superClassesPlusSubClasses");
-                        System.out.println(superClassesPlusSubClasses.values());
-
-                        System.out.println();
-
-                        System.out.println(" ********************************************************* ");
-                        System.out.println("Printing classes [Which were not super Classes]");
-                        System.out.println(classes);
-
-                        System.out.println();
-
-                        System.out.println(" *************************** Iterating over SuperClasses Containing their Sub Classes ****************************** ");
-                        superClassesPlusSubClasses.forEach((superClass, subClasses) -> {
-
-                            JSONArray wrapperArray = new JSONArray();
-                            JSONObject containerObject = new JSONObject();
-                            containerObject.put("s", superClass._1);
-                            containerObject.put("p", groupedClass);
-                            containerObject.put("o", superClass._2);
-
-                            wrapperArray.add(containerObject);
-
-                            List<String> classesSameAsSubClasses = classes.stream().filter(subClasses::contains).collect(Collectors.toList());
-
-                            System.out.println(" ********************************************************* ");
-                            System.out.println("Printing classes SameAs SubClasses");
-                            System.out.println(classesSameAsSubClasses);
-                            System.out.println();
-
-                            List<String> classesDifferentFromSubClasses = classes.stream().filter( obj -> !subClasses.contains(obj)).collect(Collectors.toList());
-
-                            System.out.println(" ********************************************************* ");
-                            System.out.println("Printing classes Different from SubClasses");
-                            System.out.println(classesDifferentFromSubClasses);
-                            System.out.println();
-
-                            for (Tuple2 tuple: classesAndConfidence){
-                               if(classesSameAsSubClasses.contains(tuple._1)){
-                                   JSONObject temp = new JSONObject();
-                                   classesSameAsSubClasses.get(classesSameAsSubClasses.indexOf(tuple._1));
-                                   temp.put("s", tuple._1);
-                                   temp.put("p", groupedClass);
-                                   temp.put("o", tuple._2);
-                                   wrapperArray.add(temp);
-                               }
-
-                                if(classesDifferentFromSubClasses.contains(tuple._1)){
-                                    JSONObject temp = new JSONObject();
-                                    classesSameAsSubClasses.get(classesDifferentFromSubClasses.indexOf(tuple._1));
-                                    temp.put("s", tuple._1);
-                                    temp.put("p", groupedClass);
-                                    temp.put("o", tuple._2);
-                                    onlyClassesArray.add(temp);
-                                }
-                            }
-                            System.out.println();
-                            superAndSubClassesArray.add(wrapperArray);
-                        });
-                    });
-                    System.out.println(superAndSubClassesArray.toJSONString());
-                    System.out.println(onlyClassesArray.toJSONString());
+                    alignmentsArray = new GlobalVsLocal(dataSource1Info, dataSource2Info).runGlobalVsLocalIntegration();
                 }
 
             } else {
@@ -183,6 +70,7 @@ public class SchemaIntegrationResource {
                             dataSource2Info.getAsString("parsedFileAddress"),
                             alignmentsIRI
                     );
+                    JSONArray tempAlignmentsArray = alignmentsArray;
                     RDFUtil.runAQuery("SELECT * WHERE { GRAPH <" + alignmentsIRI + "> {?s ?p ?o} }", alignmentsIRI).forEachRemaining(triple -> {
                         JSONObject alignments = new JSONObject();
                         alignments.put("s", triple.get("s").toString());
@@ -192,8 +80,9 @@ public class SchemaIntegrationResource {
                         alignments.put("lexical_confidence", triple.get("o").toString().split("__")[2]);
                         alignments.put("structural_confidence", triple.get("o").toString().split("__")[3]);
                         alignments.put("mapping_direction", triple.get("o").toString().split("__")[4]);
-                        alignmentsArray.add(alignments);
+                        tempAlignmentsArray.add(alignments);
                     });
+                    alignmentsArray = tempAlignmentsArray;
                 }
             } // end else condition here
             String integratedIRI = schemaIntegrationHelper.integrateTDBDatasets(dataSource1Info, dataSource2Info);
