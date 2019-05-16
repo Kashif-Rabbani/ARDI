@@ -79,12 +79,13 @@ function getAlignments() {
                                 .text(val.p)
                             ).append($('<td>').text(Math.round(val.confidence * 100) / 100)
                             )
-                            .append($('<td>').append('<button type="button" id ="acceptAlignment" class="btn btn-success" value=\"" + alignmentsInfo.indexOf(val) + "\">Accept</button> '))
+                            .append($('<td>').append('<button type="button" id ="acceptAlignment" class="btn btn-success" value="' + alignmentsInfo.indexOf(val) + '">Accept</button> '))
                             .append($('<td>').append('<button type="button" id ="rejectAlignment" class="btn btn-danger">Reject</button> '))
                     );
             }
 
             if (integrationType === "GLOBAL-vs-LOCAL") {
+                $('#GlobalVsLocalRow').removeClass('d-none');
                 if (val.mapping_type === 'CLASS') {
                     var otherClasses = val.other_classes;
                     var superClasses = val.super_classes;
@@ -106,7 +107,7 @@ function getAlignments() {
                                     "\t<td>" + alignment.s + "</td>\n" +
                                     "\t<td>" + alignment.p + "</td>\n" +
                                     "\t<td class='confidence-td'>" + Math.round(alignment.confidence * 100) / 100 + "</td>\n" +
-                                    "\t<td class='accept-reject-buttons'><button type=\"button\" id=\"acceptAlignment\" class=\"btn btn-success\" value=\"'" + alignmentsInfo.indexOf(alignment) + "'\">Accept</button> </td>\n" +
+                                    "\t<td class='accept-reject-buttons'><button type=\"button\" id=\"acceptAlignment\" class=\"btn btn-success\" value=\"" + alignmentsInfo.indexOf(alignment) + "\">Accept</button> </td>\n" +
                                     "\t<td class='accept-reject-buttons'><button type=\"button\" id=\"rejectAlignment\" class=\"btn btn-danger\">Reject</button> </td>\n" +
                                     "</tr>";
                             } else {
@@ -115,7 +116,7 @@ function getAlignments() {
                                     "\t<td>" + alignment.s + "</td>\n" +
                                     "\t<td>" + alignment.p + "</td>\n" +
                                     "\t<td class='confidence-td'>" + Math.round(alignment.confidence * 100) / 100 + "</td>\n" +
-                                    "\t<td class='accept-reject-buttons'><button type=\"button\" id=\"acceptAlignment\" class=\"btn btn-success\" value=\"'" + alignmentsInfo.indexOf(alignment) + "'\">Accept</button> </td>\n" +
+                                    "\t<td class='accept-reject-buttons'><button type=\"button\" id=\"acceptAlignment\" class=\"btn btn-success\" value=\"" + alignmentsInfo.indexOf(alignment) + "\">Accept</button> </td>\n" +
                                     "\t<td class='accept-reject-buttons'><button type=\"button\" id=\"rejectAlignment\" class=\"btn btn-danger\">Reject</button> </td>\n" +
                                     "</tr>");
                             }
@@ -174,9 +175,10 @@ function getAlignments() {
                 }
             }
             if (integrationType === "LOCAL-vs-LOCAL") {
+                $('#LocalVsLocalRow').removeClass('d-none');
                 if (val.mapping_type === 'CLASS') {
                     alignmentsInfo.push(val);
-                    $('#alignmentsClass').find('#alignmentsBodyClasses')
+                    $('#localAlignmentsClass').find('#localAlignmentsClassBody')
                         .append($('<tr id="row' + n + '">')
                             // .append($('<td>').text(i))
                                 .append($('<td>')
