@@ -239,6 +239,7 @@ $(document).ready(function () {
 
     // Click handler for Finish Integration Button
     $("#integratedDataSourcesButton").on('click', function () {
+        $("#overlay").fadeIn(100);
         console.log("IntegratedDataSourcesButton Clicked");
         var postData = {};
         postData.iri = params[0] + "-" + params[1];

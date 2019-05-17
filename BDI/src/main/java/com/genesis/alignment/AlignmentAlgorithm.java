@@ -7,6 +7,7 @@ import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.vocabulary.RDF;
 
 import java.util.HashMap;
 
@@ -36,6 +37,7 @@ public class AlignmentAlgorithm {
                         case "OBJECT-PROPERTY":
                             System.out.println("OBJECT-PROPERTY");
                             //TODO Handle the Object Property
+                            RDFUtil.addCustomTriple(basicInfo.getAsString("integratedIRI"), data.get("PropertyA"), "EQUIVALENT_PROPERTY", data.get("PropertyB"));
                             break;
                         case "DATA-PROPERTY":
                             System.out.println("DATA-PROPERTY");
@@ -46,18 +48,38 @@ public class AlignmentAlgorithm {
                             //TODO Case 1 -  When classes of the properties are aligned
                             if (result.size() > 0) {
                                 System.out.println("CLASSES PRESENT");
+
+                                //Move the Properties to the Parent class
+                                String newGlobalProperty = basicInfo.getAsString("integratedIRI") + "/" + ResourceFactory.createResource(data.get("PropertyA")).getLocalName();
+                                String newPropertyDomain = basicInfo.getAsString("integratedIRI") + "/" + ResourceFactory.createResource(data.get("DomainPropA")).getLocalName(); //+ "_" + ResourceFactory.createResource(data.get("DomainPropB")).getLocalName();
+
+                                RDFUtil.addProperty(basicInfo.getAsString("integratedIRI"), newGlobalProperty, newPropertyDomain, data.get("RangePropA"));
+
+                                // Handle SameAs
+                                RDFUtil.addCustomTriple(basicInfo.getAsString("integratedIRI"), data.get("PropertyA"), "EQUIVALENT_PROPERTY", newGlobalProperty);
+                                RDFUtil.addCustomTriple(basicInfo.getAsString("integratedIRI"), data.get("PropertyB"), "EQUIVALENT_PROPERTY", newGlobalProperty);
+
                                 // Remove Properties from aligned Classes
                                 RDFUtil.removeProperty(basicInfo.getAsString("integratedIRI"), data.get("PropertyA"), data.get("DomainPropA"), data.get("RangePropA"));
                                 RDFUtil.removeProperty(basicInfo.getAsString("integratedIRI"), data.get("PropertyB"), data.get("DomainPropB"), data.get("RangePropB"));
 
-                                //Move the Properties to the Parent class
-                                String domainOfNewProperty = basicInfo.getAsString("integratedIRI") + "/"
-                                        + ResourceFactory.createResource(data.get("DomainPropA")).getLocalName();
-                                //+ "_" + ResourceFactory.createResource(data.get("DomainPropB")).getLocalName();
-                                RDFUtil.addProperty(basicInfo.getAsString("integratedIRI"), data.get("PropertyA"), domainOfNewProperty, data.get("RangePropA"));
-                            }
 
-                            //TODO Case 2 - When classes of the properties are not aligned
+                            } else {
+                                //TODO Case 2 -  When classes of the properties are not aligned
+                                String newGlobalGraphProperty = basicInfo.getAsString("integratedIRI") + "/" + ResourceFactory.createResource(data.get("PropertyA")).getLocalName();
+
+                                RDFUtil.removeProperty(basicInfo.getAsString("integratedIRI"), data.get("PropertyA"), data.get("DomainPropA"), data.get("RangePropA"));
+                                RDFUtil.removeProperty(basicInfo.getAsString("integratedIRI"), data.get("PropertyB"), data.get("DomainPropB"), data.get("RangePropB"));
+
+                                String[] domainsForNewGlobalPropertyResource = {data.get("DomainPropA"), data.get("DomainPropB")};
+
+                                RDFUtil.addProperty(basicInfo.getAsString("integratedIRI"), newGlobalGraphProperty, domainsForNewGlobalPropertyResource, data.get("RangePropA"));
+
+
+                                // Handle SameAs
+                                RDFUtil.addCustomTriple(basicInfo.getAsString("integratedIRI"), newGlobalGraphProperty, "EQUIVALENT_PROPERTY", data.get("PropertyA"));
+                                RDFUtil.addCustomTriple(basicInfo.getAsString("integratedIRI"), newGlobalGraphProperty, "EQUIVALENT_PROPERTY", data.get("PropertyB"));
+                            }
 
                             break;
                     }
@@ -86,14 +108,13 @@ public class AlignmentAlgorithm {
                             RDFUtil.addCustomTriple(basicInfo.getAsString("integratedIRI"), classRow.get("classA"), "SUB_CLASS_OF", classRow.get("classB"));
                             break;
                         case "LOCALCLASS":
-                            String newGlobalGraphClassResource = "";
                             Resource classA = ResourceFactory.createResource(classRow.get("classA"));
-                            Resource classB = ResourceFactory.createResource(classRow.get("classB"));
+                            //Resource classB = ResourceFactory.createResource(classRow.get("classB"));
 
                             //if (basicInfo.getAsString("integrationType").equals("LOCAL-vs-LOCAL")) {
-                                //newGlobalGraphClassResource = integratedIRI + "/" + classA.getURI().split(Namespaces.Schema.val())[1];
-                                newGlobalGraphClassResource = basicInfo.getAsString("integratedIRI") + "/" + classA.getLocalName();
-                           // }
+                            //newGlobalGraphClassResource = integratedIRI + "/" + classA.getURI().split(Namespaces.Schema.val())[1];
+                            String newGlobalGraphClassResource = basicInfo.getAsString("integratedIRI") + "/" + classA.getLocalName();
+                            // }
 
                             System.out.println("GG Resource: " + newGlobalGraphClassResource);
 

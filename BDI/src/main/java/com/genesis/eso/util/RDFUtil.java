@@ -128,6 +128,22 @@ public class RDFUtil {
         ds.commit();
         ds.close();
     }
+    public static void addProperty(String namedGraph, String property, String[] domains, String range) {
+        Dataset ds = Utils.getTDBDataset();
+        ds.begin(ReadWrite.WRITE);
+        Model graph = ds.getNamedModel(namedGraph);
+        graph.add(new ResourceImpl(property), RDF.type, RDF.Property);
+
+        for(String domain : domains) {
+            graph.add(new ResourceImpl(property), new PropertyImpl(RDFS.DOMAIN), new ResourceImpl(domain));
+        }
+        graph.add(new ResourceImpl(property), new PropertyImpl(RDFS.RANGE), new ResourceImpl(range));
+        graph.commit();
+        graph.close();
+        ds.commit();
+        ds.close();
+    }
+
 
     public static void addBatchOfTriples(String namedGraph, List<Tuple3<String, String, String>> triples) {
         //System.out.println("Adding triple: [namedGraph] "+namedGraph+", [s] "+s+", [p] "+p+", [o] "+o);
