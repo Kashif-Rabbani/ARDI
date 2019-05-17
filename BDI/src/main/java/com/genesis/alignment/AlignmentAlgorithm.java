@@ -53,7 +53,7 @@ public class AlignmentAlgorithm {
                                 //Move the Properties to the Parent class
                                 String domainOfNewProperty = basicInfo.getAsString("integratedIRI") + "/"
                                         + ResourceFactory.createResource(data.get("DomainPropA")).getLocalName();
-                                        //+ "_" + ResourceFactory.createResource(data.get("DomainPropB")).getLocalName();
+                                //+ "_" + ResourceFactory.createResource(data.get("DomainPropB")).getLocalName();
                                 RDFUtil.addProperty(basicInfo.getAsString("integratedIRI"), data.get("PropertyA"), domainOfNewProperty, data.get("RangePropA"));
                             }
 
@@ -81,21 +81,30 @@ public class AlignmentAlgorithm {
 
             switch (classRow.get("actionType")) {
                 case "ACCEPTED":
-                    String newGlobalGraphClassResource = "";
-                    Resource classA = ResourceFactory.createResource(classRow.get("classA"));
-                    Resource classB = ResourceFactory.createResource(classRow.get("classB"));
+                    switch (classRow.get("classType")) {
+                        case "SUPERCLASS":
+                            RDFUtil.addCustomTriple(basicInfo.getAsString("integratedIRI"), classRow.get("classA"), "SUB_CLASS_OF", classRow.get("classB"));
+                            break;
+                        case "LOCALCLASS":
+                            String newGlobalGraphClassResource = "";
+                            Resource classA = ResourceFactory.createResource(classRow.get("classA"));
+                            Resource classB = ResourceFactory.createResource(classRow.get("classB"));
 
-                    if (basicInfo.getAsString("integrationType").equals("LOCAL-vs-LOCAL")) {
-                        //newGlobalGraphClassResource = integratedIRI + "/" + classA.getURI().split(Namespaces.Schema.val())[1];
-                        newGlobalGraphClassResource = basicInfo.getAsString("integratedIRI") + "/" + classA.getLocalName();
+                            //if (basicInfo.getAsString("integrationType").equals("LOCAL-vs-LOCAL")) {
+                                //newGlobalGraphClassResource = integratedIRI + "/" + classA.getURI().split(Namespaces.Schema.val())[1];
+                                newGlobalGraphClassResource = basicInfo.getAsString("integratedIRI") + "/" + classA.getLocalName();
+                           // }
+
+                            System.out.println("GG Resource: " + newGlobalGraphClassResource);
+
+                            RDFUtil.addClassOrPropertyTriple(basicInfo.getAsString("integratedIRI"), newGlobalGraphClassResource, "CLASS");
+                            RDFUtil.addCustomTriple(basicInfo.getAsString("integratedIRI"), classRow.get("classA"), "SUB_CLASS_OF", newGlobalGraphClassResource);
+                            RDFUtil.addCustomTriple(basicInfo.getAsString("integratedIRI"), classRow.get("classB"), "SUB_CLASS_OF", newGlobalGraphClassResource);
+                            break;
                     }
-                    System.out.println("GG Resource: " + newGlobalGraphClassResource);
-                    RDFUtil.addClassOrPropertyTriple(basicInfo.getAsString("integratedIRI"), newGlobalGraphClassResource, "CLASS");
-                    RDFUtil.addCustomTriple(basicInfo.getAsString("integratedIRI"), classRow.get("classA"), "SUB_CLASS_OF", newGlobalGraphClassResource);
-                    RDFUtil.addCustomTriple(basicInfo.getAsString("integratedIRI"), classRow.get("classB"), "SUB_CLASS_OF", newGlobalGraphClassResource);
-
                     break;
                 case "REJECTED":
+                    //TODO:
                     break;
             }
 

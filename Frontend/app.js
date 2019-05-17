@@ -2,7 +2,7 @@ var config = require(__dirname + '/config');
 var port = config.PORT;
 var express = require('express');
 var path = require('path');
-//var favicon = require('serve-favicon');
+var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
@@ -93,7 +93,7 @@ app.get('/test', test_route.getGraph);
 app.post('/fileupload', file_upload.uploadFile);
 app.post('/triggerExtraction', trigger_extraction.triggerExtraction);
 app.post('/integrateDataSources', integrate_data_Sources.triggerDataSourcesIntegration);
-//app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.ico')));
+app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.ico')));
 
 
 /********** User resource ****************************************************************/

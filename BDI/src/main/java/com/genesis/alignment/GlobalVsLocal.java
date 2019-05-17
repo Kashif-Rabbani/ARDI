@@ -5,6 +5,7 @@ import com.genesis.eso.util.Tuple2;
 import com.genesis.eso.util.Tuple3;
 import com.genesis.rdf.model.bdi_ontology.Namespaces;
 import com.genesis.resources.SchemaIntegrationHelper;
+import com.genesis.resources.SchemaIntegrationResource;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 
@@ -64,14 +65,7 @@ public class GlobalVsLocal {
         RDFUtil.runAQuery("SELECT * WHERE { GRAPH <" + alignmentsIRI + "> {?s ?p ?o} }", alignmentsIRI).forEachRemaining(triple -> {
             JSONObject alignments = new JSONObject();
             if (!triple.get("o").toString().split("__")[1].equals("CLASS")) {
-                alignments.put("s", triple.get("s").toString());
-                alignments.put("p", triple.get("p").toString());
-                alignments.put("confidence", triple.get("o").toString().split("__")[0]);
-                alignments.put("mapping_type", triple.get("o").toString().split("__")[1]);
-                alignments.put("lexical_confidence", triple.get("o").toString().split("__")[2]);
-                alignments.put("structural_confidence", triple.get("o").toString().split("__")[3]);
-                alignments.put("mapping_direction", triple.get("o").toString().split("__")[4]);
-                alignmentsArray.add(alignments);
+                schemaIntegrationHelper.populateResponseArray(alignmentsArray, triple, alignments);
             }
         });
         JSONObject o = new JSONObject();
@@ -142,6 +136,10 @@ public class GlobalVsLocal {
 
     private void populateSuperSubClasses(JSONArray superAndSubClassesArray, JSONArray onlyClassesArray, String groupedClass, Map<Tuple2<String, String>, List<String>> superClassesPlusSubClasses, List<String> classes, List<Tuple2> classesAndConfidence) {
         superClassesPlusSubClasses.forEach((superClass, subClasses) -> {
+            System.out.println("********* Printing Super and Sub Classes: ");
+            System.out.println(superClass._1);
+            System.out.println(subClasses.toString());
+            System.out.println();
             // Creating a wrapper array to wrap the information about this super class
             JSONArray wrapperArray = new JSONArray();
             // Creating an object to store the ClassA, GroupedByClass i.e. class B, and the Confidence Value. Note that we know that this is a superClass Info only.
@@ -156,6 +154,11 @@ public class GlobalVsLocal {
             List<String> classesSameAsSubClasses = classes.stream().filter(subClasses::contains).collect(Collectors.toList());
             // Filter out those classes which are not same as subclasses of the superclass we are iterating
             List<String> classesDifferentFromSubClasses = classes.stream().filter(obj -> !subClasses.contains(obj)).collect(Collectors.toList());
+            System.out.println("classesSameAsSubClasses: ");
+            System.out.println(classesSameAsSubClasses);
+
+            System.out.println("classesDifferentFromSubClasses: ");
+            System.out.println(classesDifferentFromSubClasses);
 
             //Iterate over the list of ClassesAndConfidence (These are the classes which are not superClasses)
             for (Tuple2 tuple : classesAndConfidence) {

@@ -43,6 +43,7 @@ console.log(params);
     });
 }*/
 
+
 function getAlignments() {
     $("#overlay").fadeIn(100);
     console.log("Requesting bdiAlignments");
@@ -100,10 +101,13 @@ function getAlignments() {
                         var headerRow;
                         var bodyRows = [];
                         superClass.forEach(function (alignment) {
-                            alignmentsInfo.push(alignment);
+
+                            // First row will always be a Super Class
                             if (iteratorCount === 0) {
+                                alignment.classType = "SUPERCLASS";
+                                alignmentsInfo.push(alignment);
                                 headerRow =
-                                    "<tr id=\"row\">\n" +
+                                    "<tr id=\"row" + alignmentsInfo.indexOf(alignment) + "\">\n" +
                                     "\t<td>" + alignment.s + "</td>\n" +
                                     "\t<td>" + alignment.p + "</td>\n" +
                                     "\t<td class='confidence-td'>" + Math.round(alignment.confidence * 100) / 100 + "</td>\n" +
@@ -111,8 +115,11 @@ function getAlignments() {
                                     "\t<td class='accept-reject-buttons'><button type=\"button\" id=\"rejectAlignment\" class=\"btn btn-danger\">Reject</button> </td>\n" +
                                     "</tr>";
                             } else {
+                                // Other rows will be sub classes of that super class
+                                alignment.classType = "LOCALCLASS";
+                                alignmentsInfo.push(alignment);
                                 bodyRows.push(
-                                    "<tr id=\"row\">\n" +
+                                    "<tr id=\"row" + alignmentsInfo.indexOf(alignment) + "\">\n" +
                                     "\t<td>" + alignment.s + "</td>\n" +
                                     "\t<td>" + alignment.p + "</td>\n" +
                                     "\t<td class='confidence-td'>" + Math.round(alignment.confidence * 100) / 100 + "</td>\n" +
@@ -124,43 +131,17 @@ function getAlignments() {
                         });
 
 
-                        var cardElement = "<div class=\"card bg-light bg-white border-0\">\n" +
-                            "    <div class=\"card-header remove-padding bg-white border-bottom-0 \">\n" +
-                            "        <div class=\"row\">\n" +
-                            "            <div class=\"col-md-11\" id=\"id\">\n" +
-                            "                <table class=\"table table-hover remove-margin\" id=\"headerTable" + temp + "\">\n" +
-                            "                   <tbody id=\"headerTableBody" + temp + "\">\n" +
-                            "                    \n" + headerRow +
-                            "                  </tbody>\n" +
-                            "                </table>\n" +
-                            "            </div>\n" +
-                            "            <div class=\"col-md-1 text-center\"><button class=\"btn btn-link\" data-toggle=\"collapse\" data-target=\"#dropDownData" + temp + "\" id=\"dropDownButton\"><i class=\"fas fa-chevron-circle-down fa-2x\" style=\"color:#18bc9c;\"></i></button></div>\n" +
-                            "        </div>\n" +
-                            "    </div>\n" +
-                            "    <div class=\"collapse\" id=\"dropDownData" + temp + "\" aria-labelledby=\"headingOne\" data-parent=\"#accordion\">\n" +
-                            "        <div class=\"card-body\">\n" +
-                            "            <div class=\"row\">\n" +
-                            "                <div class=\"col-md-11\" id=\"idd\">\n" +
-                            "                    <table class=\"table table-hover remove-margin\" id=\"bodyTable" + temp + "\">\n" +
-                            "                       <tbody class='bg-light' id=\"bodyTableBody" + temp + "\">\n" +
-                            "                         \n" + bodyRows.join(" ") +
-                            "                       </tbody>\n" +
-                            "                    </table>\n" +
-                            "                </div>\n" +
-                            "                <div class=\"col-md-1 \"></div>\n" +
-                            "            </div>\n" +
-                            "        </div>\n" +
-                            "    </div>\n" +
-                            "</div>";
+                        var cardElement = constructHTMLComponent(temp, headerRow, bodyRows);
 
                         $("#superClass").append(cardElement);
                         temp++;
                     });
 
                     otherClasses.forEach(function (classVal) {
+                        classVal.classType = "LOCALCLASS";
                         alignmentsInfo.push(classVal);
                         $('#alignmentsClass').find('#alignmentsBodyClasses')
-                            .append($('<tr id="row' + n + '">')
+                            .append($('<tr id="row' + alignmentsInfo.indexOf(classVal) + '">')
                                 // .append($('<td>').text(i))
                                     .append($('<td>')
                                         .text(classVal.s)
@@ -177,9 +158,10 @@ function getAlignments() {
             if (integrationType === "LOCAL-vs-LOCAL") {
                 $('#LocalVsLocalRow').removeClass('d-none');
                 if (val.mapping_type === 'CLASS') {
+                    val.classType = "LOCALCLASS";
                     alignmentsInfo.push(val);
                     $('#localAlignmentsClass').find('#localAlignmentsClassBody')
-                        .append($('<tr id="row' + n + '">')
+                        .append($('<tr id="row' + alignmentsInfo.indexOf(val) + '">')
                             // .append($('<td>').text(i))
                                 .append($('<td>')
                                     .text(val.s)
@@ -201,6 +183,7 @@ function getAlignments() {
 }
 
 function acceptButtonClickHandler(acceptButton, i) {
+    $("#overlay").fadeIn(100);
     console.log("AcceptButtonClickHandler");
     console.log(i);
     console.log(alignmentsInfo[i]);
@@ -220,7 +203,9 @@ function acceptButtonClickHandler(acceptButton, i) {
             $("#overlay").fadeOut(100);
             console.log(response);
             if (response === "AlignmentSucceeded") {
-                $("#row" + i).addClass("d-none");
+                if (data.classType !== "SUPERCLASS") {
+                    $("#row" + i).addClass("d-none");
+                }
             }
         },
         error: function (response) {
@@ -278,3 +263,36 @@ $(document).ready(function () {
         });
     });
 });
+
+
+function constructHTMLComponent(temp, headerRow, bodyRows) {
+    var cardElement = "<div class=\"card bg-light bg-white border-0\">\n" +
+        "    <div class=\"card-header remove-padding bg-white border-bottom-0 \">\n" +
+        "        <div class=\"row\">\n" +
+        "            <div class=\"col-md-11\" id=\"id\">\n" +
+        "                <table class=\"table table-hover remove-margin\" id=\"headerTable" + temp + "\">\n" +
+        "                   <tbody id=\"headerTableBody" + temp + "\">\n" +
+        "                    \n" + headerRow +
+        "                  </tbody>\n" +
+        "                </table>\n" +
+        "            </div>\n" +
+        "            <div class=\"col-md-1 text-center\"><button class=\"btn btn-link\" data-toggle=\"collapse\" data-target=\"#dropDownData" + temp + "\" id=\"dropDownButton\"><i class=\"fas fa-chevron-circle-down fa-2x\" style=\"color:#18bc9c;\"></i></button></div>\n" +
+        "        </div>\n" +
+        "    </div>\n" +
+        "    <div class=\"collapse\" id=\"dropDownData" + temp + "\" aria-labelledby=\"headingOne\" data-parent=\"#accordion\">\n" +
+        "        <div class=\"card-body\">\n" +
+        "            <div class=\"row\">\n" +
+        "                <div class=\"col-md-11\" id=\"idd\">\n" +
+        "                    <table class=\"table table-hover remove-margin\" id=\"bodyTable" + temp + "\">\n" +
+        "                       <tbody class='bg-light' id=\"bodyTableBody" + temp + "\">\n" +
+        "                         \n" + bodyRows.join(" ") +
+        "                       </tbody>\n" +
+        "                    </table>\n" +
+        "                </div>\n" +
+        "                <div class=\"col-md-1 \"></div>\n" +
+        "            </div>\n" +
+        "        </div>\n" +
+        "    </div>\n" +
+        "</div>";
+    return cardElement;
+}

@@ -11,6 +11,7 @@ import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
 import org.apache.jena.query.Dataset;
+import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
@@ -75,19 +76,13 @@ public class SchemaIntegrationResource {
                     JSONArray tempAlignmentsArray = alignmentsArray;
                     RDFUtil.runAQuery("SELECT * WHERE { GRAPH <" + alignmentsIRI + "> {?s ?p ?o} }", alignmentsIRI).forEachRemaining(triple -> {
                         JSONObject alignments = new JSONObject();
-                        alignments.put("s", triple.get("s").toString());
-                        alignments.put("p", triple.get("p").toString());
-                        alignments.put("confidence", triple.get("o").toString().split("__")[0]);
-                        alignments.put("mapping_type", triple.get("o").toString().split("__")[1]);
-                        alignments.put("lexical_confidence", triple.get("o").toString().split("__")[2]);
-                        alignments.put("structural_confidence", triple.get("o").toString().split("__")[3]);
-                        alignments.put("mapping_direction", triple.get("o").toString().split("__")[4]);
-                        tempAlignmentsArray.add(alignments);
+                       schemaIntegrationHelper.populateResponseArray(tempAlignmentsArray, triple, alignments);
                     });
                     alignmentsArray = tempAlignmentsArray;
                 }
             } // end else condition here
             String integratedIRI = schemaIntegrationHelper.integrateTDBDatasets(dataSource1Info, dataSource2Info);
+
             schemaIntegrationHelper.initAlignmentTables();
 
             return Response.ok((alignmentsArray)).build();
@@ -97,6 +92,7 @@ public class SchemaIntegrationResource {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
+
 
 
     @POST
@@ -123,6 +119,7 @@ public class SchemaIntegrationResource {
                 System.out.println("GLOBAL-vs-GLOBAL");
             } else if (objBody.getAsString("ds1_id").contains("INTEGRATED-")) {
                 System.out.println("GLOBAL-vs-LOCAL");
+                schemaIntegrationHelper.processAlignment(objBody, integratedIRI, s, p, query, checkIfQueryContainsResult, "GLOBAL-vs-LOCAL");
             } else {
                 schemaIntegrationHelper.processAlignment(objBody, integratedIRI, s, p, query, checkIfQueryContainsResult, "LOCAL-vs-LOCAL");
                 System.out.println("LOCAL-vs-LOCAL");
@@ -154,7 +151,7 @@ public class SchemaIntegrationResource {
             objBody.put("integratedIRI", integratedIRI);
             //System.out.println(objBody.toJSONString()); {"iri":"wfFEEDGx-FBFLAdRr","integrationType":"LOCAL-vs-LOCAL", "integratedIRI":"http:\/\/www.BDIOntology.com\/global\/wfFEEDGx-FBFLAdRr","ds2_id":"FBFLAdRr","ds1_id":"wfFEEDGx"}
             new AlignmentAlgorithm(objBody);
-            String integratedModelFileName = writeToFile(objBody.getAsString("iri"), integratedIRI);
+            String integratedModelFileName = schemaIntegrationHelper.writeToFile(objBody.getAsString("iri"), integratedIRI);
             //Convert RDFS to VOWL (Visualization Framework) Compatible JSON
             JSONObject vowlObj = Utils.oWl2vowl(ConfigManager.getProperty("output_path") + integratedModelFileName);
             if (objBody.getAsString("integrationType").equals("GLOBAL-vs-LOCAL")) {
@@ -189,24 +186,5 @@ public class SchemaIntegrationResource {
         }
     }
 
-    private String writeToFile(String iri, String integratedIRI) {
-        // Write the integrated Graph into file by reading from TDB
-        Dataset integratedDataset = Utils.getTDBDataset();
-        integratedDataset.begin(ReadWrite.WRITE);
-        Model model = integratedDataset.getNamedModel(integratedIRI);
-        System.out.println("iri: " + iri);
-        String integratedModelFileName = iri + ".ttl";
-        //String integratedModelFileName = objBody.getAsString("dataSource1Name") + "-" + objBody.getAsString("dataSource2Name") + ".ttl";
-        try {
-            model.write(new FileOutputStream(ConfigManager.getProperty("output_path") + integratedModelFileName), "TURTLE");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        model.commit();
-        model.close();
-        integratedDataset.commit();
-        integratedDataset.end();
-        integratedDataset.close();
-        return integratedModelFileName;
-    }
+
 }

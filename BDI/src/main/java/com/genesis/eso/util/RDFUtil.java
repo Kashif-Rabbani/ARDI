@@ -56,7 +56,7 @@ public class RDFUtil {
         ds.begin(ReadWrite.WRITE);
         Model graph = ds.getNamedModel(namedGraph);
         if (p.equals("CLASS"))
-            graph.add(new ResourceImpl(s), RDF.type, RDFS.CLASS);
+            graph.add(new ResourceImpl(s), RDF.type, new ResourceImpl(RDFS.CLASS));
         if (p.equals("PROPERTY"))
             graph.add(new ResourceImpl(s), RDF.type, RDF.Property);
         graph.commit();

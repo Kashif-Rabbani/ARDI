@@ -1,9 +1,6 @@
 package com.genesis.resources;
 
-import com.genesis.eso.util.MongoUtil;
-import com.genesis.eso.util.RDFUtil;
-import com.genesis.eso.util.SQLiteUtils;
-import com.genesis.eso.util.Utils;
+import com.genesis.eso.util.*;
 import com.genesis.rdf.model.bdi_ontology.Namespaces;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -13,6 +10,7 @@ import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
 import org.apache.jena.query.Dataset;
+import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
@@ -41,8 +39,8 @@ public class SchemaIntegrationHelper {
 
                     // Classes p (source 1 Class) and s (source2 Class)
                     if (triple.get("o").asResource().getLocalName().equals("Class")) {
-                        String sparqlClassAProperties = " SELECT DISTINCT ?p WHERE { GRAPH <" + integratedIRI + "> { ?p rdfs:domain <" + objBody.getAsString("s") + "> . } }";
-                        String sparqlClassBProperties = " SELECT DISTINCT ?p WHERE { GRAPH <" + integratedIRI + "> { ?p rdfs:domain <" + objBody.getAsString("p") + "> . } }";
+                        String sparqlClassAProperties = " SELECT DISTINCT ?p WHERE { GRAPH <" + integratedIRI + "> { ?p rdfs:domain <" + objBody.getAsString("p") + "> . } }";
+                        String sparqlClassBProperties = " SELECT DISTINCT ?p WHERE { GRAPH <" + integratedIRI + "> { ?p rdfs:domain <" + objBody.getAsString("s") + "> . } }";
 
                         List<String> listPropertiesClassA = getSparqlQueryResult(integratedIRI, sparqlClassAProperties);
                         List<String> listPropertiesClassB = getSparqlQueryResult(integratedIRI, sparqlClassBProperties);
@@ -50,14 +48,15 @@ public class SchemaIntegrationHelper {
                         System.out.println(String.join(",", listPropertiesClassA));
                         System.out.println(String.join(",", listPropertiesClassB));
 
-                        String sql = "INSERT INTO Class (classA,classB,countPropClassA,countPropClassB,listPropClassA,listPropClassB,actionType) VALUES (" +
+                        String sql = "INSERT INTO Class (classA,classB,countPropClassA,countPropClassB,listPropClassA,listPropClassB,actionType,classType) VALUES (" +
                                 "'" + objBody.getAsString("p") + "'" + "," +
                                 "'" + objBody.getAsString("s") + "'" + "," +
                                 "'" + listPropertiesClassA.size() + "'" + "," +
                                 "'" + listPropertiesClassB.size() + "'" + "," +
                                 "'" + String.join(",", listPropertiesClassA) + "'" + "," +
                                 "'" + String.join(",", listPropertiesClassB) + "'" + "," +
-                                "'" + objBody.getAsString("actionType") + "'" +
+                                "'" + objBody.getAsString("actionType") + "'" + "," +
+                                "'" + objBody.getAsString("classType") + "'" +
                                 " );";
                         System.out.println("Inserting into SQLite Table Class");
                         SQLiteUtils.executeQuery(sql);
@@ -257,7 +256,37 @@ public class SchemaIntegrationHelper {
         });
         return temp;
     }
+    public void populateResponseArray(JSONArray tempAlignmentsArray, QuerySolution triple, JSONObject alignments) {
+        alignments.put("s", triple.get("s").toString());
+        alignments.put("p", triple.get("p").toString());
+        alignments.put("confidence", triple.get("o").toString().split("__")[0]);
+        alignments.put("mapping_type", triple.get("o").toString().split("__")[1]);
+        alignments.put("lexical_confidence", triple.get("o").toString().split("__")[2]);
+        alignments.put("structural_confidence", triple.get("o").toString().split("__")[3]);
+        alignments.put("mapping_direction", triple.get("o").toString().split("__")[4]);
+        tempAlignmentsArray.add(alignments);
+    }
 
+    public String writeToFile(String iri, String integratedIRI) {
+        // Write the integrated Graph into file by reading from TDB
+        Dataset integratedDataset = Utils.getTDBDataset();
+        integratedDataset.begin(ReadWrite.WRITE);
+        Model model = integratedDataset.getNamedModel(integratedIRI);
+        System.out.println("iri: " + iri);
+        String integratedModelFileName = iri + ".ttl";
+        //String integratedModelFileName = objBody.getAsString("dataSource1Name") + "-" + objBody.getAsString("dataSource2Name") + ".ttl";
+        try {
+            model.write(new FileOutputStream(ConfigManager.getProperty("output_path") + integratedModelFileName), "TURTLE");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        model.commit();
+        model.close();
+        integratedDataset.commit();
+        integratedDataset.end();
+        integratedDataset.close();
+        return integratedModelFileName;
+    }
     public static List<String> getPropertyTableFeatures() {
         List<String> propertyTableAttributes = new ArrayList<>();
         propertyTableAttributes.add("PropertyA");
@@ -281,6 +310,7 @@ public class SchemaIntegrationHelper {
         classTableAttributes.add("listPropClassA");
         classTableAttributes.add("listPropClassB");
         classTableAttributes.add("actionType");
+        classTableAttributes.add("classType");
         return classTableAttributes;
     }
 
