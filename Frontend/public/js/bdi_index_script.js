@@ -6,20 +6,30 @@ function getIntegratedFileDetails() {
         console.log(data);
         var i = 1;
         $.each((data), function (key, value) {
+
             var dataSource = JSON.parse(value);
+
+            var dataSourcesNames = [];
+
+            dataSource.dataSources.forEach(function (ds) {
+                //console.log(ds.dataSourceName);
+                dataSourcesNames.push(ds.dataSourceName);
+            });
+
             $('#integratedDataSources').find('tbody')
                 .append($('<tr>')
-                    .append($('<td>').append('<input type="checkbox" class="dataSourceCheckbox" name="dataSource" value = "' + dataSource.dataSourceID + "__" + dataSource.name +  '" /> '))
+                    .append($('<td>').append('<input type="checkbox" class="dataSourceCheckbox" name="dataSource" value = "' + dataSource.dataSourceID + "__" + dataSource.name + '" /> '))
                     .append($('<td>')
                         .text(i)
                     ).append($('<td>').text(dataSource.name))
                     .append($('<td>')
-                        .text(dataSource.iri)
+                        .text(dataSourcesNames.join(", "))
                     ).append($('<td>')
-                        .text(dataSource.parsedFileAddress)
+                        .text(dataSource.iri)
                     )//.append($('<td>').append($('<a href="/view_data_source?dataSourceID=' + (dataSource.dataSourceID) + '">').append($('<span class="fa fa-search"></span>'))))
-                    .append($('<td>').append($('<a href="/view/' + (dataSource.integratedVowlJsonFileName) + '&Integrated' + '">').append($('<span class="fa fa-search"></span>')))
-                    )
+                    .append($('<td class="text-center">').append($('<a href="/view/' + (dataSource.integratedVowlJsonFileName) + '&Integrated' + '">').append($('<span class="fa fa-search"></span>')))
+                    ).append($('<td class="text-center deleteWrapper">')
+                        .append($('<button  value="' + dataSource.dataSourceID + '" class="btn btn-outline-light pop-function delete-button" rel="popover" >').append($('<span color="red" class="fa fa-trash"></span></button>'))))
                 );
 
             ++i;
@@ -43,29 +53,18 @@ function getParsedFileDetails() {
                     ).append($('<td>')
                         .text(dataSource.type)
                     ).append($('<td>')
-                        .text(dataSource.parsedFileAddress)
+                        .text(dataSource.iri)
                     )//.append($('<td>').append($('<a href="/view_data_source?dataSourceID=' + (dataSource.dataSourceID) + '">').append($('<span class="fa fa-search"></span>'))))
-                    .append($('<td>').append($('<a href="/view/' + (dataSource.vowlJsonFileName) + '&' + dataSource.name + '">').append($('<span class="fa fa-search"></span>')))
+                    .append($('<td class="text-center">').append($('<a href="/view/' + (dataSource.vowlJsonFileName) + '&' + dataSource.name + '">').append($('<span class="fa fa-search"></span>')))
                     )
+                    .append($('<td class="text-center deleteWrapper">')
+                        .append($('<button  value="' + dataSource.dataSourceID + '" class="btn btn-outline-light pop-function delete-button" rel="popover" >').append($('<span color="red" class="fa fa-trash"></span></button>'))))
                 );
 
             ++i;
         });
     });
 }
-
-/*function goToAlignmentsView(data) {
-    //console.log("Inside Alignments" + data + '/integration/:ids_id&ds1_id&:ds2_id&:ds1_name&:ds2_name&:align_iri');
-    var d = JSON.parse(data);
-    // var url = '/integration/' + d.integratedDataSourceID + '&' + d.dataSourceID1 + '&' + d.dataSourceID2 + '&' +
-    //     d.dataSource1Name + '&' + d.dataSource2Name + '&' + d.alignmentsIRI + '&' + d.integratedIRI;
-    var url = '/integration/' + d.integratedDataSourceID + '&' +
-        d.dataSource1Name + '&' + d.dataSource2Name;
-    console.log(url);
-
-    $("#overlay").fadeOut(300);
-    window.location.href = url;
-}*/
 
 function handler(dataSource) {
     $.ajax({
@@ -262,8 +261,9 @@ $(function () {
     });
     handleProgressBar();
 });
-$(document).ready(function () {
 
+
+$(document).ready(function () {
     $(document).ajaxSend(function () {
         $("#overlay").fadeIn(100);
     });
@@ -271,7 +271,47 @@ $(document).ready(function () {
     $(document).ajaxStop(function () {
         $("#overlay").fadeOut(100);
     });
+
+    var popOverSettings = {
+        placement: 'top',
+        container: 'body',
+        html: true,
+        selector: '[rel="popover"]',
+        trigger: "focus"
+        /*content: function () {
+            return $(bodyPopOver).html();
+        }*/
+    };
+
+    $('body').popover(popOverSettings);
+
+    $("body").on('click', '.delete-button', function () {
+        var bodyPopOver =
+            '<div id="popover-content">\n' +
+            '    <p>Are you sure? <br></p> <button value="' + $(this).val() + '" class="btn btn-sm btn-danger delete-confirmed" id="DeleteButtonSaysYes">Yes</button>\n' +
+            '</div>';
+
+        if ($('.popover').hasClass('in')) {
+            $(this).popover('hide');
+        } else {
+            $(this).attr('data-content', bodyPopOver);
+            $(this).popover('show');
+        }
+    });
+
+    $("body").on('click', '.delete-confirmed', function () {
+        console.log($(this).val());
+        $.get("/deleteDataSource/" + $(this).val(), function (data) {
+            console.log(data);
+            if (data === "DELETED") {
+                window.location.href = "/";
+            }
+        });
+    });
+
+
     $("body").on('change', 'input[type=checkbox]', function () {
+        //$('[data-toggle="popover"]').popover();
         var checkedCheckedBoxes = $('input[type=checkbox]:checked').length;
         var integrateButton = $("#integrateDataSourcesButton");
         if (checkedCheckedBoxes > 2) {
@@ -294,3 +334,16 @@ $(document).ready(function () {
 
 
 });
+
+/*function goToAlignmentsView(data) {
+    //console.log("Inside Alignments" + data + '/integration/:ids_id&ds1_id&:ds2_id&:ds1_name&:ds2_name&:align_iri');
+    var d = JSON.parse(data);
+    // var url = '/integration/' + d.integratedDataSourceID + '&' + d.dataSourceID1 + '&' + d.dataSourceID2 + '&' +
+    //     d.dataSource1Name + '&' + d.dataSource2Name + '&' + d.alignmentsIRI + '&' + d.integratedIRI;
+    var url = '/integration/' + d.integratedDataSourceID + '&' +
+        d.dataSource1Name + '&' + d.dataSource2Name;
+    console.log(url);
+
+    $("#overlay").fadeOut(300);
+    window.location.href = url;
+}*/

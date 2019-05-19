@@ -13,6 +13,7 @@ import org.bson.Document;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.File;
 import java.util.List;
 
 @Path("bdi")
@@ -44,7 +45,6 @@ public class DataSourcesResource {
         return Response.ok(new Gson().toJson(dataSources)).build();
     }
 
-
     @GET
     @Path("bdiIntegratedDataSources/{integratedIRI}")
     @Consumes("text/plain")
@@ -56,6 +56,51 @@ public class DataSourcesResource {
         if (!ids.isEmpty())
             idsInfo = (JSONObject) JSONValue.parse(ids);
         return Response.ok(new Gson().toJson(idsInfo)).build();
+    }
+
+    @GET
+    @Path("bdiDeleteDataSource/{dataSourceID}")
+    @Consumes("text/plain")
+    public Response GET_DeleteDataSource(@PathParam("dataSourceID") String id) {
+        System.out.println("[GET /bdiDeleteDataSource" + "/" + id);
+        String dataSourceInfo = "";
+        String collectionType = "";
+        String flag = "ERROR";
+        SchemaIntegrationHelper schemaIntegrationHelper = new SchemaIntegrationHelper();
+        if (id.contains("INTEGRATED-")) {
+            collectionType = "INTEGRATED";
+            dataSourceInfo = schemaIntegrationHelper.getIntegratedDataSourceInfo(id);
+        } else {
+            collectionType = "DATA-SOURCE";
+            dataSourceInfo = schemaIntegrationHelper.getDataSourceInfo(id);
+        }
+        JSONObject dsInfo = new JSONObject();
+
+        if (!dataSourceInfo.isEmpty())
+            dsInfo = (JSONObject) JSONValue.parse(dataSourceInfo);
+
+        if (collectionType.equals("DATA-SOURCE")) {
+            if (new File(dsInfo.getAsString("parsedFileAddress")).delete() &&
+                    new File(dsInfo.getAsString("vowlJsonFilePath")).delete() &&
+                    new File(dsInfo.getAsString("sourceFileAddress")).delete()) {
+                schemaIntegrationHelper.deleteDataSourceInfo(id, collectionType);
+                System.out.println("Deleted : " + dsInfo.getAsString("parsedFileAddress") + "\n" + dsInfo.getAsString("integratedVowlJsonFilePath"));
+                flag = "DELETED";
+            } else {
+                System.out.println("Error deleting");
+            }
+        }
+
+        if (collectionType.equals("INTEGRATED")) {
+            if (new File(dsInfo.getAsString("parsedFileAddress")).delete() && new File(dsInfo.getAsString("integratedVowlJsonFilePath")).delete()) {
+                schemaIntegrationHelper.deleteDataSourceInfo(id, collectionType);
+                System.out.println("Deleted : " + dsInfo.getAsString("parsedFileAddress") + "\n" + dsInfo.getAsString("integratedVowlJsonFilePath"));
+                flag = "DELETED";
+            } else {
+                System.out.println("Error deleting");
+            }
+        }
+        return Response.ok(new Gson().toJson(flag)).build();
     }
 
 

@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.mongodb.client.model.Filters.eq;
+
 public class SchemaIntegrationHelper {
     public SchemaIntegrationHelper() {
     }
@@ -168,13 +170,13 @@ public class SchemaIntegrationHelper {
         System.out.println("OLD DS ID: " + integratedDataSourceInfo.getAsString("dataSourceID"));
         System.out.println("NEW DS ID: " + newDataSourceID);
 
-        collection.updateOne(Filters.eq("dataSourceID", integratedDataSourceInfo.getAsString("dataSourceID")), new Document("$set", new Document("dataSourceID", newDataSourceID)));
-        collection.updateOne(Filters.eq("dataSourceID", newDataSourceID), new Document("$set", new Document("iri", Namespaces.G.val() + integratedDataSourceInfo.getAsString("dataSourceID") + "-" + dataSource2Info.getAsString("dataSourceID"))));
-        collection.updateOne(Filters.eq("dataSourceID", newDataSourceID), new Document("$set", new Document("integratedVowlJsonFileName", vowlObj.getAsString("vowlJsonFileName"))));
-        collection.updateOne(Filters.eq("dataSourceID", newDataSourceID), new Document("$set", new Document("integratedVowlJsonFilePath", vowlObj.getAsString("vowlJsonFilePath"))));
-        collection.updateOne(Filters.eq("dataSourceID", newDataSourceID), new Document("$set", new Document("parsedFileAddress", integratedModelFileName)));
-        collection.updateOne(Filters.eq("dataSourceID", newDataSourceID), new Document("$set", new Document("dataSources", dataSourcesArray)));
-        collection.updateOne(Filters.eq("dataSourceID", newDataSourceID), new Document("$set", new Document("name", integratedDataSourceInfo.getAsString("name").replaceAll(" ", "") + dataSource2Info.getAsString("name").replaceAll(" ", ""))));
+        collection.updateOne(eq("dataSourceID", integratedDataSourceInfo.getAsString("dataSourceID")), new Document("$set", new Document("dataSourceID", newDataSourceID)));
+        collection.updateOne(eq("dataSourceID", newDataSourceID), new Document("$set", new Document("iri", Namespaces.G.val() + integratedDataSourceInfo.getAsString("dataSourceID") + "-" + dataSource2Info.getAsString("dataSourceID"))));
+        collection.updateOne(eq("dataSourceID", newDataSourceID), new Document("$set", new Document("integratedVowlJsonFileName", vowlObj.getAsString("vowlJsonFileName"))));
+        collection.updateOne(eq("dataSourceID", newDataSourceID), new Document("$set", new Document("integratedVowlJsonFilePath", vowlObj.getAsString("vowlJsonFilePath"))));
+        collection.updateOne(eq("dataSourceID", newDataSourceID), new Document("$set", new Document("parsedFileAddress", integratedModelFileName)));
+        collection.updateOne(eq("dataSourceID", newDataSourceID), new Document("$set", new Document("dataSources", dataSourcesArray)));
+        collection.updateOne(eq("dataSourceID", newDataSourceID), new Document("$set", new Document("name", integratedDataSourceInfo.getAsString("name").replaceAll(" ", "") + dataSource2Info.getAsString("name").replaceAll(" ", ""))));
 
         client.close();
     }
@@ -244,18 +246,32 @@ public class SchemaIntegrationHelper {
     static void updateIntegratedDataSourceInfo(String iri, JSONObject vowlObj) {
         MongoClient client = Utils.getMongoDBClient();
         MongoCollection collection = MongoUtil.getIntegratedDataSourcesCollection(client);
-        collection.updateMany(Filters.eq("integratedDataSourceID", iri), new Document("$set", new Document("integratedVowlJsonFilePath", vowlObj.getAsString("vowlJsonFilePath"))));
-        collection.updateMany(Filters.eq("integratedDataSourceID", iri), new Document("$set", new Document("integratedVowlJsonFileName", vowlObj.getAsString("vowlJsonFileName"))));
+        collection.updateMany(eq("integratedDataSourceID", iri), new Document("$set", new Document("integratedVowlJsonFilePath", vowlObj.getAsString("vowlJsonFilePath"))));
+        collection.updateMany(eq("integratedDataSourceID", iri), new Document("$set", new Document("integratedVowlJsonFileName", vowlObj.getAsString("vowlJsonFileName"))));
         client.close();
     }
 
-    public  List<String> getSparqlQueryResult(String namedGraph, String query) {
+    public void deleteDataSourceInfo(String dataSourceID, String collectionType) {
+        MongoClient client = Utils.getMongoDBClient();
+        MongoCollection collection = null;
+        if (collectionType.equals("INTEGRATED")) {
+            collection = MongoUtil.getIntegratedDataSourcesCollection(client);
+        }
+        if (collectionType.equals("DATA-SOURCE")) {
+            collection = MongoUtil.getDataSourcesCollection(client);
+        }
+        collection.deleteOne(eq("dataSourceID", dataSourceID));
+        client.close();
+    }
+
+    public List<String> getSparqlQueryResult(String namedGraph, String query) {
         List<String> temp = new ArrayList<>();
         RDFUtil.runAQuery(RDFUtil.sparqlQueryPrefixes + query, namedGraph).forEachRemaining(triple -> {
             temp.add(triple.get("p").toString());
         });
         return temp;
     }
+
     public void populateResponseArray(JSONArray tempAlignmentsArray, QuerySolution triple, JSONObject alignments) {
         alignments.put("s", triple.get("s").toString());
         alignments.put("p", triple.get("p").toString());
@@ -287,6 +303,7 @@ public class SchemaIntegrationHelper {
         integratedDataset.close();
         return integratedModelFileName;
     }
+
     public static List<String> getPropertyTableFeatures() {
         List<String> propertyTableAttributes = new ArrayList<>();
         propertyTableAttributes.add("PropertyA");

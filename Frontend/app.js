@@ -14,6 +14,7 @@ var flash = require('express-flash');
 var multer = require('multer');
 var uploadd = multer({dest: config.FILES_PATH});
 var passport = require('passport');
+
 //var fs = require('fs');
 //var upload = require("express-fileupload");
 //var formData = require('form-data');
@@ -143,6 +144,7 @@ app.get('/bdiIntegratedDataSources/:integratedDataSourceID', bdi_data_source_rou
 app.get('/bdiDataSource/:dataSourceID', bdi_data_source_routes.getDataSource);
 app.post('/bdiDataSource', bdi_data_source_routes.postDataSource);
 
+app.get("/deleteDataSource/:ds_id", bdi_data_source_routes.deleteDataSource);
 app.get('/bdiAlignments/:ds1_id&:ds2_id', integrate_data_Sources.getAlignments);
 
 app.post('/alignmentsAccept', integrate_data_Sources.acceptAlignment);
