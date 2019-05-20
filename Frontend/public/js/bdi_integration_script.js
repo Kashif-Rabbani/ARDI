@@ -121,25 +121,37 @@ function getAlignments() {
                         var iteratorCount = 0;
                         var headerRow;
                         var bodyRows = [];
+                        var indexOfAlignment;
                         superClass.forEach(function (alignment) {
 
                             // First row will always be a Super Class
                             if (iteratorCount === 0) {
                                 alignment.classType = "SUPERCLASS";
                                 alignmentsInfo.push(alignment);
-
+                                indexOfAlignment = alignmentsInfo.indexOf(alignment);
                                 var cA = removeURI(alignment.s).split("/")[removeURI(alignment.s).split("/").length - 1];
                                 var cB = removeURI(alignment.p).split("/")[removeURI(alignment.p).split("/").length - 1];
-
-                                headerRow =
-                                    "<tr id=\"row" + alignmentsInfo.indexOf(alignment) + "\">\n" +
-                                    "\t<td>" + cA + " <span class=\"badge badge-info\">" + (removeURI(alignment.s)).split("/")[0] + " IRI </span>  " + '<span class="badge badge-primary">Global Graph</span> ' +
-                                    " <span class=\"badge badge-success\">Super Class</span></td>\n" +
-                                    "\t<td>" + cB + " <span class=\"badge badge-info\">" + (removeURI(alignment.p)).split("/")[0] + " IRI</span> <span class=\"badge badge-primary\">New Source Graph</span> </td>\n" +
-                                    "\t<td class='confidence-td'>" + (Math.round(alignment.confidence * 100) / 100) * 100 + "%</td>\n" +
-                                    "\t<td class='accept-reject-buttons'><button type=\"button\" id=\"acceptAlignment\" class=\"btn btn-success\" value=\"" + alignmentsInfo.indexOf(alignment) + "\">Accept</button> </td>\n" +
-                                    "\t<td class='accept-reject-buttons'><button type=\"button\" id=\"rejectAlignment\" class=\"btn btn-danger\">Reject</button> </td>\n" +
-                                    "</tr>";
+                                if (ifCollectionClasses(cA, cB)) {
+                                    headerRow =
+                                        "<tr id=\"row" + alignmentsInfo.indexOf(alignment) + "\">\n" +
+                                        "\t<td>" + cA + " <span class=\"badge badge-info\">" + (removeURI(alignment.s)).split("/")[0] + " IRI </span>  " + '<span class="badge badge-primary">Global Graph</span> ' +
+                                        " <span class=\"badge badge-success\"> Super Class</span> <i class=\"fa fa-info-circle\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"It is recommended to align the matching class with the super class instead of its subclasses.\" aria-hidden=\"true\"></i> <span class=\"badge badge-warning\"><i class=\"fa fa-exclamation-triangle\" aria-hidden=\"true\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Not Recommended. Collection classes can only be aligned with collection classes.\">Not Recommended</i></span> </td>\n" +
+                                        "\t<td>" + cB + " <span class=\"badge badge-info\">" + (removeURI(alignment.p)).split("/")[0] + " IRI</span> <span class=\"badge badge-primary\">New Source Graph</span> <span class=\"badge badge-warning\"><i class=\"fa fa-exclamation-triangle\" aria-hidden=\"true\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Not Recommended. Collection classes can only be aligned with collection classes.\">Not Recommended</i></span></td>\n" +
+                                        "\t<td class='confidence-td'>" + (Math.round(alignment.confidence * 100) / 100) * 100 + "%</td>\n" +
+                                        "\t<td class='accept-reject-buttons'><button type=\"button\" id=\"acceptAlignment\" class=\"btn btn-success\" value=\"" + alignmentsInfo.indexOf(alignment) + "\">Accept</button> </td>\n" +
+                                        "\t<td class='accept-reject-buttons'><button type=\"button\" id=\"rejectAlignment\" class=\"btn btn-danger\">Reject</button> </td>\n" +
+                                        "</tr>";
+                                } else {
+                                    headerRow =
+                                        "<tr id=\"row" + alignmentsInfo.indexOf(alignment) + "\">\n" +
+                                        "\t<td>" + cA + " <span class=\"badge badge-info\">" + (removeURI(alignment.s)).split("/")[0] + " IRI </span>  " + '<span class="badge badge-primary">Global Graph</span> ' +
+                                        " <span class=\"badge badge-success\"> Super Class</span> <i class=\"fa fa-info-circle\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"It is recommended to align the matching class with the super class instead of its subclasses.\" aria-hidden=\"true\"></i>  </td>\n" +
+                                        "\t<td>" + cB + " <span class=\"badge badge-info\">" + (removeURI(alignment.p)).split("/")[0] + " IRI</span> <span class=\"badge badge-primary\">New Source Graph</span> </td>\n" +
+                                        "\t<td class='confidence-td'>" + (Math.round(alignment.confidence * 100) / 100) * 100 + "%</td>\n" +
+                                        "\t<td class='accept-reject-buttons'><button type=\"button\" id=\"acceptAlignment\" class=\"btn btn-success\" value=\"" + alignmentsInfo.indexOf(alignment) + "\">Accept</button> </td>\n" +
+                                        "\t<td class='accept-reject-buttons'><button type=\"button\" id=\"rejectAlignment\" class=\"btn btn-danger\">Reject</button> </td>\n" +
+                                        "</tr>";
+                                }
                             } else {
                                 // Other rows will be sub classes of that super class
                                 alignment.classType = "LOCALCLASS";
@@ -162,7 +174,7 @@ function getAlignments() {
                         });
 
 
-                        var cardElement = constructHTMLComponent(temp, headerRow, bodyRows);
+                        var cardElement = constructHTMLComponent(temp, headerRow, bodyRows, indexOfAlignment);
 
                         $("#superClass").append(cardElement);
                         temp++;
@@ -232,7 +244,7 @@ function getAlignments() {
                                     ).append($('<td>')
                                         .text(cB).append($('<span class="badge-margin badge badge-info"> ' + ' ' + (removeURI(val.p)).split("/")[0] + ' IRI</span> <span class="badge badge-primary">New Source Graph</span>' +
                                         '<span class="badge badge-warning"><i class="fa fa-exclamation-triangle" aria-hidden="true" data-toggle="tooltip" data-placement="top" title="Not Recommended. Collection classes can only be aligned with collection classes.">Not Recommended</i></span>'))
-                                ).append($('<td>').text((Math.round(val.confidence * 100) / 100) * 100 + '%' + '')
+                                    ).append($('<td>').text((Math.round(val.confidence * 100) / 100) * 100 + '%' + '')
                                     )
                                     .append($('<td>').append('<button type="button" id ="acceptAlignment" class="btn btn-success" value="' + alignmentsInfo.indexOf(val) + '">Accept</button> '))
                                     .append($('<td>').append('<button type="button" id ="rejectAlignment" class="btn btn-danger">Reject</button> '))
@@ -284,8 +296,9 @@ function acceptButtonClickHandler(acceptButton, i) {
             $("#overlay").fadeOut(100);
             console.log(response);
             if (response === "AlignmentSucceeded") {
-                if (data.classType !== "SUPERCLASS") {
-                    $("#row" + i).addClass("d-none");
+                $("#row" + i).addClass("d-none");
+                if (data.classType === "SUPERCLASS") {
+                    $("#dropDownButton" + i).addClass("d-none");
                 }
             }
         },
@@ -347,8 +360,9 @@ $(document).ready(function () {
 });
 
 
-function constructHTMLComponent(temp, headerRow, bodyRows) {
-    var cardElement = "<div class=\"card bg-light bg-white border-0\">\n" +
+function constructHTMLComponent(temp, headerRow, bodyRows, index) {
+    console.log(index);
+    var cardElement = "<div class=\"card bg-light bg-white border-0\" id=\"card" + temp + "\" >\n" +
         "    <div class=\"card-header remove-padding bg-white border-bottom-0 \">\n" +
         "        <div class=\"row\">\n" +
         "            <div class=\"col-md-11\" id=\"id\">\n" +
@@ -358,11 +372,11 @@ function constructHTMLComponent(temp, headerRow, bodyRows) {
         "                  </tbody>\n" +
         "                </table>\n" +
         "            </div>\n" +
-        "            <div class=\"col-md-1\"><button class=\"btn btn-link\" data-toggle=\"collapse\" data-target=\"#dropDownData" + temp + "\" id=\"dropDownButton\"><i class=\"fas fa-chevron-circle-down fa-2x\" style=\"color:#18bc9c;\"></i></button></div>\n" +
+        "            <div class=\"col-md-1\"><button class=\"btn btn-link\" data-toggle=\"collapse\" data-target=\"#dropDownData" + temp + "\" id=\"dropDownButton" + index + "\"><i class=\"fas fa-chevron-circle-down fa-2x\" style=\"color:#18bc9c;\"></i></button></div>\n" +
         "        </div>\n" +
         "    </div>\n" +
         "    <div class=\"collapse\" id=\"dropDownData" + temp + "\" aria-labelledby=\"headingOne\" data-parent=\"#accordion\">\n" +
-        "        <div class=\"card-body\">\n" +
+        "        <div class=\"card-body remove-top-padding\">\n" +
         "            <div class=\"row\">\n" +
         "               </div>  <div class=\"col-md-11\" id=\"idd\">\n" +
         "                    <table class=\"table table-hover remove-margin\" id=\"bodyTable" + temp + "\">\n" +

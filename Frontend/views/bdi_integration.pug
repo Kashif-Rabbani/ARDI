@@ -55,8 +55,12 @@ block content
                             | Align Classes
 
             .card-body
-                //h5(style="color:black")
-                //    | Note that the Collection Classes can only be aligned with the Collection Classes.
+                p(style="color:black")
+                    i.fa.fa-info-circle.badge-margin(aria-hidden='true')
+                    |  Collection Class should only be aligned with a Collection Class. Please pay attention to this
+                    span.badge.badge-warning.badge-margin
+                        i.fa.fa-exclamation-triangle(aria-hidden='true', data-toggle='tooltip', data-placement='top', title='Warning! Collection classes can only be aligned with collection classes.') NOT
+                    |  Warning symbol.
 
                 .row.d-none#GlobalVsLocalRow
                     .col-md-11

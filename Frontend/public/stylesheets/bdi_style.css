@@ -23,3 +23,6 @@ table {
 .badge-margin {
     margin-left: 10px;
 }
+.remove-top-padding{
+    padding-top: 0px;
+}
