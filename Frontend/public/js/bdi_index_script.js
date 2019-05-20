@@ -239,7 +239,7 @@ $(function () {
             object.s2Name = dataSources[1].split("__")[1];
             console.log(object);
 
-            if (object.id1.includes("INTEGRATED_") && object.id2.includes("INTEGRATED_")) {
+            if (object.id1.includes("INTEGRATED-") && object.id2.includes("INTEGRATED-")) {
                 console.log("Integration of Global Graphs not allowed yet.");
             } else {
                 window.location.href = '/integration/' + object.id1 + '&' + object.id2 + '&' + object.s1Name + '&' + object.s2Name;

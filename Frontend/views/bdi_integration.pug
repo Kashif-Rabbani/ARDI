@@ -55,16 +55,16 @@ block content
                             | Align Classes
 
             .card-body
-                p(style="color:deepskyblue")
-                    | Note that the Collection Classes can only be aligned with the Collection Classes.
+                //h5(style="color:black")
+                //    | Note that the Collection Classes can only be aligned with the Collection Classes.
 
                 .row.d-none#GlobalVsLocalRow
                     .col-md-11
                         table.table.table-hover.border-0#alignmentsClass
                             thead
                                 tr
-                                    th Mappings from #{ds1_name}
-                                    th Mappings from #{ds2_name}
+                                    th #{ds1_name}
+                                    th #{ds2_name}
                                     th.confidence-td Confidence
                                     th.accept-reject-buttons Accept
                                     th.accept-reject-buttons Reject
@@ -77,8 +77,8 @@ block content
                         table.table.table-hover.border-0#localAlignmentsClass
                             thead
                                 tr
-                                    th Mappings from #{ds1_name}
-                                    th Mappings from #{ds2_name}
+                                    th  #{ds1_name}
+                                    th  #{ds2_name}
                                     th.confidence-td Confidence
                                     th.accept-reject-buttons Accept
                                     th.accept-reject-buttons Reject
@@ -98,8 +98,8 @@ block content
                 table.table.table-hover#alignments
                     thead
                         tr
-                            th Mappings from #{ds1_name}
-                            th Mappings from #{ds2_name}
+                            th #{ds1_name}
+                            th #{ds2_name}
                             th.confidence-td Confidence
                             th.accept-reject-buttons Accept
                             th.accept-reject-buttons Reject
@@ -115,8 +115,8 @@ block content
                 table.table.table-hover#alignmentsObjProp
                     thead
                         tr
-                            th Mappings from #{ds1_name}
-                            th Mappings from #{ds2_name}
+                            th #{ds1_name}
+                            th #{ds2_name}
                             th.confidence-td Confidence
                             th.accept-reject-buttons Accept
                             th.accept-reject-buttons Reject

@@ -43,6 +43,21 @@ console.log(params);
     });
 }*/
 
+function removeURI(iri) {
+    return iri.split("http://www.BDIOntology.com/")[1];
+}
+
+function ifCollectionClasses(a, b) {
+    if ((a.includes("_Collection") && !b.includes("_Collection")) || (!a.includes("_Collection") && b.includes("_Collection"))) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+$(function () {
+    $("#infoButton").popover('show');
+});
 
 function getAlignments() {
     $("#overlay").fadeIn(100);
@@ -55,14 +70,18 @@ function getAlignments() {
             var n = i - 1;
             if (val.mapping_type === 'DATA-PROPERTY') {
                 alignmentsInfo.push(val);
+
+                var classA = removeURI(val.s).split("/")[removeURI(val.s).split("/").length - 1];
+                var classB = removeURI(val.p).split("/")[removeURI(val.p).split("/").length - 1];
+
                 $('#alignments').find('#alignmentsBody')
                     .append($('<tr id="row' + n + '">')
                         /*.append($('<td>').text(i))*/
                             .append($('<td>')
-                                .text(val.s)
+                                .text(classA).append($('<span class="badge-margin badge badge-info"> ' + ' ' + (removeURI(val.s)).split("/")[0] + ' IRI</span> <span class="badge badge-primary">Global Graph</span>'))
                             ).append($('<td>')
-                                .text(val.p)
-                            ).append($('<td>').text(Math.round(val.confidence * 100) / 100)
+                                .text(classB).append($('<span class="badge-margin badge badge-info"> ' + ' ' + (removeURI(val.p)).split("/")[0] + ' IRI</span> <span class="badge badge-primary">New Source Graph</span>'))
+                            ).append($('<td>').text((Math.round(val.confidence * 100) / 100) * 100 + '%' + '')
                             )
                             .append($('<td class="accept-reject-buttons">').append('<button type="button" id ="acceptAlignment" class="btn btn-success" value="' + alignmentsInfo.indexOf(val) + '">Accept</button> '))
                             .append($('<td class="accept-reject-buttons">').append('<button type="button" id ="rejectAlignment" class="btn btn-danger">Reject</button> '))
@@ -71,14 +90,16 @@ function getAlignments() {
 
             if (val.mapping_type === 'OBJECT-PROPERTY') {
                 alignmentsInfo.push(val);
+                var classAobjectP = removeURI(val.s).split("/")[removeURI(val.s).split("/").length - 1];
+                var classBobjectP = removeURI(val.p).split("/")[removeURI(val.p).split("/").length - 1];
                 $('#alignmentsObjProp').find('#alignmentsBodyObjectProperties')
                     .append($('<tr id="row' + n + '">')
                         // .append($('<td>').text(i))
                             .append($('<td>')
-                                .text(val.s)
+                                .text(classAobjectP).append($('<span class="badge-margin badge badge-info"> ' + ' ' + (removeURI(val.s)).split("/")[0] + ' IRI</span> <span class="badge badge-primary">Global Graph</span>'))
                             ).append($('<td>')
-                                .text(val.p)
-                            ).append($('<td>').text(Math.round(val.confidence * 100) / 100)
+                                .text(classBobjectP).append($('<span class="badge-margin badge badge-info"> ' + ' ' + (removeURI(val.p)).split("/")[0] + ' IRI</span> <span class="badge badge-primary">New Source Graph</span>'))
+                            ).append($('<td>').text((Math.round(val.confidence * 100) / 100) * 100 + '%' + '')
                             )
                             .append($('<td>').append('<button type="button" id ="acceptAlignment" class="btn btn-success" value="' + alignmentsInfo.indexOf(val) + '">Accept</button> '))
                             .append($('<td>').append('<button type="button" id ="rejectAlignment" class="btn btn-danger">Reject</button> '))
@@ -92,9 +113,9 @@ function getAlignments() {
                     var superClasses = val.super_classes;
                     //superClasses.push(superClasses[0]);
                     var temp = 1;
-                    if (superClasses.length > 0) {
-                        $("#SuperClassNote").append("<p style=\"color:deepskyblue\">Sub Classes are collapsed under Super Classes. It is recommended to align with the Super Class.</p>");
-                    }
+                    /*if (superClasses.length > 0) {
+                        $("#SuperClassNote").append("<h5 style=\"color:deepskyblue\">Sub Classes are collapsed under Super Classes. It is recommended to align with the Super Class.</h5>");
+                    }*/
 
                     superClasses.forEach(function (superClass) {
                         var iteratorCount = 0;
@@ -106,11 +127,16 @@ function getAlignments() {
                             if (iteratorCount === 0) {
                                 alignment.classType = "SUPERCLASS";
                                 alignmentsInfo.push(alignment);
+
+                                var cA = removeURI(alignment.s).split("/")[removeURI(alignment.s).split("/").length - 1];
+                                var cB = removeURI(alignment.p).split("/")[removeURI(alignment.p).split("/").length - 1];
+
                                 headerRow =
                                     "<tr id=\"row" + alignmentsInfo.indexOf(alignment) + "\">\n" +
-                                    "\t<td>" + alignment.s + "</td>\n" +
-                                    "\t<td>" + alignment.p + "</td>\n" +
-                                    "\t<td class='confidence-td'>" + Math.round(alignment.confidence * 100) / 100 + "</td>\n" +
+                                    "\t<td>" + cA + " <span class=\"badge badge-info\">" + (removeURI(alignment.s)).split("/")[0] + " IRI </span>  " + '<span class="badge badge-primary">Global Graph</span> ' +
+                                    " <span class=\"badge badge-success\">Super Class</span></td>\n" +
+                                    "\t<td>" + cB + " <span class=\"badge badge-info\">" + (removeURI(alignment.p)).split("/")[0] + " IRI</span> <span class=\"badge badge-primary\">New Source Graph</span> </td>\n" +
+                                    "\t<td class='confidence-td'>" + (Math.round(alignment.confidence * 100) / 100) * 100 + "%</td>\n" +
                                     "\t<td class='accept-reject-buttons'><button type=\"button\" id=\"acceptAlignment\" class=\"btn btn-success\" value=\"" + alignmentsInfo.indexOf(alignment) + "\">Accept</button> </td>\n" +
                                     "\t<td class='accept-reject-buttons'><button type=\"button\" id=\"rejectAlignment\" class=\"btn btn-danger\">Reject</button> </td>\n" +
                                     "</tr>";
@@ -118,11 +144,16 @@ function getAlignments() {
                                 // Other rows will be sub classes of that super class
                                 alignment.classType = "LOCALCLASS";
                                 alignmentsInfo.push(alignment);
+
+                                var cAO = removeURI(alignment.s).split("/")[removeURI(alignment.s).split("/").length - 1];
+                                var cBO = removeURI(alignment.p).split("/")[removeURI(alignment.p).split("/").length - 1];
+
                                 bodyRows.push(
                                     "<tr id=\"row" + alignmentsInfo.indexOf(alignment) + "\">\n" +
-                                    "\t<td>" + alignment.s + "</td>\n" +
-                                    "\t<td>" + alignment.p + "</td>\n" +
-                                    "\t<td class='confidence-td'>" + Math.round(alignment.confidence * 100) / 100 + "</td>\n" +
+                                    "\t<td>" + cAO + " <span class=\"badge badge-info\">" + (removeURI(alignment.s)).split("/")[0] + " IRI </span>  " + ' <span class="badge badge-primary">Global Graph</span> ' +
+                                    " <span class=\"badge badge-success\">SubClass</span></td>\n" +
+                                    "\t<td>" + cBO + " <span class=\"badge badge-info\">" + (removeURI(alignment.p)).split("/")[0] + " IRI </span> <span class=\"badge badge-primary\">New Source Graph</span> </td>\n" +
+                                    "\t<td class='confidence-td'>" + (Math.round(alignment.confidence * 100) / 100) * 100 + "%</td>\n" +
                                     "\t<td class='accept-reject-buttons'><button type=\"button\" id=\"acceptAlignment\" class=\"btn btn-success\" value=\"" + alignmentsInfo.indexOf(alignment) + "\">Accept</button> </td>\n" +
                                     "\t<td class='accept-reject-buttons'><button type=\"button\" id=\"rejectAlignment\" class=\"btn btn-danger\">Reject</button> </td>\n" +
                                     "</tr>");
@@ -140,18 +171,43 @@ function getAlignments() {
                     otherClasses.forEach(function (classVal) {
                         classVal.classType = "LOCALCLASS";
                         alignmentsInfo.push(classVal);
-                        $('#alignmentsClass').find('#alignmentsBodyClasses')
-                            .append($('<tr id="row' + alignmentsInfo.indexOf(classVal) + '">')
-                                // .append($('<td>').text(i))
-                                    .append($('<td>')
-                                        .text(classVal.s)
-                                    ).append($('<td>')
-                                        .text(classVal.p)
-                                    ).append($('<td>').text(Math.round(classVal.confidence * 100) / 100)
-                                    )
-                                    .append($('<td>').append('<button type="button" id ="acceptAlignment" class="btn btn-success" value="' + alignmentsInfo.indexOf(classVal) + '">Accept</button> '))
-                                    .append($('<td>').append('<button type="button" id ="rejectAlignment" class="btn btn-danger">Reject</button> '))
-                            );
+
+                        var cA = removeURI(classVal.s).split("/")[removeURI(classVal.s).split("/").length - 1];
+                        var cB = removeURI(classVal.p).split("/")[removeURI(classVal.p).split("/").length - 1];
+
+                        //console.log(ifCollectionClasses(cA, cB));
+
+                        if (ifCollectionClasses(cA, cB)) {
+                            $('#alignmentsClass').find('#alignmentsBodyClasses')
+                                .append($('<tr id="row' + alignmentsInfo.indexOf(classVal) + '">')
+                                    // .append($('<td>').text(i))
+                                        .append($('<td>')
+                                            .text(cA).append($('<span class="badge-margin badge badge-info"> ' + ' ' + (removeURI(classVal.s)).split("/")[0] + ' IRI</span> ' +
+                                                '<span class="badge badge-primary">Global Graph</span> ' +
+                                                '<span class="badge badge-warning"><i class="fa fa-exclamation-triangle" aria-hidden="true" data-toggle="tooltip" data-placement="top" title="Not Recommended. Collection classes can only be aligned with collection classes.">Not Recommended</i></span>'))
+                                        ).append($('<td>')
+                                            .text(cB).append($('<span class="badge-margin badge badge-info"> ' + ' ' + (removeURI(classVal.p)).split("/")[0] + ' IRI</span> ' +
+                                            '<span class="badge badge-primary">New Source Graph</span> ' +
+                                            '<span class="badge badge-warning"><i class="fa fa-exclamation-triangle" aria-hidden="true" data-toggle="tooltip" data-placement="top" title="Not Recommended. Collection classes can only be aligned with collection classes.">Not Recommended</i></span>'))
+                                        ).append($('<td>').text((Math.round(classVal.confidence * 100) / 100) * 100 + '%' + '')
+                                        )
+                                        .append($('<td>').append('<button type="button" id ="acceptAlignment" class="btn btn-success" value="' + alignmentsInfo.indexOf(classVal) + '">Accept</button> '))
+                                        .append($('<td>').append('<button type="button" id ="rejectAlignment" class="btn btn-danger">Reject</button> '))
+                                );
+                        } else {
+                            $('#alignmentsClass').find('#alignmentsBodyClasses')
+                                .append($('<tr id="row' + alignmentsInfo.indexOf(classVal) + '">')
+                                    // .append($('<td>').text(i))
+                                        .append($('<td>')
+                                            .text(cA).append($('<span class="badge-margin badge badge-info"> ' + ' ' + (removeURI(classVal.s)).split("/")[0] + ' IRI</span> <span class="badge badge-primary">Global Graph</span>'))
+                                        ).append($('<td>')
+                                            .text(cB).append($('<span class="badge-margin badge badge-info"> ' + ' ' + (removeURI(classVal.p)).split("/")[0] + ' IRI</span> <span class="badge badge-primary">New Source Graph</span>'))
+                                        ).append($('<td>').text((Math.round(classVal.confidence * 100) / 100) * 100 + '%' + '')
+                                        )
+                                        .append($('<td>').append('<button type="button" id ="acceptAlignment" class="btn btn-success" value="' + alignmentsInfo.indexOf(classVal) + '">Accept</button> '))
+                                        .append($('<td>').append('<button type="button" id ="rejectAlignment" class="btn btn-danger">Reject</button> '))
+                                );
+                        }
                     });
                 }
             }
@@ -160,18 +216,43 @@ function getAlignments() {
                 if (val.mapping_type === 'CLASS') {
                     val.classType = "LOCALCLASS";
                     alignmentsInfo.push(val);
-                    $('#localAlignmentsClass').find('#localAlignmentsClassBody')
-                        .append($('<tr id="row' + alignmentsInfo.indexOf(val) + '">')
-                            // .append($('<td>').text(i))
-                                .append($('<td>')
-                                    .text(val.s)
-                                ).append($('<td>')
-                                    .text(val.p)
-                                ).append($('<td>').text(Math.round(val.confidence * 100) / 100)
-                                )
-                                .append($('<td>').append('<button type="button" id ="acceptAlignment" class="btn btn-success" value="' + alignmentsInfo.indexOf(val) + '">Accept</button> '))
-                                .append($('<td>').append('<button type="button" id ="rejectAlignment" class="btn btn-danger">Reject</button> '))
-                        );
+
+                    var cA = removeURI(val.s).split("/")[removeURI(val.s).split("/").length - 1];
+                    var cB = removeURI(val.p).split("/")[removeURI(val.p).split("/").length - 1];
+                    //console.log(ifCollectionClasses(cA, cB));
+
+                    if (ifCollectionClasses(cA, cB)) {
+                        $('#localAlignmentsClass').find('#localAlignmentsClassBody')
+                            .append($('<tr id="row' + alignmentsInfo.indexOf(val) + '">')
+                                // .append($('<td>').text(i))
+                                    .append($('<td>')
+                                        .text(cA).append($('<span class="badge-margin badge badge-info"> ' + ' ' + (removeURI(val.s)).split("/")[0] + ' IRI</span> ' +
+                                            '<span class="badge badge-primary">Global Graph</span>' +
+                                            '<span class="badge badge-warning"><i class="fa fa-exclamation-triangle" aria-hidden="true" data-toggle="tooltip" data-placement="top" title="Not Recommended. Collection classes can only be aligned with collection classes.">Not Recommended</i></span>'))
+                                    ).append($('<td>')
+                                        .text(cB).append($('<span class="badge-margin badge badge-info"> ' + ' ' + (removeURI(val.p)).split("/")[0] + ' IRI</span> <span class="badge badge-primary">New Source Graph</span>' +
+                                        '<span class="badge badge-warning"><i class="fa fa-exclamation-triangle" aria-hidden="true" data-toggle="tooltip" data-placement="top" title="Not Recommended. Collection classes can only be aligned with collection classes.">Not Recommended</i></span>'))
+                                ).append($('<td>').text((Math.round(val.confidence * 100) / 100) * 100 + '%' + '')
+                                    )
+                                    .append($('<td>').append('<button type="button" id ="acceptAlignment" class="btn btn-success" value="' + alignmentsInfo.indexOf(val) + '">Accept</button> '))
+                                    .append($('<td>').append('<button type="button" id ="rejectAlignment" class="btn btn-danger">Reject</button> '))
+                            );
+
+                    } else {
+                        $('#localAlignmentsClass').find('#localAlignmentsClassBody')
+                            .append($('<tr id="row' + alignmentsInfo.indexOf(val) + '">')
+                                // .append($('<td>').text(i))
+                                    .append($('<td>')
+                                        .text(cA).append($('<span class="badge-margin badge badge-info"> ' + ' ' + (removeURI(val.s)).split("/")[0] + ' IRI</span> ' +
+                                            '<span class="badge badge-primary">Global Graph</span>'))
+                                    ).append($('<td>')
+                                        .text(cB).append($('<span class="badge-margin badge badge-info"> ' + ' ' + (removeURI(val.p)).split("/")[0] + ' IRI</span> <span class="badge badge-primary">New Source Graph</span>'))
+                                    ).append($('<td>').text((Math.round(val.confidence * 100) / 100) * 100 + '%' + '')
+                                    )
+                                    .append($('<td>').append('<button type="button" id ="acceptAlignment" class="btn btn-success" value="' + alignmentsInfo.indexOf(val) + '">Accept</button> '))
+                                    .append($('<td>').append('<button type="button" id ="rejectAlignment" class="btn btn-danger">Reject</button> '))
+                            );
+                    }
                 }
             }
 
@@ -277,13 +358,13 @@ function constructHTMLComponent(temp, headerRow, bodyRows) {
         "                  </tbody>\n" +
         "                </table>\n" +
         "            </div>\n" +
-        "            <div class=\"col-md-1 text-center\"><button class=\"btn btn-link\" data-toggle=\"collapse\" data-target=\"#dropDownData" + temp + "\" id=\"dropDownButton\"><i class=\"fas fa-chevron-circle-down fa-2x\" style=\"color:#18bc9c;\"></i></button></div>\n" +
+        "            <div class=\"col-md-1\"><button class=\"btn btn-link\" data-toggle=\"collapse\" data-target=\"#dropDownData" + temp + "\" id=\"dropDownButton\"><i class=\"fas fa-chevron-circle-down fa-2x\" style=\"color:#18bc9c;\"></i></button></div>\n" +
         "        </div>\n" +
         "    </div>\n" +
         "    <div class=\"collapse\" id=\"dropDownData" + temp + "\" aria-labelledby=\"headingOne\" data-parent=\"#accordion\">\n" +
         "        <div class=\"card-body\">\n" +
         "            <div class=\"row\">\n" +
-        "                <div class=\"col-md-11\" id=\"idd\">\n" +
+        "               </div>  <div class=\"col-md-11\" id=\"idd\">\n" +
         "                    <table class=\"table table-hover remove-margin\" id=\"bodyTable" + temp + "\">\n" +
         "                       <tbody class='bg-light' id=\"bodyTableBody" + temp + "\">\n" +
         "                         \n" + bodyRows.join(" ") +
