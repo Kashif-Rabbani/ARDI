@@ -69,16 +69,16 @@ public class LogMapMatcher {
             if (mapping.isClassMapping()) {
                 this.alignmentsTriples.add(new Tuple3<>(mapping.getIRIStrEnt1(), mapping.getIRIStrEnt2(), Double.toString(mapping.getConfidence()) + "__CLASS__" + mapping.getLexicalConfidenceMapping() + "__" + mapping.getStructuralConfidenceMapping() + "__" + mapping.getMappingDirection()));
                 this.classesAlignments.add(new Tuple3<>(mapping.getIRIStrEnt1(), mapping.getIRIStrEnt2(), Double.toString(mapping.getConfidence())));
-                //System.out.println("isClassMapping" + mapping.getIRIStrEnt1() + "* - * " + mapping.getIRIStrEnt2() + "* - * " + mapping.getMappingDirection() + "* - * " + mapping.getConfidence());
+                System.out.println("isClassMapping" + mapping.getIRIStrEnt1() + "* - * " + mapping.getIRIStrEnt2() + "* - * " + mapping.getMappingDirection() + "* - * " + mapping.getConfidence());
             } else if (mapping.isObjectPropertyMapping()) {
                 this.alignmentsTriples.add(new Tuple3<>(mapping.getIRIStrEnt1(), mapping.getIRIStrEnt2(), Double.toString(mapping.getConfidence()) + "__OBJECT-PROPERTY__" + mapping.getLexicalConfidenceMapping() + "__" + mapping.getStructuralConfidenceMapping() + "__" + mapping.getMappingDirection()));
-                //System.out.println("isObjectPropertyMapping" +mapping.getIRIStrEnt1() + "* - * " + mapping.getIRIStrEnt2() + "* - * " + mapping.getMappingDirection() + "* - * " + mapping.getConfidence());
+                System.out.println("isObjectPropertyMapping" +mapping.getIRIStrEnt1() + "* - * " + mapping.getIRIStrEnt2() + "* - * " + mapping.getMappingDirection() + "* - * " + mapping.getConfidence());
             } else if (mapping.isDataPropertyMapping()) {
                 this.alignmentsTriples.add(new Tuple3<>(mapping.getIRIStrEnt1(), mapping.getIRIStrEnt2(), Double.toString(mapping.getConfidence()) + "__DATA-PROPERTY__" + mapping.getLexicalConfidenceMapping() + "__" + mapping.getStructuralConfidenceMapping() + "__" + mapping.getMappingDirection()));
-                //System.out.println("isDataPropertyMapping" +mapping.getIRIStrEnt1() + "* - * " + mapping.getIRIStrEnt2() + "* - * " + mapping.getMappingDirection() + "* - * " + mapping.getConfidence());
+                System.out.println("isDataPropertyMapping" +mapping.getIRIStrEnt1() + "* - * " + mapping.getIRIStrEnt2() + "* - * " + mapping.getMappingDirection() + "* - * " + mapping.getConfidence());
             } else if (mapping.isInstanceMapping()) {
                 this.alignmentsTriples.add(new Tuple3<>(mapping.getIRIStrEnt1(), mapping.getIRIStrEnt2(), Double.toString(mapping.getConfidence()) + "__INSTANCE-MAPPING__" + mapping.getLexicalConfidenceMapping() + "__" + mapping.getStructuralConfidenceMapping() + "__" + mapping.getMappingDirection()));
-                //System.out.println("isInstanceMapping" +mapping.getIRIStrEnt1() + "* - * " + mapping.getIRIStrEnt2() + "* - * " + mapping.getMappingDirection() + "* - * " + mapping.getConfidence());
+                System.out.println("isInstanceMapping" +mapping.getIRIStrEnt1() + "* - * " + mapping.getIRIStrEnt2() + "* - * " + mapping.getMappingDirection() + "* - * " + mapping.getConfidence());
             }
         }
     }

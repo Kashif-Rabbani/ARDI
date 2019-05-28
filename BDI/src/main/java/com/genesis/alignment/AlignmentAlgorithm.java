@@ -2,6 +2,7 @@ package com.genesis.alignment;
 
 import com.genesis.eso.util.RDFUtil;
 import com.genesis.eso.util.SQLiteUtils;
+import com.genesis.rdf.model.bdi_ontology.Namespaces;
 import com.genesis.resources.SchemaIntegrationHelper;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
@@ -49,6 +50,12 @@ public class AlignmentAlgorithm {
                             if (result.size() > 0) {
                                 System.out.println("CLASSES PRESENT");
 
+
+                                // Remove Properties from aligned Classes
+                                RDFUtil.removeProperty(basicInfo.getAsString("integratedIRI"), data.get("PropertyA"), data.get("DomainPropA"), data.get("RangePropA"));
+                                RDFUtil.removeProperty(basicInfo.getAsString("integratedIRI"), data.get("PropertyB"), data.get("DomainPropB"), data.get("RangePropB"));
+
+
                                 //Move the Properties to the Parent class
                                 String newGlobalProperty = basicInfo.getAsString("integratedIRI") + "/" + ResourceFactory.createResource(data.get("PropertyA")).getLocalName();
                                 String newPropertyDomain = basicInfo.getAsString("integratedIRI") + "/" + ResourceFactory.createResource(data.get("DomainPropA")).getLocalName(); //+ "_" + ResourceFactory.createResource(data.get("DomainPropB")).getLocalName();
@@ -59,12 +66,18 @@ public class AlignmentAlgorithm {
                                 RDFUtil.addCustomTriple(basicInfo.getAsString("integratedIRI"), data.get("PropertyA"), "EQUIVALENT_PROPERTY", newGlobalProperty);
                                 RDFUtil.addCustomTriple(basicInfo.getAsString("integratedIRI"), data.get("PropertyB"), "EQUIVALENT_PROPERTY", newGlobalProperty);
 
-                                // Remove Properties from aligned Classes
+
+
+                            } else if(data.get("PropertyB").contains(Namespaces.G.val())){ // PropertyB is the one with global IRI, coming from integrated global graph
+                                // Add domain of PropertyA as domain of PropertyB
+                                RDFUtil.addPropertyDomain(basicInfo.getAsString("integratedIRI"), data.get("PropertyB"), data.get("DomainPropA"));
+                                //Remove PropertyA
                                 RDFUtil.removeProperty(basicInfo.getAsString("integratedIRI"), data.get("PropertyA"), data.get("DomainPropA"), data.get("RangePropA"));
-                                RDFUtil.removeProperty(basicInfo.getAsString("integratedIRI"), data.get("PropertyB"), data.get("DomainPropB"), data.get("RangePropB"));
 
-
-                            } else {
+                                //Create sameAs edge to the PropertyA from PropertyB
+                                RDFUtil.addCustomTriple(basicInfo.getAsString("integratedIRI"), data.get("PropertyB"), "EQUIVALENT_PROPERTY", data.get("PropertyA"));
+                            }
+                            else {
                                 //TODO Case 2 -  When classes of the properties are not aligned
                                 String newGlobalGraphProperty = basicInfo.getAsString("integratedIRI") + "/" + ResourceFactory.createResource(data.get("PropertyA")).getLocalName();
 

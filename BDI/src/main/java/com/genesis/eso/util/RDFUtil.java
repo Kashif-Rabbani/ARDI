@@ -128,6 +128,19 @@ public class RDFUtil {
         ds.commit();
         ds.close();
     }
+
+
+    public static void addPropertyDomain(String namedGraph, String property, String domain) {
+        Dataset ds = Utils.getTDBDataset();
+        ds.begin(ReadWrite.WRITE);
+        Model graph = ds.getNamedModel(namedGraph);
+        graph.add(new ResourceImpl(property), new PropertyImpl(RDFS.DOMAIN), new ResourceImpl(domain));
+        graph.commit();
+        graph.close();
+        ds.commit();
+        ds.close();
+    }
+
     public static void addProperty(String namedGraph, String property, String[] domains, String range) {
         Dataset ds = Utils.getTDBDataset();
         ds.begin(ReadWrite.WRITE);

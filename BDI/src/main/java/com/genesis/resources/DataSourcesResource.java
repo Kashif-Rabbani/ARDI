@@ -1,6 +1,7 @@
 package com.genesis.resources;
 
 import com.genesis.eso.util.MongoUtil;
+import com.genesis.eso.util.RDFUtil;
 import com.genesis.eso.util.Utils;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
@@ -84,6 +85,7 @@ public class DataSourcesResource {
                     new File(dsInfo.getAsString("vowlJsonFilePath")).delete() &&
                     new File(dsInfo.getAsString("sourceFileAddress")).delete()) {
                 schemaIntegrationHelper.deleteDataSourceInfo(id, collectionType);
+                RDFUtil.removeNamedGraph(dsInfo.getAsString("iri"));
                 System.out.println("Deleted : " + dsInfo.getAsString("parsedFileAddress") + "\n" + dsInfo.getAsString("integratedVowlJsonFilePath"));
                 flag = "DELETED";
             } else {
@@ -94,6 +96,7 @@ public class DataSourcesResource {
         if (collectionType.equals("INTEGRATED")) {
             if (new File(dsInfo.getAsString("parsedFileAddress")).delete() && new File(dsInfo.getAsString("integratedVowlJsonFilePath")).delete()) {
                 schemaIntegrationHelper.deleteDataSourceInfo(id, collectionType);
+                RDFUtil.removeNamedGraph(dsInfo.getAsString("iri"));
                 System.out.println("Deleted : " + dsInfo.getAsString("parsedFileAddress") + "\n" + dsInfo.getAsString("integratedVowlJsonFilePath"));
                 flag = "DELETED";
             } else {
