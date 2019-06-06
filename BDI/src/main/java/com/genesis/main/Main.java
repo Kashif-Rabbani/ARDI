@@ -1,29 +1,9 @@
 package com.genesis.main;
 
-import com.almworks.sqlite4java.SQLiteConnection;
-import com.almworks.sqlite4java.SQLiteStatement;
-import com.genesis.eso.util.RDFUtil;
-import com.genesis.eso.util.SQLiteUtils;
-import com.genesis.eso.util.SqliteSafeDBWithPool;
-import com.genesis.eso.util.Utils;
+import com.genesis.mdm.constructs.CreateConstructs;
 import com.genesis.rdf.model.bdi_ontology.JsonSchemaExtractor;
 import com.genesis.rdf.model.bdi_ontology.XmlSchemaExtractor;
 import com.genesis.rdf.model.bdi_ontology.rdb.MySqlDB;
-import com.genesis.resources.SchemaIntegrationHelper;
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
-import net.minidev.json.JSONValue;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.ResourceFactory;
-import uk.ac.ox.krr.logmap2.*;
-import uk.ac.ox.krr.logmap2.io.FlatAlignmentFormat;
-import uk.ac.ox.krr.logmap2.mappings.objects.MappingObjectStr;
-
-import java.net.URLEncoder;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.HashMap;
-import java.util.Set;
 
 public class Main {
     public static String configPath = "config.kashif.properties";
@@ -51,6 +31,7 @@ public class Main {
                 break;
             case "TRY":
                 //This is just to test some functionality independently - Pass the argument like this : TRY N
+                new CreateConstructs("INTEGRATED-BvuPzx5o-f6mJaYK2");
                 break;
             default:
                 System.out.println("Please provide the arguments in a correct way: " +

@@ -56,8 +56,8 @@ Input/*
 !Input/README.md
 
 
-TDB_TripleDatabase
-TDB_TripleDatabase/*
+MDM_TDBMDM_TDB
+MDM_TDBMDM_TDB/*
 
 native-libs
 native-libs/*

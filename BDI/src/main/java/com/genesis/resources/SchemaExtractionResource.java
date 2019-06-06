@@ -79,13 +79,17 @@ public class SchemaExtractionResource {
     private JSONObject prepareResponse(String fileName, String IRI, JSONObject objBody, JSONObject vowlObj) {
         JSONObject resData = new JSONObject();
         resData.put("name", objBody.getAsString("givenName"));
-        resData.put("type", objBody.getAsString("type").toUpperCase());
+        resData.put("type", objBody.getAsString("type"));
         resData.put("sourceFileAddress", objBody.getAsString("filePath"));
         resData.put("parsedFileAddress", fileName);
         resData.put("dataSourceID", RandomStringUtils.randomAlphanumeric(8).replace("-", ""));
         resData.put("iri", IRI);
         resData.put("vowlJsonFilePath", vowlObj.getAsString("vowlJsonFilePath"));
         resData.put("vowlJsonFileName", vowlObj.getAsString("vowlJsonFileName"));
+
+        if(objBody.getAsString("type").equals("json")){
+            resData.put("json_path",objBody.getAsString("filePath") );
+        }
         return resData;
     }
 
