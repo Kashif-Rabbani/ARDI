@@ -27,7 +27,38 @@ public class CreateConstructs {
         if (!initGlobalGraphInfo.isEmpty()) {
             globalGraphInfo = (JSONObject) JSONValue.parse(initGlobalGraphInfo);
         }
-        prepareWrapperContent();
+        constructGlobalGraph();
+        //prepareWrapperContent();
+    }
+
+    /**
+     * This method is intended to transform the Integrated Global Graph into MDM Global Graph i.e. Concepts, features etc...
+     */
+    private void constructGlobalGraph(){
+        String namedGraph = "http://www.essi.upc.edu/~snadal/SportsUML/f87da8e05246447fa8d245ce1fd86518";
+        Dataset ds = Utils.getTDBDataset();
+        System.out.println("IS IT TRUE: " + ds.containsNamedModel(namedGraph));
+        ds.begin(ReadWrite.READ);
+        Model graph = ds.getNamedModel(namedGraph);
+        System.out.println(graph.size());
+        StmtIterator graphIterator = graph.listStatements();
+        try {
+            while (graphIterator.hasNext()) {
+                Statement graphStatement = graphIterator.next();
+
+                    System.out.print(" Subject " + graphStatement.getSubject().getURI());
+                    System.out.print(" Predicate " + graphStatement.getPredicate().getURI());
+                    System.out.print(" Object " + graphStatement.getObject().toString());
+
+            }
+            System.out.println();
+        } finally {
+            if (graphIterator != null) graphIterator.close();
+        }
+        graph.commit();
+        graph.close();
+        ds.commit();
+        ds.close();
     }
     private void prepareWrapperContent(){
         JSONArray dataSourcesArray = (JSONArray) globalGraphInfo.get("dataSources");
