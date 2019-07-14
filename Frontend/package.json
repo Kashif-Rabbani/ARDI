@@ -19,7 +19,7 @@
     "form-data": "^2.3.3",
     "formidable": "^1.2.1",
     "location-href": "^1.0.0",
-    "lodash": "^4.1.0",
+    "lodash": "^4.17.13",
     "method-override": "^2.1.2",
     "morgan": "latest",
     "multer": "latest",
